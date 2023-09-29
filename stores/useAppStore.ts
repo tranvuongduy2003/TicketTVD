@@ -1,5 +1,5 @@
-import { TokenPayload } from '@/interfaces';
-import { User } from '@/types';
+import { User } from '@/models';
+import { TokenPayload } from '@/types';
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 
