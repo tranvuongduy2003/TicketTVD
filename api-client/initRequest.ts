@@ -1,17 +1,14 @@
-import {
-  getAccessToken,
-  getRefreshToken,
-  handleRefreshToken,
-  logOut
-} from '@/utils';
+import { useAuth } from '@/hooks';
+import { ApiResponse } from '@/models';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
+  AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios';
 
 const requestConfig: AxiosRequestConfig = {
-  baseURL: process.env.API_URL,
+  baseURL: '/api',
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json'
@@ -25,10 +22,6 @@ export const axiosInstance = axios.create(requestConfig);
 export default function initRequest() {
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
-      const token = getAccessToken();
-      if (token && config.headers) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
       return config;
     },
     (error: AxiosError) => {
@@ -37,8 +30,8 @@ export default function initRequest() {
   );
 
   axiosInstance.interceptors.response.use(
-    (res: any) => {
-      return res.data;
+    (response: AxiosResponse<ApiResponse>) => {
+      return response.data.data;
     },
     async (error: any) => {
       const statusCode = error.response?.data?.statusCode;
@@ -46,27 +39,21 @@ export default function initRequest() {
 
       switch (statusCode) {
         case 401: {
-          const rfToken = getRefreshToken();
-          if (!originalConfig._retry && rfToken) {
+          if (!originalConfig._retry) {
             originalConfig._retry = true;
             try {
               console.log('retry');
-              const token = await handleRefreshToken();
-              axios.defaults.headers.common = {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-              };
-              return axiosInstance(originalConfig);
+              await useAuth().refreshToken();
             } catch (error: any) {
-              logOut();
+              useAuth().logOut();
             }
           } else {
-            logOut();
+            useAuth().logOut();
           }
           break;
         }
         case 403: {
-          logOut();
+          useAuth().logOut();
           break;
         }
         case 500: {

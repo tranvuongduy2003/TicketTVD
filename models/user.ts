@@ -15,3 +15,9 @@ export type User = {
   deletedAt?: any | Date;
   OrderModels: any[];
 };
+
+export enum Role {
+  CUSTOMER = 'CUSTOMER',
+  ADMIN = 'ADMIN',
+  ORGANIZER = 'ORGANIZER'
+}
