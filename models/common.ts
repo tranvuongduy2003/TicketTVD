@@ -13,3 +13,9 @@ export type NextPageWithLayout = NextPage & {
 export type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;
 };
+
+export interface ApiResponse<T = any> {
+  data?: T;
+  isSuccess: boolean;
+  message: string;
+}
