@@ -10,14 +10,27 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useToast } from '@/components/ui/use-toast';
+import { QUERY_KEY } from '@/constants';
+import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
+import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
+  const queryClient = useQueryClient();
+  const router = useRouter();
+  const { logIn } = useAuth();
+  const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   // 1. Define your form.
   const form = useForm<LoginPayload>({
     defaultValues: {
@@ -27,10 +40,27 @@ const Login: NextPageWithLayout = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: LoginPayload) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: LoginPayload) {
+    setIsLoading(true);
+    try {
+      const { user } = await logIn(values);
+      queryClient.setQueryData([QUERY_KEY.profile], user);
+
+      setIsLoading(false);
+      toast({
+        title: 'Đăng nhập thành công',
+        description: '',
+        duration: 500
+      });
+      router.push('/');
+    } catch (error: any) {
+      setIsLoading(false);
+      toast({
+        title: 'Đăng nhập thất bại',
+        description: error,
+        variant: 'destructive'
+      });
+    }
   }
 
   return (
@@ -83,7 +113,11 @@ const Login: NextPageWithLayout = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="text-white w-full text-base">
+            <Button
+              loading={isLoading}
+              type="submit"
+              className="text-white w-full text-base"
+            >
               Đăng nhập
             </Button>
           </form>

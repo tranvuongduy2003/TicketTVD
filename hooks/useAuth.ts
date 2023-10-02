@@ -1,20 +1,21 @@
-import { refreshToken, signIn, signOut } from '@/apis';
-import { QUERY_KEY } from '@/constants/query-key';
+import { refreshToken, signIn, signUp } from '@/apis';
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants';
 import { LoginPayload } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
+import { removeCookie, setCookie } from '@/utils';
 
 export function useAuth() {
-  const queryClient = useQueryClient();
-
   async function logIn(payload: LoginPayload) {
-    const { user } = await signIn(payload);
-    queryClient.setQueryData([QUERY_KEY.profile], user);
+    const { user, accessToken, refreshToken } = await signIn(payload);
+    setCookie(ACCESS_TOKEN, accessToken);
+    setCookie(REFRESH_TOKEN, refreshToken);
+    return { user };
   }
 
   function logOut() {
-    queryClient.setQueryData([QUERY_KEY.profile], null);
-    signOut();
+    removeCookie(ACCESS_TOKEN);
+    removeCookie(REFRESH_TOKEN);
+    localStorage.clear();
   }
 
-  return { logIn, signIn, logOut, refreshToken };
+  return { logIn, signUp, logOut, refreshToken };
 }

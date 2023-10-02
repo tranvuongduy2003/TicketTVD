@@ -1,5 +1,6 @@
 import { useAuth } from '@/hooks';
 import { ApiResponse } from '@/models';
+import { getAccessToken, getRefreshToken } from '@/utils';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
@@ -8,7 +9,7 @@ import axios, {
 } from 'axios';
 
 const requestConfig: AxiosRequestConfig = {
-  baseURL: '/api',
+  baseURL: process.env.API_URL,
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json'
@@ -22,6 +23,10 @@ export const axiosInstance = axios.create(requestConfig);
 export default function initRequest() {
   axiosInstance.interceptors.request.use(
     (config: InternalAxiosRequestConfig) => {
+      const token = getAccessToken();
+      if (token && config.headers) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
       return config;
     },
     (error: AxiosError) => {
@@ -34,16 +39,22 @@ export default function initRequest() {
       return response.data.data;
     },
     async (error: any) => {
-      const statusCode = error.response?.data?.statusCode;
+      const statusCode = error.response?.status;
       const originalConfig = error.config;
 
       switch (statusCode) {
         case 401: {
-          if (!originalConfig._retry) {
+          const refreshToken = getRefreshToken();
+          if (!originalConfig._retry && refreshToken) {
             originalConfig._retry = true;
             try {
               console.log('retry');
-              await useAuth().refreshToken();
+              const token = await useAuth().refreshToken();
+              axios.defaults.headers.common = {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              };
+              return axiosInstance(originalConfig);
             } catch (error: any) {
               useAuth().logOut();
             }
@@ -62,7 +73,7 @@ export default function initRequest() {
         default:
           break;
       }
-      return Promise.reject(error.response?.data);
+      return Promise.reject(error.response?.data.message);
     }
   );
 }

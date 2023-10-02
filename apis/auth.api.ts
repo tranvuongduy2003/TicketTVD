@@ -16,13 +16,9 @@ export const signIn = (data: LoginPayload) => {
 
 export const signUp = (data: SignUpPayload) => {
   return httpRequest.post<any, SignUpPayload>(
-    API_ROUTE.auth + '/sign-up',
+    API_ROUTE.auth + '/register',
     data
   );
-};
-
-export const signOut = () => {
-  return httpRequest.post(API_ROUTE.auth + '/logout', null);
 };
 
 export const refreshToken = () => {

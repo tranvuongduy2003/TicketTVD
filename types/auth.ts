@@ -9,16 +9,12 @@ export interface SignUpPayload {
   email: string;
   password: string;
   name: string;
-  phone: string;
-}
-
-export interface Token {
-  token: string;
-  expiredAt: string;
+  phoneNumber: string;
+  role?: 'CUSTOMER' | 'ORGANIZER';
 }
 
 export interface LoginResponse {
   user: User;
-  accessToken: Token;
-  refreshToken: Token;
+  accessToken: string;
+  refreshToken: string;
 }
