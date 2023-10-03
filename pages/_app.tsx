@@ -17,7 +17,8 @@ export const client = new QueryClient({
 
 const mulish = Mulish({
   subsets: ['vietnamese', 'latin'],
-  weight: ['200', '300', '400', '500', '600', '700', '800']
+  weight: ['200', '300', '400', '500', '600', '700', '800'],
+  fallback: ['system-ui', 'arial']
 });
 
 export default function App({ Component, pageProps }: AppPropsWithLayout) {

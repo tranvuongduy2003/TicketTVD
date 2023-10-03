@@ -4,7 +4,7 @@ import { User } from '@/models';
 import { LoginPayload, LoginResponse, SignUpPayload } from '@/types';
 
 export const getUserProfile = () => {
-  return httpRequest.get<User>('/profile');
+  return httpRequest.get<User>(API_ROUTE.auth + '/profile');
 };
 
 export const signIn = (data: LoginPayload) => {

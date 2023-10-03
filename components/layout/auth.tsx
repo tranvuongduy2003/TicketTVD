@@ -1,11 +1,11 @@
-import { useProfile } from '@/hooks';
 import { LayoutProps } from '@/models';
+import { useAuthStore } from '@/stores';
 import { useRouter } from 'next/router';
 
 export function AuthLayout({ children }: LayoutProps) {
   const router = useRouter();
 
-  const { profile } = useProfile();
+  const { profile } = useAuthStore();
 
   if (profile?.id) router.push('/');
 

@@ -1,13 +1,5 @@
-import { ACCESS_TOKEN, QUERY_KEY, REFRESH_TOKEN } from '@/constants';
-import { useQueryClient } from '@tanstack/react-query';
-import { getCookie, removeCookie } from './session';
-
-export const logOut = () => {
-  useQueryClient().setQueryData([QUERY_KEY.profile], null);
-  removeCookie(ACCESS_TOKEN);
-  removeCookie(REFRESH_TOKEN);
-  localStorage.clear();
-};
+import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants';
+import { getCookie } from './session';
 
 export const getAccessToken = () => {
   return getCookie(ACCESS_TOKEN) || '';

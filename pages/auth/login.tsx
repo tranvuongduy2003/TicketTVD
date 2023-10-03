@@ -11,11 +11,9 @@ import {
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { useToast } from '@/components/ui/use-toast';
-import { QUERY_KEY } from '@/constants';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -24,7 +22,6 @@ import { useForm } from 'react-hook-form';
 import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { logIn } = useAuth();
   const { toast } = useToast();
@@ -43,8 +40,7 @@ const Login: NextPageWithLayout = () => {
   async function onSubmit(values: LoginPayload) {
     setIsLoading(true);
     try {
-      const { user } = await logIn(values);
-      queryClient.setQueryData([QUERY_KEY.profile], user);
+      await logIn(values);
 
       setIsLoading(false);
       toast({
