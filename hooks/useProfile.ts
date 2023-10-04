@@ -8,7 +8,7 @@ export function useProfile() {
   const { setProfile } = useAuthStore();
   const queryClient = useQueryClient();
 
-  const { mutate: profileMutate, ...rest } = useMutation<
+  const { mutate: profileMutate } = useMutation<
     User | null,
     unknown,
     User | null

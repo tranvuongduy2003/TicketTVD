@@ -5,6 +5,13 @@ export interface LoginPayload {
   password: string;
 }
 
+export interface LoginWithGooglePayload {
+  email: string;
+  name: string;
+  avatar?: string;
+  tokenExpiredDate: Date;
+}
+
 export interface SignUpPayload {
   email: string;
   password: string;

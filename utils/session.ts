@@ -1,4 +1,5 @@
 import cookie from 'js-cookie';
+import JwtDecode, { JwtPayload } from 'jwt-decode';
 import nextCookie from 'next-cookies';
 
 export const getCookieFromBrowser = (key: string) => cookie.get(key);
@@ -18,10 +19,11 @@ export const getCookie = (key: string, context = {}) =>
     : getCookieFromServer(context, key);
 
 export const setCookie = (key: string, token: string) => {
+  const { exp } = JwtDecode(token) as JwtPayload;
+
   cookie.set(key, token, {
-    expires: 7,
+    expires: exp,
     sameSite: 'Lax',
-    httpOnly: true,
     secure: process.env.NODE_ENV !== 'development'
   });
 };

@@ -1,7 +1,12 @@
 import httpRequest from '@/api-client/httpRequest';
 import { API_ROUTE } from '@/constants';
 import { User } from '@/models';
-import { LoginPayload, LoginResponse, SignUpPayload } from '@/types';
+import {
+  LoginPayload,
+  LoginResponse,
+  LoginWithGooglePayload,
+  SignUpPayload
+} from '@/types';
 
 export const getUserProfile = () => {
   return httpRequest.get<User>(API_ROUTE.auth + '/profile');
@@ -10,6 +15,13 @@ export const getUserProfile = () => {
 export const signIn = (data: LoginPayload) => {
   return httpRequest.post<LoginResponse, LoginPayload>(
     API_ROUTE.auth + '/login',
+    data
+  );
+};
+
+export const signInWithGoogle = (data: LoginWithGooglePayload) => {
+  return httpRequest.post<LoginResponse, LoginWithGooglePayload>(
+    API_ROUTE.auth + '/login/google',
     data
   );
 };

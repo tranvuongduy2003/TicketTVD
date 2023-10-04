@@ -23,7 +23,7 @@ import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
-  const { logIn } = useAuth();
+  const { logIn, logInWithGoogle } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -125,7 +125,10 @@ const Login: NextPageWithLayout = () => {
             Hoặc đăng nhập với
           </p>
           <div className="flex items-center justify-between gap-4 px-2">
-            <Button className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full">
+            <Button
+              onClick={() => logInWithGoogle()}
+              className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full"
+            >
               <FaGoogle />
             </Button>
             <Button className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full">
