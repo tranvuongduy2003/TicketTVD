@@ -9,9 +9,22 @@ export default NextAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!
     }),
     FacebookProvider({
-      clientId: process.env.GITHUB_ID!,
-      clientSecret: process.env.GITHUB_SECRET!
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!
     })
   ],
+  callbacks: {
+    async jwt({ token, account }) {
+      if (account) {
+        token.provider = account.provider;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      (session as any).provider = token.provider;
+
+      return session;
+    }
+  },
   secret: process.env.NEXTAUTH_SECRET
 });

@@ -4,7 +4,7 @@ import { User } from '@/models';
 import {
   LoginPayload,
   LoginResponse,
-  LoginWithGooglePayload,
+  OAuthLoginPayload,
   SignUpPayload
 } from '@/types';
 
@@ -19,9 +19,9 @@ export const signIn = (data: LoginPayload) => {
   );
 };
 
-export const signInWithGoogle = (data: LoginWithGooglePayload) => {
-  return httpRequest.post<LoginResponse, LoginWithGooglePayload>(
-    API_ROUTE.auth + '/login/google',
+export const signInOAuth = (data: OAuthLoginPayload) => {
+  return httpRequest.post<LoginResponse, OAuthLoginPayload>(
+    API_ROUTE.auth + '/login/oauth',
     data
   );
 };

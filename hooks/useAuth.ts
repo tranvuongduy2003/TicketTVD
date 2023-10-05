@@ -1,7 +1,7 @@
-import { refreshToken, signIn, signInWithGoogle, signUp } from '@/apis';
+import { refreshToken, signIn, signInOAuth, signUp } from '@/apis';
 import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants';
 import { useAuthStore } from '@/stores';
-import { LoginPayload, LoginWithGooglePayload } from '@/types';
+import { LoginPayload, OAuthLoginPayload } from '@/types';
 import { removeCookie, setCookie } from '@/utils';
 import { signIn as nextAuthSignIn, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
@@ -36,18 +36,25 @@ export function useAuth() {
     }
   }
 
+  async function logInWithFacebook() {
+    try {
+      await nextAuthSignIn('facebook');
+    } catch (error) {
+      throw error;
+    }
+  }
+
   useEffect(() => {
     (async () => {
       if (session?.user) {
-        const payload: LoginWithGooglePayload = {
+        const payload: OAuthLoginPayload = {
           email: session.user.email!,
           name: session.user.name!,
-          tokenExpiredDate: new Date(session.expires)
+          provider: (session as any).provider.toUpperCase(),
+          tokenExpiredDate: new Date(session.expires!)
         };
         if (Boolean(session.user.image)) payload.avatar = session.user.image!;
-
-        const { user: loginUser, accessToken } =
-          await signInWithGoogle(payload);
+        const { user: loginUser, accessToken } = await signInOAuth(payload);
 
         setCookie(ACCESS_TOKEN, accessToken);
         profileMutate(loginUser);
@@ -55,5 +62,12 @@ export function useAuth() {
     })();
   }, [session?.user]);
 
-  return { logIn, signUp, logOut, refreshToken, logInWithGoogle };
+  return {
+    logIn,
+    signUp,
+    logOut,
+    refreshToken,
+    logInWithGoogle,
+    logInWithFacebook
+  };
 }

@@ -23,7 +23,7 @@ import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
-  const { logIn, logInWithGoogle } = useAuth();
+  const { logIn, logInWithGoogle, logInWithFacebook } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -131,7 +131,10 @@ const Login: NextPageWithLayout = () => {
             >
               <FaGoogle />
             </Button>
-            <Button className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full">
+            <Button
+              onClick={() => logInWithFacebook()}
+              className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full"
+            >
               <FaFacebookF />
             </Button>
           </div>
