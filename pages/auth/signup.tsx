@@ -69,7 +69,7 @@ const formSchema = z
 
 const SignUp: NextPageWithLayout = () => {
   const router = useRouter();
-  const { signUp } = useAuth();
+  const { signUp, logInWithGoogle, logInWithFacebook } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -242,10 +242,16 @@ const SignUp: NextPageWithLayout = () => {
 
         {/* OTHER CHOICES */}
         <div className="gap-4 flex justify-center mt-8">
-          <Button className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]">
+          <Button
+            onClick={() => logInWithGoogle()}
+            className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]"
+          >
             <FaGoogle />
           </Button>
-          <Button className="w-12 h-12 rounded-full text-white text-4xl bg-[#335CA6FF] hover:bg-[#233F72FF] active:bg-[#172A4CFF]">
+          <Button
+            onClick={() => logInWithFacebook()}
+            className="w-12 h-12 rounded-full text-white text-4xl bg-[#335CA6FF] hover:bg-[#233F72FF] active:bg-[#172A4CFF]"
+          >
             <FaFacebook />
           </Button>
         </div>
