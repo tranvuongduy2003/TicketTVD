@@ -1,28 +1,28 @@
 import { getUserProfile } from '@/apis';
 import { MILLISECOND_PER_HOUR, QUERY_KEY } from '@/constants';
-import { User } from '@/models';
 import { useAuthStore } from '@/stores';
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
+import { useEffect } from 'react';
 
 export function useProfile() {
   const { setProfile } = useAuthStore();
-  const queryClient = useQueryClient();
+  // const queryClient = useQueryClient();
 
-  const { mutate: profileMutate } = useMutation<
-    User | null,
-    unknown,
-    User | null
-  >({
-    mutationFn: user => {
-      return new Promise(resolve => resolve(user));
-    },
-    retry: false,
-    cacheTime: Infinity,
-    onSuccess: data => {
-      queryClient.setQueryData([QUERY_KEY.profile], data);
-      setProfile(data!);
-    }
-  });
+  // const { mutate: profileMutate } = useMutation<
+  //   User | null,
+  //   unknown,
+  //   User | null
+  // >({
+  //   mutationFn: user => {
+  //     return new Promise(resolve => resolve(user));
+  //   },
+  //   retry: false,
+  //   cacheTime: Infinity,
+  //   onSuccess: data => {
+  //     useQueryClient().setQueryData([QUERY_KEY.profile], data);
+  //     useAuthStore().setProfile(data!);
+  //   }
+  // });
 
   const { data: profile } = useQuery({
     queryKey: [QUERY_KEY.profile],
@@ -35,5 +35,11 @@ export function useProfile() {
     refetchOnReconnect: false
   });
 
-  return { profile, profileMutate };
+  useEffect(() => {
+    if (profile) {
+      setProfile(profile);
+    }
+  }, [profile]);
+
+  return { profile };
 }

@@ -5,11 +5,10 @@ import { LoginPayload, OAuthLoginPayload } from '@/types';
 import { removeCookie, setCookie } from '@/utils';
 import { signIn as nextAuthSignIn, useSession } from 'next-auth/react';
 import { useEffect } from 'react';
-import { useProfile } from '.';
 
 export function useAuth() {
-  const { profileMutate } = useProfile();
-  const { reset } = useAuthStore();
+  // const { setPro } = useProfile();
+  const { reset, setProfile } = useAuthStore();
   const { data: session } = useSession();
 
   async function logIn(payload: LoginPayload) {
@@ -17,7 +16,7 @@ export function useAuth() {
 
     setCookie(ACCESS_TOKEN, accessToken);
     setCookie(REFRESH_TOKEN, refreshToken);
-    profileMutate(user);
+    setProfile(user);
     return { user };
   }
 
@@ -57,7 +56,7 @@ export function useAuth() {
         const { user: loginUser, accessToken } = await signInOAuth(payload);
 
         setCookie(ACCESS_TOKEN, accessToken);
-        profileMutate(loginUser);
+        setProfile(loginUser);
       }
     })();
   }, [session?.user]);
