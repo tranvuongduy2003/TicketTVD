@@ -10,14 +10,24 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useToast } from '@/components/ui/use-toast';
+import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { logIn, logInWithGoogle, logInWithFacebook } = useAuth();
+  const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   // 1. Define your form.
   const form = useForm<LoginPayload>({
     defaultValues: {
@@ -27,10 +37,26 @@ const Login: NextPageWithLayout = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: LoginPayload) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: LoginPayload) {
+    setIsLoading(true);
+    try {
+      await logIn(values);
+
+      setIsLoading(false);
+      toast({
+        title: 'Đăng nhập thành công',
+        description: '',
+        duration: 500
+      });
+      router.push('/');
+    } catch (error: any) {
+      setIsLoading(false);
+      toast({
+        title: 'Đăng nhập thất bại',
+        description: error,
+        variant: 'destructive'
+      });
+    }
   }
 
   return (
@@ -83,7 +109,11 @@ const Login: NextPageWithLayout = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="text-white w-full text-base">
+            <Button
+              loading={isLoading}
+              type="submit"
+              className="text-white w-full text-base"
+            >
               Đăng nhập
             </Button>
           </form>
@@ -95,10 +125,16 @@ const Login: NextPageWithLayout = () => {
             Hoặc đăng nhập với
           </p>
           <div className="flex items-center justify-between gap-4 px-2">
-            <Button className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full">
+            <Button
+              onClick={() => logInWithGoogle()}
+              className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full"
+            >
               <FaGoogle />
             </Button>
-            <Button className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full">
+            <Button
+              onClick={() => logInWithFacebook()}
+              className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full"
+            >
               <FaFacebookF />
             </Button>
           </div>

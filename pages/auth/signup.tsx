@@ -10,11 +10,15 @@ import {
 } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { useToast } from '@/components/ui/use-toast';
 import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
+import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { FaFacebook, FaGoogle } from 'react-icons/fa6';
 import * as z from 'zod';
@@ -64,6 +68,12 @@ const formSchema = z
   });
 
 const SignUp: NextPageWithLayout = () => {
+  const router = useRouter();
+  const { signUp, logInWithGoogle, logInWithFacebook } = useAuth();
+  const { toast } = useToast();
+
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,10 +87,34 @@ const SignUp: NextPageWithLayout = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof formSchema>) {
-    // Do something with the form values.
-    // ✅ This will be type-safe and validated.
-    console.log(values);
+  async function onSubmit(values: z.infer<typeof formSchema>) {
+    setIsLoading(true);
+    try {
+      const { email, name, phone, password } = values;
+
+      await signUp({
+        email: email,
+        name: name,
+        phoneNumber: phone,
+        password: password,
+        role: 'CUSTOMER'
+      });
+
+      setIsLoading(false);
+      toast({
+        title: 'Đăng ký tài khoản thành công',
+        description: '',
+        duration: 500
+      });
+      router.push('/auth/login');
+    } catch (error: any) {
+      setIsLoading(false);
+      toast({
+        title: 'Đăng ký tài khoản thất bại',
+        description: error,
+        variant: 'destructive'
+      });
+    }
   }
 
   return (
@@ -181,7 +215,11 @@ const SignUp: NextPageWithLayout = () => {
                 </FormItem>
               )}
             />
-            <Button type="submit" className="text-white w-full text-base">
+            <Button
+              loading={isLoading}
+              type="submit"
+              className="text-white w-full text-base"
+            >
               Đăng ký
             </Button>
           </form>
@@ -204,10 +242,16 @@ const SignUp: NextPageWithLayout = () => {
 
         {/* OTHER CHOICES */}
         <div className="gap-4 flex justify-center mt-8">
-          <Button className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]">
+          <Button
+            onClick={() => logInWithGoogle()}
+            className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]"
+          >
             <FaGoogle />
           </Button>
-          <Button className="w-12 h-12 rounded-full text-white text-4xl bg-[#335CA6FF] hover:bg-[#233F72FF] active:bg-[#172A4CFF]">
+          <Button
+            onClick={() => logInWithFacebook()}
+            className="w-12 h-12 rounded-full text-white text-4xl bg-[#335CA6FF] hover:bg-[#233F72FF] active:bg-[#172A4CFF]"
+          >
             <FaFacebook />
           </Button>
         </div>
