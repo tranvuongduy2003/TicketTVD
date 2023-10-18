@@ -1,7 +1,7 @@
 import { LayoutProps } from '@/models';
 import { useAuthStore } from '@/stores';
 import { useRouter } from 'next/router';
-import { Sidebar } from '../common';
+import { Header, Sidebar } from '../common';
 
 export function AdminLayout({ children }: LayoutProps) {
   const router = useRouter();
@@ -11,10 +11,11 @@ export function AdminLayout({ children }: LayoutProps) {
 
   return (
     <>
-      <div className="flex w-full">
+      <Header />
+      <main className="flex w-full">
         <Sidebar />
-        <>{children}</>
-      </div>
+        <section className="flex-1">{children}</section>
+      </main>
     </>
   );
 }

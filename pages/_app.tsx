@@ -1,5 +1,5 @@
 import { EmptyLayout } from '@/components/layout';
-import { Toaster } from '@/components/ui/toaster';
+import { Toaster } from '@/components/ui';
 import { AppPropsWithLayout } from '@/models';
 import '@/styles/globals.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';

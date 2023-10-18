@@ -1,16 +1,16 @@
 import { AuthLayout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useToast } from '@/components/ui/use-toast';
+  FormMessage,
+  Input,
+  PasswordInput,
+  useToast
+} from '@/components/ui';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';

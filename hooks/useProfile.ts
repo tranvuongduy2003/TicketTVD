@@ -27,7 +27,6 @@ export function useProfile() {
   const { data: profile } = useQuery({
     queryKey: [QUERY_KEY.profile],
     queryFn: () => getUserProfile(),
-    retry: false,
     staleTime: 8 * MILLISECOND_PER_HOUR,
     cacheTime: Infinity,
     refetchOnMount: false,

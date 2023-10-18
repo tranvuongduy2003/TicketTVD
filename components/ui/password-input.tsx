@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 
 import { cn } from '@/utils';
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai';
-
-export interface InputProps
-  extends React.InputHTMLAttributes<HTMLInputElement> {}
+import { InputProps } from './input';
 
 const PasswordInput = React.forwardRef<HTMLInputElement, InputProps>(
   ({ className, ...props }, ref) => {
