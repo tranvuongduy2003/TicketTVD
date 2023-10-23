@@ -1,26 +1,25 @@
 import { AuthLayout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useToast } from '@/components/ui/use-toast';
+  FormMessage,
+  Input,
+  PasswordInput,
+  useToast
+} from '@/components/ui';
 import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
+import Image from "next/image";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaFacebook, FaGoogle } from 'react-icons/fa6';
 import * as z from 'zod';
 
 const formSchema = z
@@ -69,7 +68,7 @@ const formSchema = z
 
 const SignUp: NextPageWithLayout = () => {
   const router = useRouter();
-  const { signUp, logInWithGoogle, logInWithFacebook } = useAuth();
+  const { signUp } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -123,10 +122,12 @@ const SignUp: NextPageWithLayout = () => {
       <Image
         src="/images/auth-background.png"
         alt="auth-background"
-        fill={true}
-        objectFit="cover"
         className="absolute z-0"
-      />
+        style={{
+          maxWidth: "100%",
+          height: "auto",
+          objectFit: "cover"
+        }} />
       <div className="bg-primary-500 opacity-30 absolute z-10 w-full h-full top-0 left-0"></div>
 
       {/* SignUp FORM */}
@@ -226,7 +227,7 @@ const SignUp: NextPageWithLayout = () => {
         </Form>
 
         {/* LOGIN CHOICE */}
-        <p className="text-center mt-5 mb-8">
+        <p className="text-center mt-5">
           Bạn đã có tài khoản?{' '}
           <Link href={'/auth/login'}>
             <span className="text-primary-500 font-bold">Đăng nhập</span>
@@ -234,14 +235,14 @@ const SignUp: NextPageWithLayout = () => {
         </p>
 
         {/* DIVIDER */}
-        <div className="border-solid border relative">
+        {/* <div className="border-solid border relative">
           <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2">
             Hoặc
           </span>
-        </div>
+        </div> */}
 
         {/* OTHER CHOICES */}
-        <div className="gap-4 flex justify-center mt-8">
+        {/* <div className="gap-4 flex justify-center mt-8">
           <Button
             onClick={() => logInWithGoogle()}
             className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]"
@@ -254,7 +255,7 @@ const SignUp: NextPageWithLayout = () => {
           >
             <FaFacebook />
           </Button>
-        </div>
+        </div> */}
       </div>
     </div>
   );

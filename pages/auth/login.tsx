@@ -1,29 +1,28 @@
 import { AuthLayout } from '@/components/layout';
-import { Button } from '@/components/ui/button';
 import {
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormMessage
-} from '@/components/ui/form';
-import { Input } from '@/components/ui/input';
-import { PasswordInput } from '@/components/ui/password-input';
-import { useToast } from '@/components/ui/use-toast';
+  FormMessage,
+  Input,
+  PasswordInput,
+  useToast
+} from '@/components/ui';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
-import Image from 'next/image';
+import Image from "next/image";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
-  const { logIn, logInWithGoogle, logInWithFacebook } = useAuth();
+  const { logIn } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -65,10 +64,12 @@ const Login: NextPageWithLayout = () => {
       <Image
         src="/images/auth-background.png"
         alt="auth-background"
-        fill={true}
-        objectFit="cover"
         className="absolute z-0"
-      />
+        style={{
+          maxWidth: "100%",
+          height: "auto",
+          objectFit: "cover"
+        }} />
       <div className="bg-primary-500 opacity-30 absolute z-10 w-full h-full top-0 left-0"></div>
 
       {/* LOGIN FORM */}
@@ -120,7 +121,7 @@ const Login: NextPageWithLayout = () => {
         </Form>
 
         {/* OTHER CHOICES */}
-        <div className="mt-[50px] mb-10">
+        {/* <div className="mt-[50px] mb-10">
           <p className="text-center text-sm text-neutral-500 mb-[18px]">
             Hoặc đăng nhập với
           </p>
@@ -138,10 +139,10 @@ const Login: NextPageWithLayout = () => {
               <FaFacebookF />
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {/* SIGNUP CHOICE */}
-        <p className="text-center">
+        <p className="text-center mt-10">
           Bạn vẫn chưa có tài khoản?{' '}
           <Link href={'/auth/signup'}>
             <span className="text-primary-500 font-bold">Đăng kí ngay</span>

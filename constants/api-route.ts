@@ -1,3 +1,4 @@
 export const API_ROUTE = {
-  auth: '/auth'
+  auth: '/auth',
+  user: '/user'
 };
