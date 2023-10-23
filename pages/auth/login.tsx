@@ -140,7 +140,7 @@ const Login: NextPageWithLayout = () => {
         </div> */}
 
         {/* SIGNUP CHOICE */}
-        <p className="text-center">
+        <p className="text-center mt-10">
           Bạn vẫn chưa có tài khoản?{' '}
           <Link href={'/auth/signup'}>
             <span className="text-primary-500 font-bold">Đăng kí ngay</span>

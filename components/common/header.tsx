@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuthStore } from '@/stores';
+import { logOut } from '@/utils';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -96,11 +97,14 @@ export function Header() {
         <DropdownMenuContent className="w-56">
           <DropdownMenuItem className="cursor-pointer px-3 py-2">
             <LuUser className="mr-2 text-base" />
-            <span className="text-base">Profile</span>
+            <span className="text-base">Thông tin cá nhân</span>
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer px-3 py-2">
+          <DropdownMenuItem
+            className="cursor-pointer px-3 py-2"
+            onClick={() => logOut()}
+          >
             <LuLogOut className="mr-2 text-base" />
-            <span className="text-base">Log out</span>
+            <span className="text-base">Đăng xuất</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -225,7 +225,7 @@ const SignUp: NextPageWithLayout = () => {
         </Form>
 
         {/* LOGIN CHOICE */}
-        <p className="text-center mt-5 mb-8">
+        <p className="text-center mt-5">
           Bạn đã có tài khoản?{' '}
           <Link href={'/auth/login'}>
             <span className="text-primary-500 font-bold">Đăng nhập</span>
@@ -233,11 +233,11 @@ const SignUp: NextPageWithLayout = () => {
         </p>
 
         {/* DIVIDER */}
-        <div className="border-solid border relative">
+        {/* <div className="border-solid border relative">
           <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2">
             Hoặc
           </span>
-        </div>
+        </div> */}
 
         {/* OTHER CHOICES */}
         {/* <div className="gap-4 flex justify-center mt-8">
