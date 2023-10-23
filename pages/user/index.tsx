@@ -6,7 +6,7 @@ import { useUsers } from '@/hooks';
 import { NextPageWithLayout, Role } from '@/models';
 
 const UserPage: NextPageWithLayout = () => {
-  const { data: users } = useUsers();
+  const { data: users } = useUsers() as any;
 
   return (
     <div className="w-full px-8 py-20">
@@ -32,13 +32,17 @@ const UserPage: NextPageWithLayout = () => {
           </TabsList>
           <TabsContent value="customer">
             <DataTable
-              data={users?.filter(user => user.role === Role.CUSTOMER) ?? []}
+              data={
+                users?.filter((user: any) => user.role === Role.CUSTOMER) ?? []
+              }
               columns={customerColumns}
             />
           </TabsContent>
           <TabsContent value="organizer">
             <DataTable
-              data={users?.filter(user => user.role === Role.ORGANIZER) ?? []}
+              data={
+                users?.filter((user: any) => user.role === Role.ORGANIZER) ?? []
+              }
               columns={organizerColumns}
             />
           </TabsContent>

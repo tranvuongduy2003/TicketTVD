@@ -15,7 +15,7 @@ import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from "next/image";
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -123,11 +123,9 @@ const SignUp: NextPageWithLayout = () => {
         src="/images/auth-background.png"
         alt="auth-background"
         className="absolute z-0"
-        style={{
-          maxWidth: "100%",
-          height: "auto",
-          objectFit: "cover"
-        }} />
+        fill
+        style={{ objectFit: 'cover' }}
+      />
       <div className="bg-primary-500 opacity-30 absolute z-10 w-full h-full top-0 left-0"></div>
 
       {/* SignUp FORM */}
