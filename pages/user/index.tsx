@@ -32,13 +32,17 @@ const UserPage: NextPageWithLayout = () => {
           </TabsList>
           <TabsContent value="customer">
             <DataTable
-              data={users?.filter(user => user.role === Role.CUSTOMER) ?? []}
+              data={
+                users?.filter((user: any) => user.role === Role.CUSTOMER) ?? []
+              }
               columns={customerColumns}
             />
           </TabsContent>
           <TabsContent value="organizer">
             <DataTable
-              data={users?.filter(user => user.role === Role.ORGANIZER) ?? []}
+              data={
+                users?.filter((user: any) => user.role === Role.ORGANIZER) ?? []
+              }
               columns={organizerColumns}
             />
           </TabsContent>
