@@ -10,9 +10,7 @@ import {
   SelectValue
 } from '../ui';
 
-export interface IFooterProps {}
-
-export function Footer(props: IFooterProps) {
+export function Footer() {
   return (
     <footer className="px-32 py-8 bg-neutral-900 flex justify-between items-center">
       <div className="border-neutral-500 text-neutral-400 w-40">
