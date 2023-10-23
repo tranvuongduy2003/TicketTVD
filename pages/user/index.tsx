@@ -6,7 +6,7 @@ import { useUsers } from '@/hooks';
 import { NextPageWithLayout, Role } from '@/models';
 
 const UserPage: NextPageWithLayout = () => {
-  const { data: users } = useUsers() as any;
+  const { users } = useUsers();
 
   return (
     <div className="w-full px-8 py-20">

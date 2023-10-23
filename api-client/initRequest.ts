@@ -1,4 +1,4 @@
-import { refreshToken } from '@/apis';
+import { useAuth } from '@/hooks';
 import { ApiResponse } from '@/models';
 import { getAccessToken, getRefreshToken, logOut } from '@/utils';
 import axios, {
@@ -49,17 +49,17 @@ export default function initRequest() {
             originalConfig._retry = true;
             try {
               console.log('retry');
-              const token = await refreshToken();
+              const token = await useAuth().handleRefreshToken();
               axios.defaults.headers.common = {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
               };
               return axiosInstance(originalConfig);
             } catch (error: any) {
-              logOut();
+              useAuth().logOut();
             }
           } else {
-            logOut();
+            useAuth().logOut();
           }
           break;
         }

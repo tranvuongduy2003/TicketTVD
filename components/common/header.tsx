@@ -35,7 +35,7 @@ export function Header() {
               src="/images/logo.png"
               alt="Logo"
               width={43}
-              height={43}
+              height={60}
               style={{
                 objectFit: 'cover'
               }}
