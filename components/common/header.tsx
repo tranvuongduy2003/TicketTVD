@@ -2,7 +2,7 @@
 
 import { useAuthStore } from '@/stores';
 import { logOut } from '@/utils';
-import Image from "next/image";
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { LuChevronDown, LuLogOut, LuUser } from 'react-icons/lu';
@@ -37,10 +37,9 @@ export function Header() {
               width={43}
               height={43}
               style={{
-                maxWidth: "100%",
-                height: "auto",
-                objectFit: "cover"
-              }} />
+                objectFit: 'cover'
+              }}
+            />
           </div>
           <h2 className="text-lg font-bold leading-7">
             <span className="text-neutral-700">Ticket</span>

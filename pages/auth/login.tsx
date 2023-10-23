@@ -14,7 +14,7 @@ import {
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
-import Image from "next/image";
+import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -64,12 +64,10 @@ const Login: NextPageWithLayout = () => {
       <Image
         src="/images/auth-background.png"
         alt="auth-background"
+        fill
         className="absolute z-0"
-        style={{
-          maxWidth: "100%",
-          height: "auto",
-          objectFit: "cover"
-        }} />
+        style={{ objectFit: 'cover' }}
+      />
       <div className="bg-primary-500 opacity-30 absolute z-10 w-full h-full top-0 left-0"></div>
 
       {/* LOGIN FORM */}
