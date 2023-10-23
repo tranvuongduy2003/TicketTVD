@@ -1,6 +1,6 @@
 'use client';
 
-import Image from 'next/legacy/image';
+import Image from "next/image";
 import Link from 'next/link';
 import {
   Select,
@@ -37,8 +37,11 @@ export function Footer() {
               alt="Logo"
               width={43}
               height={60}
-              objectFit="cover"
-            />
+              style={{
+                maxWidth: "100%",
+                height: "auto",
+                objectFit: "cover"
+              }} />
           </div>
           <h2 className="text-lg font-bold leading-7">
             <span className="text-white">Ticket</span>
