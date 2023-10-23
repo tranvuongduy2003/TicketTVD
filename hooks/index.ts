@@ -1,2 +1,2 @@
-export * from './useAuth';
-export * from './useUsers';
+export * from './use-auth';
+export * from './use-users';

@@ -1,4 +1,3 @@
-'use client';
 import { LayoutProps, Role } from '@/models';
 import { useAuthStore } from '@/stores';
 import { useRouter } from 'next/router';

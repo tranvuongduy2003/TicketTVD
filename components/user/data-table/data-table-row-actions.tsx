@@ -18,7 +18,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
-  let userId = row.getValue('id');
+  // let userId = row.getValue('id');
 
   return (
     <DropdownMenu>
