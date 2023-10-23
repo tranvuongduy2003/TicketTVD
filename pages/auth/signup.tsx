@@ -15,7 +15,7 @@ import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
-import Image from 'next/image';
+import Image from "next/legacy/image";
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
