@@ -1,4 +1,6 @@
-import { useProfile } from '@/hooks';
+'use client';
+
+import { useAuthStore } from '@/stores';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -20,7 +22,7 @@ import {
 
 export function Header() {
   const router = useRouter();
-  const { profile } = useProfile();
+  const { profile } = useAuthStore();
 
   return (
     <header className="px-8 h-14 flex items-center shadow-xs justify-between">
@@ -77,11 +79,14 @@ export function Header() {
         <DropdownMenuTrigger>
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src={profile?.avatar} />
+              <AvatarImage src={profile?.avatar} suppressHydrationWarning />
               <AvatarFallback>AV</AvatarFallback>
             </Avatar>
             <div>
-              <h3 className="text-sm leading-[22px] text-neutral-900">
+              <h3
+                className="text-sm leading-[22px] text-neutral-900"
+                suppressHydrationWarning
+              >
                 {profile?.name}
               </h3>
             </div>

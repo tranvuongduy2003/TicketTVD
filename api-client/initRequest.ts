@@ -1,6 +1,6 @@
-import { useAuth } from '@/hooks';
+import { refreshToken } from '@/apis';
 import { ApiResponse } from '@/models';
-import { getAccessToken, getRefreshToken } from '@/utils';
+import { getAccessToken, getRefreshToken, logOut } from '@/utils';
 import axios, {
   AxiosError,
   AxiosRequestConfig,
@@ -44,27 +44,27 @@ export default function initRequest() {
 
       switch (statusCode) {
         case 401: {
-          const refreshToken = getRefreshToken();
-          if (!originalConfig._retry && refreshToken) {
+          const refreshTkn = getRefreshToken();
+          if (!originalConfig._retry && refreshTkn) {
             originalConfig._retry = true;
             try {
               console.log('retry');
-              const token = await useAuth().refreshToken();
+              const token = await refreshToken();
               axios.defaults.headers.common = {
                 'Content-Type': 'application/json',
                 Authorization: `Bearer ${token}`
               };
               return axiosInstance(originalConfig);
             } catch (error: any) {
-              useAuth().logOut();
+              logOut();
             }
           } else {
-            useAuth().logOut();
+            logOut();
           }
           break;
         }
         case 403: {
-          useAuth().logOut();
+          logOut();
           break;
         }
         case 500: {

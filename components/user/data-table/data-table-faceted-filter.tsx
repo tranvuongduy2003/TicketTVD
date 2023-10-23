@@ -17,7 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Separator
-} from '../ui';
+} from '../../ui';
 
 interface DataTableFacetedFilterProps<TData, TValue> {
   column?: Column<TData, TValue>;
@@ -40,7 +40,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 border-dashed">
+        <Button variant="outline" size="sm" className="h-10 border-dashed">
           <LuPlusCircle className="mr-2 h-4 w-4" />
           {title}
           {selectedValues?.size > 0 && (
@@ -82,7 +82,7 @@ export function DataTableFacetedFilter<TData, TValue>({
         <Command>
           <CommandInput placeholder={title} />
           <CommandList>
-            <CommandEmpty>No results found.</CommandEmpty>
+            <CommandEmpty>Không tìm thấy.</CommandEmpty>
             <CommandGroup>
               {options.map(option => {
                 const isSelected = selectedValues.has(option.value);
@@ -105,7 +105,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                       className={cn(
                         'mr-2 flex h-4 w-4 items-center justify-center rounded-sm border border-primary',
                         isSelected
-                          ? 'bg-primary text-primary-foreground'
+                          ? 'bg-primary text-white'
                           : 'opacity-50 [&_svg]:invisible'
                       )}
                     >
@@ -132,7 +132,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     onSelect={() => column?.setFilterValue(undefined)}
                     className="justify-center text-center"
                   >
-                    Clear filters
+                    Xóa bộ lọc
                   </CommandItem>
                 </CommandGroup>
               </>

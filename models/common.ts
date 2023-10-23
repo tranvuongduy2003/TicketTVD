@@ -1,4 +1,3 @@
-import { ColumnDef } from '@tanstack/react-table';
 import { NextPage } from 'next';
 import { Session } from 'next-auth';
 import { JWT } from 'next-auth/jwt';
@@ -13,11 +12,6 @@ export interface LayoutProps {
 export type NextPageWithLayout = NextPage & {
   Layout?: (props: LayoutProps) => ReactElement;
 };
-
-export interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
 
 export type AppPropsWithLayout = AppProps & {
   Component: NextPageWithLayout;

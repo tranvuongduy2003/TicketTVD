@@ -1,10 +1,5 @@
 import { Column } from '@tanstack/react-table';
-import {
-  LuArrowDown,
-  LuArrowUp,
-  LuChevronsUpDown,
-  LuEyeOff
-} from 'react-icons/lu';
+import { LuArrowDown, LuArrowUp, LuChevronsUpDown } from 'react-icons/lu';
 
 import { cn } from '@/utils';
 import {
@@ -12,9 +7,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
-} from '../ui';
+} from '../../ui';
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -53,16 +47,11 @@ export function DataTableColumnHeader<TData, TValue>({
         <DropdownMenuContent align="start">
           <DropdownMenuItem onClick={() => column.toggleSorting(false)}>
             <LuArrowUp className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Asc
+            Tăng dần
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => column.toggleSorting(true)}>
             <LuArrowDown className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Desc
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onClick={() => column.toggleVisibility(false)}>
-            <LuEyeOff className="mr-2 h-3.5 w-3.5 text-muted-foreground/70" />
-            Hide
+            Giảm dần
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

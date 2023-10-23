@@ -1,5 +1,5 @@
-import { DataTableProps } from '@/models';
 import {
+  ColumnDef,
   ColumnFiltersState,
   SortingState,
   VisibilityState,
@@ -20,11 +20,16 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '../ui';
+} from '../../ui';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
-export function CustomerTable<TData, TValue>({
+export interface DataTableProps<TData, TValue> {
+  columns: ColumnDef<TData, TValue>[];
+  data: TData[];
+}
+
+export function DataTable<TData, TValue>({
   data,
   columns
 }: DataTableProps<TData, TValue>) {
@@ -101,7 +106,7 @@ export function CustomerTable<TData, TValue>({
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  No results.
+                  Danh sách trống.
                 </TableCell>
               </TableRow>
             )}

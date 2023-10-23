@@ -19,11 +19,10 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { FaFacebookF, FaGoogle } from 'react-icons/fa6';
 
 const Login: NextPageWithLayout = () => {
   const router = useRouter();
-  const { logIn, logInWithGoogle, logInWithFacebook } = useAuth();
+  const { logIn } = useAuth();
   const { toast } = useToast();
 
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -120,7 +119,7 @@ const Login: NextPageWithLayout = () => {
         </Form>
 
         {/* OTHER CHOICES */}
-        <div className="mt-[50px] mb-10">
+        {/* <div className="mt-[50px] mb-10">
           <p className="text-center text-sm text-neutral-500 mb-[18px]">
             Hoặc đăng nhập với
           </p>
@@ -138,7 +137,7 @@ const Login: NextPageWithLayout = () => {
               <FaFacebookF />
             </Button>
           </div>
-        </div>
+        </div> */}
 
         {/* SIGNUP CHOICE */}
         <p className="text-center">

@@ -2,10 +2,10 @@
 
 import { Table } from '@tanstack/react-table';
 import { LuPlusCircle } from 'react-icons/lu';
-import { Button, Input } from '../ui';
+import { Button, Input } from '../../ui';
 
+import { Status } from '@/models';
 import { DataTableFacetedFilter } from './data-table-faceted-filter';
-import { priorities, statuses } from './data/data';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -20,34 +20,36 @@ export function DataTableToolbar<TData>({
     <div className="flex items-center justify-between">
       <div className="flex flex-1 items-center space-x-2">
         <Input
-          placeholder="Filter tasks..."
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+          placeholder="Tìm kiếm"
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
           onChange={event =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
+            table.getColumn('name')?.setFilterValue(event.target.value)
           }
-          className="h-8 w-[150px] lg:w-[250px]"
+          className="h-10 w-[150px] lg:w-[250px]"
         />
         {table.getColumn('status') && (
           <DataTableFacetedFilter
             column={table.getColumn('status')}
-            title="Status"
-            options={statuses}
-          />
-        )}
-        {table.getColumn('priority') && (
-          <DataTableFacetedFilter
-            column={table.getColumn('priority')}
-            title="Priority"
-            options={priorities}
+            title="Trạng thái"
+            options={[
+              {
+                label: 'Hoạt động',
+                value: Status.ACTIVE
+              },
+              {
+                label: 'Ngưng hoạt động',
+                value: Status.DEACTIVE
+              }
+            ]}
           />
         )}
         {isFiltered && (
           <Button
             variant="ghost"
             onClick={() => table.resetColumnFilters()}
-            className="h-8 px-2 lg:px-3"
+            className="h-10 px-2 lg:px-3"
           >
-            Reset
+            Khôi phục
             <LuPlusCircle className="ml-2 h-4 w-4" />
           </Button>
         )}
