@@ -39,3 +39,6 @@ next-env.d.ts
 
 #package-lock
 package-lock.json
+
+/certificates
+*.pem
