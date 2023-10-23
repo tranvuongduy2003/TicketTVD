@@ -14,7 +14,7 @@ import {
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
-import Image from "next/legacy/image";
+import Image from 'next/legacy/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -64,7 +64,6 @@ const Login: NextPageWithLayout = () => {
       <Image
         src="/images/auth-background.png"
         alt="auth-background"
-        fill={true}
         objectFit="cover"
         className="absolute z-0"
       />
