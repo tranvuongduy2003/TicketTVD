@@ -3,6 +3,8 @@
 import { Row } from '@tanstack/react-table';
 import { LuMoreHorizontal } from 'react-icons/lu';
 
+import { User } from '@/models';
+import { useRouter } from 'next/router';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +20,8 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
-  // let userId = row.getValue('id');
+  const router = useRouter();
+  const userId = (row.original as User).id;
 
   return (
     <DropdownMenu>
@@ -31,7 +34,9 @@ export function DataTableRowActions<TData>({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="w-[160px]">
-        <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => router.push(`/user/${userId}`)}>
+          Chỉnh sửa
+        </DropdownMenuItem>
         <DropdownMenuItem>
           <span className="text-danger-500">Vô hiệu hóa</span>
         </DropdownMenuItem>
