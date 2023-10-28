@@ -1,4 +1,5 @@
 export const QUERY_KEY = {
   profile: 'profile',
-  users: 'users'
+  users: 'users',
+  user: 'user'
 };

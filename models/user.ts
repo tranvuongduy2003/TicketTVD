@@ -3,15 +3,22 @@ export type User = {
   name: string;
   email: string;
   phoneNumber: string;
-  dob: Date | string;
-  gender: string;
+  dob: Date;
+  gender: Gender;
   avatar: string;
   totalBuyedTickets: number;
+  totalEvents: number;
+  totalSoldTickets: number;
   status: Status;
   role: Role;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  createdAt: Date;
+  updatedAt: Date;
 };
+
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE'
+}
 
 export enum Role {
   CUSTOMER = 'CUSTOMER',

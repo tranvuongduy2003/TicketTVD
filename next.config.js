@@ -13,7 +13,13 @@ const nextConfig = {
   },
   compiler: {
     styledComponents: true
-  }
+  },
+  fontLoaders: [
+    {
+      loader: '@next/font/google',
+      options: { subsets: ['vietnamese', 'latin'] }
+    }
+  ]
 };
 
 module.exports = nextConfig;

@@ -38,14 +38,14 @@ export function Sidebar() {
   const router = useRouter();
 
   return (
-    <aside className="h-screen py-[22px] px-[15px] shadow-xs bg-neutral-100">
+    <aside className="h-screen py-[22px] px-[15px] w-60 shadow-xs bg-neutral-100">
       <ul className="flex flex-col items-stretch gap-y-4">
         {components.map((item, index) => (
           <Link key={index} href={item.href}>
             <li
               className={twMerge(
                 'ease-linear transition-all bg-transparent hover:bg-slate-200 w-full px-4 py-3 rounded-lg flex items-center gap-2 text-sm font-normal leading-5 text-neutral-600',
-                router.pathname === item.href &&
+                router.pathname.includes(item.href) &&
                   'bg-primary-500 text-white font-bold hover:bg-primary-600'
               )}
             >
