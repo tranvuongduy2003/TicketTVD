@@ -49,11 +49,11 @@ export function Header() {
         <NavigationMenu className="h-full">
           <NavigationMenuList>
             <NavigationMenuItem>
-              <Link href="/user" legacyBehavior passHref>
+              <Link href="/" legacyBehavior passHref>
                 <NavigationMenuLink
                   className={twMerge(
                     'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
-                    router.pathname === '/user' && 'font-bold '
+                    router.pathname === '/' && 'font-bold '
                   )}
                 >
                   Trang chủ
@@ -82,7 +82,11 @@ export function Header() {
         <DropdownMenuTrigger>
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src={profile?.avatar} suppressHydrationWarning />
+              <AvatarImage
+                src={profile?.avatar}
+                suppressHydrationWarning
+                style={{ objectFit: 'cover' }}
+              />
               <AvatarFallback>AV</AvatarFallback>
             </Avatar>
             <div>
@@ -97,7 +101,10 @@ export function Header() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuItem className="cursor-pointer px-3 py-2">
+          <DropdownMenuItem
+            className="cursor-pointer px-3 py-2"
+            onClick={() => router.push('/profile')}
+          >
             <LuUser className="mr-2 text-base" />
             <span className="text-base">Thông tin cá nhân</span>
           </DropdownMenuItem>
