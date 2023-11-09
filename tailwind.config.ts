@@ -8,6 +8,9 @@ module.exports = {
     './src/**/*.{ts,tsx}'
   ],
   theme: {
+    fontFamily: {
+      body: 'var(--body-font)'
+    },
     container: {
       center: true,
       padding: '2rem',

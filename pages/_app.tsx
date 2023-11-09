@@ -9,7 +9,8 @@ import { SWRConfig } from 'swr';
 const mulish = Mulish({
   subsets: ['vietnamese', 'latin'],
   weight: ['200', '300', '400', '500', '600', '700', '800'],
-  fallback: ['system-ui', 'arial']
+  fallback: ['system-ui', 'arial'],
+  variable: '--body-font'
 });
 
 export default function App({
@@ -26,7 +27,7 @@ export default function App({
       }}
     >
       <Layout>
-        <main className={mulish.className}>
+        <main className={`${mulish.className} ${mulish.variable}`}>
           <Component {...pageProps} />
           <Toaster />
         </main>

@@ -3,15 +3,22 @@ export type User = {
   name: string;
   email: string;
   phoneNumber: string;
-  dob: Date | string;
-  gender: string;
+  dob: Date;
+  gender: Gender | string;
   avatar: string;
   totalBuyedTickets: number;
-  status: Status;
-  role: Role;
-  createdAt: Date | string;
-  updatedAt: Date | string;
+  totalEvents: number;
+  totalSoldTickets: number;
+  status: Status | string;
+  role: Role | string;
+  createdAt: Date;
+  updatedAt: Date;
 };
+
+export enum Gender {
+  MALE = 'MALE',
+  FEMALE = 'FEMALE'
+}
 
 export enum Role {
   CUSTOMER = 'CUSTOMER',
@@ -22,4 +29,9 @@ export enum Role {
 export enum Status {
   ACTIVE = 'ACTIVE',
   DEACTIVE = 'DEACTIVE'
+}
+
+export interface ChangePasswordPayload {
+  oldPassword: string;
+  newPassword: string;
 }

@@ -10,6 +10,7 @@ export function useUsers(options?: Partial<SWRConfiguration>) {
     isLoading
   } = useSWR(QUERY_KEY.users, () => userApi.getUsers(), {
     revalidateOnMount: true,
+    revalidateOnFocus: true,
     keepPreviousData: true,
     ...options
   });
