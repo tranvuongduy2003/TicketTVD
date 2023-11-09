@@ -5,38 +5,32 @@ import { LoginPayload, LoginResponse, SignUpPayload } from '@/types';
 
 export const authApi = {
   getUserProfile: () => {
-    return httpRequest.get<User>(API_ROUTE.auth + '/profile');
+    return httpRequest.get<User>(API_ROUTE.auth + '/profile', {
+      baseURL: process.env.AUTH_API_URL
+    });
   },
 
   signIn: (data: LoginPayload) => {
     return httpRequest.post<LoginResponse, LoginPayload>(
       API_ROUTE.auth + '/login',
-      data
+      data,
+      { baseURL: process.env.AUTH_API_URL }
     );
   },
-
-  // signInOAuth = (data: OAuthLoginPayload) => {
-  //   return httpRequest.post<any, OAuthLoginPayload>(
-  //     API_ROUTE.auth + '/login/oauth',
-  //     data
-  //   );
-  // };
 
   signUp: (data: SignUpPayload) => {
     return httpRequest.post<any, SignUpPayload>(
       API_ROUTE.auth + '/register',
-      data
+      data,
+      { baseURL: process.env.AUTH_API_URL }
     );
   },
 
   refreshToken: (data: { refreshToken: string }) => {
     return httpRequest.post<string, { refreshToken: string }>(
       API_ROUTE.auth + '/refresh-token',
-      data
+      data,
+      { baseURL: process.env.AUTH_API_URL }
     );
   }
-
-  // logOut: () => {
-  //   return httpRequest.post(API_ROUTE.auth + '/logout', null);
-  // }
 };

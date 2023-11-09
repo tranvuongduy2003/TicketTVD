@@ -17,6 +17,7 @@ export function useAuth(options?: Partial<SWRConfiguration>) {
 
   const {
     data: profile,
+    isLoading,
     error,
     mutate
   } = useSWR(QUERY_KEY.profile, () => authApi.getUserProfile(), {
@@ -53,6 +54,7 @@ export function useAuth(options?: Partial<SWRConfiguration>) {
   }
 
   return {
+    isLoading,
     profile,
     error,
     logIn,

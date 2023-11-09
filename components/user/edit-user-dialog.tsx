@@ -1,15 +1,18 @@
-import { PHONE_REGEX } from '@/constants';
+import { fileApi, userApi } from '@/apis';
+import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
 import { useUser } from '@/hooks';
-import { Gender, Role, Status } from '@/models';
+import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
 import { getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { LuCalendar, LuUpload } from 'react-icons/lu';
+import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
+import { mutate } from 'swr';
 import * as z from 'zod';
+import { ChangePasswordCard, DeactivateUserCard } from '../profile';
 import {
   Avatar,
   AvatarFallback,
@@ -19,8 +22,6 @@ import {
   Calendar,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -52,11 +53,7 @@ export interface EditUserDialogProps {
 }
 
 const formSchema = z.object({
-  email: z
-    .string()
-    .min(1, { message: 'Email không được để trống' })
-    .max(100, { message: 'Email không được vượt quá 100 kí tự' })
-    .email('Email không hợp lệ'),
+  email: z.string(),
   name: z
     .string()
     .min(1, 'Họ tên không được để trống')
@@ -70,8 +67,8 @@ const formSchema = z.object({
   gender: z.string(),
   status: z.string(),
   role: z.string(),
-  createdAt: z.date(),
-  avatar: z.string()
+  createdAt: z.date().optional(),
+  avatar: z.any()
 });
 
 export function EditUserDialog({
@@ -84,7 +81,19 @@ export function EditUserDialog({
   const { user, isLoading } = useUser(userId ?? '');
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
+    useState<boolean>(false);
+  const [isShowExtensiveChangePassword, setIsShowExtensiveChangePassword] =
+    useState<boolean>(false);
+  const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
+    useState<boolean>(false);
   const [preview, setPreview] = useState<string>('');
+
+  useEffect(() => {
+    if (user) {
+      setPreview(user.avatar);
+    }
+  }, [user]);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -95,20 +104,35 @@ export function EditUserDialog({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      console.log(values);
+      const { avatar, createdAt, phone, ...rest } = values;
+
+      const payload: Partial<User> = { phoneNumber: phone, ...rest };
+
+      if (Boolean(avatar) && avatar.length > 0) {
+        const avatarBlob = await fileApi.uploadFile(avatar[0]);
+        payload.avatar = avatarBlob.blob.uri;
+      } else {
+        payload.avatar = user?.avatar;
+      }
+
+      await userApi.updateUser(user?.id ?? '', payload);
+
+      mutate([QUERY_KEY.user, user?.id]);
+      mutate(QUERY_KEY.users);
 
       setLoading(false);
       toast({
         title: 'Chỉnh sửa thông tin người dùng thành công',
         description: '',
-        duration: 500
+        duration: MILLISECOND_PER_SECOND * 0.5
       });
     } catch (error: any) {
       setLoading(false);
       toast({
         title: 'Chỉnh sửa thông tin người dùng thất bại',
         description: error,
-        variant: 'destructive'
+        variant: 'destructive',
+        duration: MILLISECOND_PER_SECOND
       });
     }
   }
@@ -133,7 +157,6 @@ export function EditUserDialog({
               >
                 <div className="col-span-2">
                   <FormField
-                    defaultValue={user.avatar}
                     control={form.control}
                     name="avatar"
                     render={({ field: { onChange, value, ...rest } }) => (
@@ -156,6 +179,7 @@ export function EditUserDialog({
                             className="hidden"
                             type="file"
                             {...rest}
+                            multiple={false}
                             onChange={event => {
                               const { files, displayUrl } = getImageData(event);
                               setPreview(displayUrl);
@@ -195,6 +219,7 @@ export function EditUserDialog({
                       <FormLabel>Email</FormLabel>
                       <FormControl>
                         <Input
+                          disabled={true}
                           type="email"
                           placeholder="example.email@gmail.com"
                           {...field}
@@ -253,12 +278,14 @@ export function EditUserDialog({
                             locale={vi}
                             lang="vi"
                             mode="single"
+                            captionLayout="dropdown-buttons"
                             selected={field.value}
                             onSelect={field.onChange}
                             disabled={date =>
                               date > new Date() || date < new Date('1900-01-01')
                             }
-                            initialFocus
+                            fromYear={1900}
+                            toYear={new Date().getFullYear()}
                           />
                         </PopoverContent>
                       </Popover>
@@ -284,14 +311,10 @@ export function EditUserDialog({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value={Gender.MALE}>
-                            <span className="capitalize">
-                              {Gender.MALE.toLowerCase()}
-                            </span>
+                            <span className="capitalize">Nam</span>
                           </SelectItem>
                           <SelectItem value={Gender.FEMALE}>
-                            <span className="capitalize">
-                              {Gender.FEMALE.toLowerCase()}
-                            </span>
+                            <span className="capitalize">Nữ</span>
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -343,14 +366,10 @@ export function EditUserDialog({
                         </FormControl>
                         <SelectContent>
                           <SelectItem value={Role.CUSTOMER}>
-                            <span className="!capitalize">
-                              {Role.CUSTOMER.toLowerCase()}
-                            </span>
+                            <span className="!capitalize">Khách hàng</span>
                           </SelectItem>
                           <SelectItem value={Role.ORGANIZER}>
-                            <span className="!capitalize">
-                              {Role.ORGANIZER.toLowerCase()}
-                            </span>
+                            <span className="!capitalize">Chủ sự kiện</span>
                           </SelectItem>
                         </SelectContent>
                       </Select>
@@ -362,6 +381,7 @@ export function EditUserDialog({
                   defaultValue={new Date(user.createdAt)}
                   control={form.control}
                   name="createdAt"
+                  disabled={true}
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>Ngày tham gia</FormLabel>
@@ -369,6 +389,7 @@ export function EditUserDialog({
                         <PopoverTrigger asChild>
                           <FormControl>
                             <Button
+                              disabled={true}
                               variant={'outline'}
                               className={cn(
                                 'w-full pl-3 text-left font-normal',
@@ -402,28 +423,68 @@ export function EditUserDialog({
                 />
               </form>
             </Form>
-            <Card className="mt-8 mb-6">
-              <CardHeader>
-                <CardTitle className="text-lg">Thông tin thêm</CardTitle>
-              </CardHeader>
-              <CardContent>
-                {user.totalBuyedTickets !== null && (
-                  <div className="mb-2">
-                    Tổng số vé đã mua: {user.totalBuyedTickets}
-                  </div>
-                )}
-                {user.totalEvents !== null && (
-                  <div className="mb-2">
-                    Tổng số vé đã mua: {user.totalEvents}
-                  </div>
-                )}
-                {user.totalSoldTickets !== null && (
-                  <div className="mb-2">
-                    Tổng số vé đã mua: {user.totalSoldTickets}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+            <div className="mt-5">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
+              >
+                <h3 className="text-lg font-semibold mb-3">Thông tin thêm</h3>
+                <LuChevronDown />
+              </div>
+              {isShowExtensiveInfo && (
+                <Card className="pt-6 transition-all">
+                  <CardContent>
+                    {user.totalBuyedTickets !== null && (
+                      <div className="mb-2">
+                        Tổng số vé đã mua: {user.totalBuyedTickets}
+                      </div>
+                    )}
+                    {user.totalEvents !== null && (
+                      <div className="mb-2">
+                        Tổng sự kiện: {user.totalEvents}
+                      </div>
+                    )}
+                    {user.totalSoldTickets !== null && (
+                      <div className="mb-2">
+                        Tổng số vé đã đã bán: {user.totalSoldTickets}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+            <div className="mt-3">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() =>
+                  setIsShowExtensiveChangePassword(
+                    !isShowExtensiveChangePassword
+                  )
+                }
+              >
+                <h3 className="text-lg font-semibold mb-3">
+                  Thay đổi mật khẩu
+                </h3>
+                <LuChevronDown />
+              </div>
+              {isShowExtensiveChangePassword && (
+                <ChangePasswordCard userId={user.id} />
+              )}
+            </div>
+            <div className="mt-3">
+              <div
+                className="flex items-center gap-2 cursor-pointer"
+                onClick={() =>
+                  setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
+                }
+              >
+                <h3 className="text-lg font-semibold mb-3">Vô hiệu hóa</h3>
+                <LuChevronDown />
+              </div>
+              {isShowExtensiveDeactiveUser && (
+                <DeactivateUserCard userId={user.id} />
+              )}
+            </div>
           </>
         )}
         <DialogFooter>
@@ -433,7 +494,7 @@ export function EditUserDialog({
             className="text-white"
             onClick={form.handleSubmit(onSubmit)}
           >
-            Đăng ký
+            Lưu
           </Button>
           <Button variant="outline" onClick={() => onOpenChange(false)}>
             Đóng

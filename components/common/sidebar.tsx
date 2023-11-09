@@ -9,17 +9,17 @@ import { twMerge } from 'tailwind-merge';
 const components: { title: string; href: string; icon: ReactElement }[] = [
   {
     title: 'Bảng điều khiển',
-    href: '/dashboad',
+    href: '/dashboard',
     icon: <LuLayoutDashboard />
   },
   {
     title: 'Quản lý sự kiện',
-    href: '/events',
+    href: '/event',
     icon: <LuCalendar />
   },
   {
     title: 'Quản lý đơn mua',
-    href: '/payments',
+    href: '/payment',
     icon: <BsCreditCard />
   },
   {
@@ -29,7 +29,7 @@ const components: { title: string; href: string; icon: ReactElement }[] = [
   },
   {
     title: 'Quản lý thể loại',
-    href: '/categories',
+    href: '/category',
     icon: <MdOutlineCategory />
   }
 ];
@@ -38,7 +38,7 @@ export function Sidebar() {
   const router = useRouter();
 
   return (
-    <aside className="h-screen py-[22px] px-[15px] w-60 shadow-xs bg-neutral-100">
+    <aside className="min-h-screen py-[22px] px-[15px] w-60 shadow-xs bg-neutral-100">
       <ul className="flex flex-col items-stretch gap-y-4">
         {components.map((item, index) => (
           <Link key={index} href={item.href}>

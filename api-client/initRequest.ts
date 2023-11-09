@@ -14,7 +14,7 @@ import axios, {
 } from 'axios';
 
 const requestConfig: AxiosRequestConfig = {
-  baseURL: process.env.API_URL,
+  baseURL: process.env.BASE_API_URL,
   timeout: 20000,
   headers: {
     'Content-Type': 'application/json'

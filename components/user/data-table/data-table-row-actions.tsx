@@ -10,9 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { User } from '@/models';
+import { Status, User } from '@/models';
 import { useState } from 'react';
-import { DisableConfirmationDialog, EditUserDialog } from '..';
+import { ConfirmationDialog, EditUserDialog } from '..';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -22,10 +22,11 @@ export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
-  const [isDisableConfirmationDialogOpen, setIsDisableConfirmationDialogOpen] =
+  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
 
   const userId = (row.original as User).id;
+  const status = (row.original as User).status as Status;
 
   return (
     <>
@@ -42,14 +43,16 @@ export function DataTableRowActions<TData>({
           <DropdownMenuItem onClick={() => setIsEditDialogOpen(true)}>
             Chỉnh sửa
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span
-              className="text-danger-500"
-              onClick={() => setIsDisableConfirmationDialogOpen(true)}
-            >
-              Vô hiệu hóa
-            </span>
-          </DropdownMenuItem>
+          {status === Status.ACTIVE && (
+            <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>
+              <span className="text-danger-500">Vô hiệu hóa</span>
+            </DropdownMenuItem>
+          )}
+          {status === Status.DEACTIVE && (
+            <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>
+              <span className="text-green-700">Kích hoạt</span>
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       {isEditDialogOpen && (
@@ -59,11 +62,12 @@ export function DataTableRowActions<TData>({
           userId={userId}
         />
       )}
-      {isDisableConfirmationDialogOpen && (
-        <DisableConfirmationDialog
-          open={isDisableConfirmationDialogOpen}
-          onOpenChange={setIsDisableConfirmationDialogOpen}
-          onOk={() => {}}
+      {isConfirmationDialogOpen && (
+        <ConfirmationDialog
+          open={isConfirmationDialogOpen}
+          onOpenChange={setIsConfirmationDialogOpen}
+          userId={userId}
+          status={status}
         />
       )}
     </>

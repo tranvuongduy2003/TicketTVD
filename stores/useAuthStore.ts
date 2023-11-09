@@ -7,7 +7,7 @@ type State = {
 };
 
 type Action = {
-  setProfile: (profile: User) => void;
+  setProfile: (profile: Partial<User>) => void;
   reset: () => void;
 };
 

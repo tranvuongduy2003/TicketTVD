@@ -11,6 +11,7 @@ import {
   PasswordInput,
   useToast
 } from '@/components/ui';
+import { MILLISECOND_PER_SECOND } from '@/constants';
 import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
@@ -103,7 +104,7 @@ const SignUp: NextPageWithLayout = () => {
       toast({
         title: 'Đăng ký tài khoản thành công',
         description: '',
-        duration: 500
+        duration: MILLISECOND_PER_SECOND * 0.5
       });
       router.push('/auth/login');
     } catch (error: any) {
@@ -111,7 +112,8 @@ const SignUp: NextPageWithLayout = () => {
       toast({
         title: 'Đăng ký tài khoản thất bại',
         description: error,
-        variant: 'destructive'
+        variant: 'destructive',
+        duration: MILLISECOND_PER_SECOND
       });
     }
   }

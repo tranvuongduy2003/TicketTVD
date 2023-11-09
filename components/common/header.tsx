@@ -82,7 +82,11 @@ export function Header() {
         <DropdownMenuTrigger>
           <div className="flex items-center gap-3">
             <Avatar>
-              <AvatarImage src={profile?.avatar} suppressHydrationWarning />
+              <AvatarImage
+                src={profile?.avatar}
+                suppressHydrationWarning
+                style={{ objectFit: 'cover' }}
+              />
               <AvatarFallback>AV</AvatarFallback>
             </Avatar>
             <div>
