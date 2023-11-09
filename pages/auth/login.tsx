@@ -11,6 +11,7 @@ import {
   PasswordInput,
   useToast
 } from '@/components/ui';
+import { MILLISECOND_PER_SECOND } from '@/constants';
 import { useAuth } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
@@ -45,7 +46,7 @@ const Login: NextPageWithLayout = () => {
       toast({
         title: 'Đăng nhập thành công',
         description: '',
-        duration: 500
+        duration: MILLISECOND_PER_SECOND * 0.5
       });
       router.push('/');
     } catch (error: any) {
@@ -53,7 +54,8 @@ const Login: NextPageWithLayout = () => {
       toast({
         title: 'Đăng nhập thất bại',
         description: error,
-        variant: 'destructive'
+        variant: 'destructive',
+        duration: MILLISECOND_PER_SECOND
       });
     }
   }
