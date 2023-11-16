@@ -48,7 +48,6 @@ const Login: NextPageWithLayout = () => {
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
-      router.push('/');
     } catch (error: any) {
       setIsLoading(false);
       toast({

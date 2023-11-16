@@ -15,7 +15,7 @@ const initState: State = {
   profile: null
 };
 
-export const useAuthStore = create(
+export const useProfileStore = create(
   persist<State & Action>(
     set => ({
       ...initState,
@@ -24,7 +24,7 @@ export const useAuthStore = create(
       reset: () => set({ ...initState })
     }),
     {
-      name: 'auth', // unique name
+      name: 'profile', // unique name
       storage: createJSONStorage(() => localStorage)
     }
   )

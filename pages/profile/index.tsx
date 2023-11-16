@@ -28,7 +28,7 @@ import {
 import { PHONE_REGEX } from '@/constants';
 import { useAuth } from '@/hooks';
 import { Gender, NextPageWithLayout, User } from '@/models';
-import { useAuthStore } from '@/stores';
+import { useProfileStore } from '@/stores';
 import { cn } from '@/types';
 import { getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,7 +59,7 @@ const Profile: NextPageWithLayout = () => {
   const { toast } = useToast();
 
   const { profile, isLoading } = useAuth();
-  const { setProfile } = useAuthStore();
+  const { setProfile } = useProfileStore();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [preview, setPreview] = useState<string>('');

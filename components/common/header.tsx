@@ -1,7 +1,6 @@
 'use client';
 
-import { useAuthStore } from '@/stores';
-import { logOut } from '@/utils';
+import { useProfileStore } from '@/stores';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
@@ -20,10 +19,12 @@ import {
   NavigationMenuLink,
   NavigationMenuList
 } from '../ui';
+import { useAuth } from '@/hooks';
 
 export function Header() {
   const router = useRouter();
-  const { profile } = useAuthStore();
+  const { profile } = useProfileStore();
+  const { logOut } = useAuth();
 
   return (
     <header className="px-8 h-14 flex items-center shadow-xs justify-between">

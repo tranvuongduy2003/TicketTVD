@@ -1,18 +1,19 @@
+'use client';
+
+import { useAuth } from '@/hooks';
 import { LayoutProps, Role } from '@/models';
-import { useAuthStore } from '@/stores';
-import { useRouter } from 'next/router';
-import { useEffect } from 'react';
+import Router from 'next/router';
+import { useLayoutEffect } from 'react';
 import { Footer, Header, Sidebar } from '../common';
 
 export function AdminLayout({ children }: LayoutProps) {
-  const router = useRouter();
-  const { profile } = useAuthStore();
+  const { profile, isLoading } = useAuth();
 
-  useEffect(() => {
-    if (!profile?.id || profile?.role !== Role.ADMIN) {
-      router.push('/auth/login');
+  useLayoutEffect(() => {
+    if (!isLoading && (!profile || profile.role !== Role.ADMIN)) {
+      Router.push('/auth/login');
     }
-  }, []);
+  }, [isLoading, profile]);
 
   return (
     <>

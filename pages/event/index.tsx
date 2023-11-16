@@ -1,12 +1,25 @@
+import { columns } from '@/components/event';
 import { AdminLayout } from '@/components/layout';
+import { DataTable } from '@/components/event/data-table';
+import { useEvents } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 
-export interface EventProps {}
+const EventPage: NextPageWithLayout = () => {
+  const { events } = useEvents();
 
-const Event: NextPageWithLayout = (props: EventProps) => {
-  return <div>Event</div>;
+  return (
+    <div className="w-full px-8 py-20">
+      <h1 className="text-[32px] leading-[48px] font-bold mb-7">
+        Quản lý sự kiện
+      </h1>
+
+      <div>
+        <DataTable data={events || []} columns={columns} />
+      </div>
+    </div>
+  );
 };
 
-Event.Layout = AdminLayout;
+EventPage.Layout = AdminLayout;
 
-export default Event;
+export default EventPage;

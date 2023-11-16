@@ -1,13 +1,16 @@
+import { useAuth } from '@/hooks';
 import { LayoutProps, Role } from '@/models';
-import { useAuthStore } from '@/stores';
-import { useRouter } from 'next/router';
+import Router from 'next/router';
+import { useLayoutEffect } from 'react';
 
 export function OrganizerLayout({ children }: LayoutProps) {
-  const router = useRouter();
-  const { profile } = useAuthStore();
+  const { profile, isLoading } = useAuth();
 
-  if (!profile?.id || profile?.role !== Role.ORGANIZER)
-    router.push('/auth/login');
+  useLayoutEffect(() => {
+    if (!isLoading && (!profile || profile.role !== Role.ORGANIZER)) {
+      Router.push('/auth/login');
+    }
+  }, [isLoading, profile]);
 
   return <>{children}</>;
 }
