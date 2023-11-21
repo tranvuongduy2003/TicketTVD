@@ -17,12 +17,10 @@ import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Login: NextPageWithLayout = () => {
-  const router = useRouter();
   const { logIn } = useAuth();
   const { toast } = useToast();
 

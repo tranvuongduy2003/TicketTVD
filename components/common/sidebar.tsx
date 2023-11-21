@@ -14,22 +14,22 @@ const components: { title: string; href: string; icon: ReactElement }[] = [
   },
   {
     title: 'Quản lý sự kiện',
-    href: '/event',
+    href: '/management/event',
     icon: <LuCalendar />
   },
   {
     title: 'Quản lý đơn mua',
-    href: '/payment',
+    href: '/management/payment',
     icon: <BsCreditCard />
   },
   {
     title: 'Quản lý người dùng',
-    href: '/user',
+    href: '/management/user',
     icon: <LuUser />
   },
   {
     title: 'Quản lý thể loại',
-    href: '/category',
+    href: '/management/category',
     icon: <MdOutlineCategory />
   }
 ];

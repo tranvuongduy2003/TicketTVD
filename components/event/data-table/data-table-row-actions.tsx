@@ -41,7 +41,9 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem onClick={() => router.push(`/event/${eventId}`)}>
+          <DropdownMenuItem
+            onClick={() => router.push(`/event/${eventId}/edit`)}
+          >
             Chỉnh sửa
           </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>

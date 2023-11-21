@@ -3,5 +3,6 @@ export const QUERY_KEY = {
   users: 'users',
   user: 'user',
   events: 'events',
-  event: 'event'
+  event: 'event',
+  categories: 'categories'
 };

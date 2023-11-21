@@ -33,7 +33,7 @@ export function RemoveEventConfirmDialog({
     try {
       await eventApi.deleteEvent(eventId);
 
-      mutate(QUERY_KEY.event);
+      mutate(QUERY_KEY.events);
 
       setIsLoading(false);
       onOpenChange(false);

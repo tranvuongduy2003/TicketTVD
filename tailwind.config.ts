@@ -145,6 +145,21 @@ module.exports = {
           '900': '#041e0d',
           DEFAULT: '#1dd75b'
         },
+        neutral: {
+          '100': '#FAFAFBFF',
+          '150': '#F8F9FAFF',
+          '200': '#F3F4F6FF',
+          '300': '#DEE1E6FF',
+          '400': '#BCC1CAFF',
+          '500': '#9095A0FF',
+          '550': '#6E7787FF',
+          '600': '#565E6CFF',
+          '650': '#424955FF',
+          '700': '#323842FF',
+          '800': '#1D2128FF',
+          '900': '#171A1FFF',
+          DEFAULT: '#171A1FFF'
+        },
         destructive: {
           DEFAULT: 'hsl(var(--destructive))',
           foreground: 'hsl(var(--destructive-foreground))'

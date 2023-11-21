@@ -8,8 +8,18 @@ export const eventApi = {
       baseURL: process.env.EVENT_API_URL
     });
   },
+  getEventsByOrganizerId: (organizerId: string) => {
+    return httpRequest.get<Event[]>(`${API_ROUTE.event}/${organizerId}`, {
+      baseURL: process.env.EVENT_API_URL
+    });
+  },
   getEventById: (id: number) => {
     return httpRequest.get<Event>(`${API_ROUTE.event}/${id}`, {
+      baseURL: process.env.EVENT_API_URL
+    });
+  },
+  createEvent: (data: Partial<Event>) => {
+    return httpRequest.post(API_ROUTE.event, data, {
       baseURL: process.env.EVENT_API_URL
     });
   },

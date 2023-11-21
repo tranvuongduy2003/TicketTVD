@@ -1,5 +1,5 @@
 import { fileApi, userApi } from '@/apis';
-import { AdminLayout } from '@/components/layout';
+import { AdminLayout, MainLayout, ProtectedLayout } from '@/components/layout';
 import { ChangePasswordCard, DeactivateUserCard } from '@/components/profile';
 import {
   Avatar,
@@ -320,6 +320,6 @@ const Profile: NextPageWithLayout = () => {
   );
 };
 
-Profile.Layout = AdminLayout;
+Profile.Layout = ProtectedLayout;
 
 export default Profile;

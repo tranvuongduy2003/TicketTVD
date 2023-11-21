@@ -3,4 +3,4 @@ export * from './auth';
 export * from './customer';
 export * from './main';
 export * from './organizer';
-export * from './empty';
+export * from './protected';

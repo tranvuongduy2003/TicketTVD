@@ -25,7 +25,9 @@ export type Event = {
   isPromotion: boolean;
   promotionPlan: number;
   publishTime: Date;
-  creatorId: number;
+  creatorId: string;
+  favourite: number;
+  share: number;
   status: UserStatus;
   createdAt: Date;
   updatedAt: Date;

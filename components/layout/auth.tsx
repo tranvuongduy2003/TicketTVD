@@ -12,6 +12,8 @@ export function AuthLayout({ children }: LayoutProps) {
     if (!isLoading && profile) {
       if (profile.role === Role.ADMIN) {
         Router.push('/dashboard');
+      } else if (profile.role === Role.CUSTOMER) {
+        Router.push('/explore');
       } else {
         Router.push('/');
       }
