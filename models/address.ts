@@ -1,6 +1,7 @@
 export type Province = {
   name: string;
   slug: string;
+  type: string;
   name_with_type: string;
   code: string;
 };
@@ -14,3 +15,5 @@ export type District = {
   code: string;
   parent_code: string;
 };
+
+export type Tree = Province & { quan_huyen: District[] };

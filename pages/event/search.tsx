@@ -7,16 +7,21 @@ import {
 import { MainLayout } from '@/components/layout';
 import { Button, Skeleton } from '@/components/ui';
 import { useCategories, useEvents } from '@/hooks';
-import { NextPageWithLayout } from '@/models';
-import { useState } from 'react';
+import { Event, NextPageWithLayout } from '@/models';
+import { useEffect, useState } from 'react';
 
 const PER_PAGE = 3;
 
 const EventSearchPage: NextPageWithLayout = () => {
-  const { events, isLoading: eventLoading } = useEvents();
+  const [page, setPage] = useState<number>(1);
+  const [filteredEvents, setFilteredEvents] = useState<Event[]>();
+
+  const { events, setSearchValue, isLoading: eventLoading } = useEvents();
   const { categories, isLoading: categoryLoading } = useCategories();
 
-  const [page, setPage] = useState<number>(1);
+  useEffect(() => {
+    setFilteredEvents(events);
+  }, [events]);
 
   return (
     <div className="py-14 px-32">
@@ -25,7 +30,7 @@ const EventSearchPage: NextPageWithLayout = () => {
       </h1>
 
       <div className="px-[134px] mb-11">
-        <EventSearchBar />
+        <EventSearchBar onSearch={setSearchValue} />
       </div>
 
       <div className="flex gap-6 mb-[106px]">
@@ -36,12 +41,18 @@ const EventSearchPage: NextPageWithLayout = () => {
             </>
           ) : (
             categories &&
-            categories.length > 0 && <FilterBar categories={categories} />
+            categories.length > 0 && (
+              <FilterBar
+                events={events || []}
+                setFilter={setFilteredEvents}
+                categories={categories}
+              />
+            )
           )}
         </div>
         <div className="flex-1">
           <p className="text-sm my-5">
-            <span className="font-bold">{events?.length}</span> kết quả
+            <span className="font-bold">{filteredEvents?.length}</span> kết quả
           </p>
           <div className="flex flex-col gap-8">
             {eventLoading ? (
@@ -51,16 +62,16 @@ const EventSearchPage: NextPageWithLayout = () => {
                 <Skeleton className="h-[221px]" />
               </>
             ) : (
-              events &&
-              events.length > 0 &&
-              events
+              filteredEvents &&
+              filteredEvents.length > 0 &&
+              filteredEvents
                 .slice(0, page * PER_PAGE)
                 .map(event => <SearchEventCard key={event.id} event={event} />)
             )}
           </div>
           <div className="mt-8 flex justify-center">
-            {events &&
-              (page * PER_PAGE < events.length ? (
+            {filteredEvents &&
+              (page * PER_PAGE < filteredEvents.length ? (
                 <Button
                   type="button"
                   className="text-white"
@@ -69,13 +80,15 @@ const EventSearchPage: NextPageWithLayout = () => {
                   Xem thêm
                 </Button>
               ) : (
-                <Button
-                  type="button"
-                  className="text-white"
-                  onClick={() => setPage(1)}
-                >
-                  Thu gọn
-                </Button>
+                filteredEvents.length < PER_PAGE && (
+                  <Button
+                    type="button"
+                    className="text-white"
+                    onClick={() => setPage(1)}
+                  >
+                    Thu gọn
+                  </Button>
+                )
               ))}
           </div>
         </div>

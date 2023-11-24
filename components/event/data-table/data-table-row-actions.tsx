@@ -42,7 +42,7 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem
-            onClick={() => router.push(`/event/${eventId}/edit`)}
+            onClick={() => router.push(`/management/event/${eventId}`)}
           >
             Chỉnh sửa
           </DropdownMenuItem>

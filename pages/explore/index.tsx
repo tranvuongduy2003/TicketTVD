@@ -34,7 +34,7 @@ const ExplorePage: NextPageWithLayout = () => {
 
         {/* SEARCH */}
         <div className="px-72 w-full z-20 mt-10 mb-[150px]">
-          <EventSearchBar />
+          <EventSearchBar onSearch={() => router.push('/event/search')} />
         </div>
 
         <h4 className="text-white text-[32px] font-bold leading-[48px] mx-auto text-center z-20 mb-12">
@@ -86,6 +86,11 @@ const ExplorePage: NextPageWithLayout = () => {
             events &&
             events.length > 0 &&
             events
+              ?.sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
               ?.slice(0, 3)
               .map(event => <EventCard key={event.id} event={event} />)
           )}

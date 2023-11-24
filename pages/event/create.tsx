@@ -233,19 +233,15 @@ const CreateEventPage: NextPageWithLayout = () => {
 
       const { isPublish, publishDate, publishTime } = publishForm.getValues();
 
-      console.log(
-        concatDateWithTime(new Date(ticketStartDate), new Date(ticketStartTime))
-      );
-
       const data: Partial<Event> = {
         name: name,
         description: description,
         categoryId: Number.parseInt(categoryId),
         location: `${address}, ${districts?.find(item => item.code === district)
           ?.path_with_type}`,
-        eventDate: new Date(eventDate),
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
+        eventDate: concatDateWithTime(eventDate, startTime),
+        startTime: concatDateWithTime(eventDate, startTime),
+        endTime: concatDateWithTime(eventDate, endTime),
         ticketIsPaid: isPaid === 'paid' ? true : false,
         ticketQuantity: Number.parseInt(quantity),
         ticketPrice: Number.parseInt(price),
@@ -257,25 +253,14 @@ const CreateEventPage: NextPageWithLayout = () => {
         creatorId: profile?.id
       };
 
-      if (isPublish) {
-        data.publishTime = concatDateWithTime(
-          publishDate || new Date(),
-          publishTime || new Date()
-        );
+      if (isPublish && publishDate && publishTime) {
+        data.publishTime = concatDateWithTime(publishDate, publishTime);
       }
 
       // Upload cover image
       if (coverImage) {
         const compressedCoverImage = await compressFile(coverImage!);
-        console.log(
-          '🚀 ~ file: create.tsx:270 ~ handleCreateEvent ~ compressedCoverImage:',
-          compressedCoverImage
-        );
         const coverImageUrl = await fileApi.uploadFile(compressedCoverImage);
-        console.log(
-          '🚀 ~ file: create.tsx:275 ~ handleCreateEvent ~ coverImageUrl:',
-          coverImageUrl
-        );
         data.coverImage = coverImageUrl.blob.uri;
       }
       // Upload albums
@@ -777,7 +762,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                       )}
                                     >
                                       {field.value ? (
-                                        format(field.value, 'dd/MM/yyyy')
+                                        format(field.value, 'dd/MM/yyyy', {
+                                          locale: vi
+                                        })
                                       ) : (
                                         <span>Chọn ngày tổ chức sự kiện</span>
                                       )}
@@ -830,7 +817,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                           )}
                                         >
                                           {field.value ? (
-                                            format(field.value, 'HH:mm')
+                                            format(field.value, 'HH:mm', {
+                                              locale: vi
+                                            })
                                           ) : (
                                             <span>Chọn thời gian bắt đầu</span>
                                           )}
@@ -874,7 +863,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                           )}
                                         >
                                           {field.value ? (
-                                            format(field.value, 'HH:mm')
+                                            format(field.value, 'HH:mm', {
+                                              locale: vi
+                                            })
                                           ) : (
                                             <span>Chọn thời gian kết thúc</span>
                                           )}
@@ -1033,7 +1024,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                       )}
                                     >
                                       {field.value ? (
-                                        format(field.value, 'dd/MM/yyyy')
+                                        format(field.value, 'dd/MM/yyyy', {
+                                          locale: vi
+                                        })
                                       ) : (
                                         <span>Chọn ngày bắt đầu mua vé</span>
                                       )}
@@ -1083,7 +1076,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                       )}
                                     >
                                       {field.value ? (
-                                        format(field.value, 'HH:mm')
+                                        format(field.value, 'HH:mm', {
+                                          locale: vi
+                                        })
                                       ) : (
                                         <span>Chọn thời gian mở cửa</span>
                                       )}
@@ -1124,7 +1119,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                       )}
                                     >
                                       {field.value ? (
-                                        format(field.value, 'dd/MM/yyyy')
+                                        format(field.value, 'dd/MM/yyyy', {
+                                          locale: vi
+                                        })
                                       ) : (
                                         <span>Chọn ngày kết thúc mua vé</span>
                                       )}
@@ -1174,7 +1171,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                       )}
                                     >
                                       {field.value ? (
-                                        format(field.value, 'HH:mm')
+                                        format(field.value, 'HH:mm', {
+                                          locale: vi
+                                        })
                                       ) : (
                                         <span>Chọn thời gian đóng cửa</span>
                                       )}
@@ -1264,9 +1263,11 @@ const CreateEventPage: NextPageWithLayout = () => {
                         addressForm.watch().eventDate,
                         addressForm.watch().startTime
                       ),
-                      location: `${addressForm.watch().address} - ${
-                        addressForm.watch().district
-                      } - ${addressForm.watch().province}}`
+                      location: `${
+                        addressForm.watch().address
+                      }, ${districts?.find(
+                        item => item.code === addressForm.watch().district
+                      )?.path_with_type}`
                     }}
                   />
                 </div>
@@ -1321,7 +1322,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                         )}
                                       >
                                         {field.value ? (
-                                          format(field.value, 'dd/MM/yyyy')
+                                          format(field.value, 'dd/MM/yyyy', {
+                                            locale: vi
+                                          })
                                         ) : (
                                           <span>
                                             Chọn ngày xuất bản sự kiện
@@ -1374,7 +1377,9 @@ const CreateEventPage: NextPageWithLayout = () => {
                                         )}
                                       >
                                         {field.value ? (
-                                          format(field.value, 'HH:mm')
+                                          format(field.value, 'HH:mm', {
+                                            locale: vi
+                                          })
                                         ) : (
                                           <span>
                                             Chọn thời gian xuất bản sự kiện

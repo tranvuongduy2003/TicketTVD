@@ -4,7 +4,7 @@ import {
   getHours,
   getMinutes,
   getMonth,
-  getYear
+  getSeconds
 } from 'date-fns';
 
 export const formatDate = (date: Date) => {
@@ -24,9 +24,13 @@ export const formatDate = (date: Date) => {
     'Thứ 7'
   ];
 
-  const result = `${dayOfWeekNames[dayOfWeek]}, ${dayOfMonth} tháng ${
+  const result = `${dayOfWeekNames[dayOfWeek]}, ${dayOfMonth + 1} tháng ${
     month + 1
-  } | ${format(date, 'hh:mm aa')}`;
+  } | ${date.toLocaleString('en-EN', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true
+  })}`;
 
   return result;
 };
@@ -58,20 +62,14 @@ export const formatDateToTime = (date: Date) => {
 };
 
 export const concatDateWithTime = (date: Date, time: Date) => {
-  const dayOfMonth = date.getDate().toLocaleString('vi-VN', {
-    minimumIntegerDigits: 2,
-    useGrouping: false
-  });
+  const hours = getHours(time);
 
-  const month = getMonth(date).toLocaleString('vi-VN', {
-    minimumIntegerDigits: 2,
-    useGrouping: false
-  });
+  const minutes = getMinutes(time);
 
-  const year = getYear(date);
+  const seconds = getSeconds(time);
 
   const result = new Date(
-    `${year}-${month}-${dayOfMonth} ${time.toTimeString().split(' ')[0]}`
+    `${date.toDateString()} ${hours}:${minutes}:${seconds} GMT+0700`
   );
 
   return result;

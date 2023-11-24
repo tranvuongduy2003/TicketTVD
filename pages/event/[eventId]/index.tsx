@@ -13,6 +13,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { ReactElement, ReactNode, useState } from 'react';
 import {
+  LuArrowLeft,
   LuCalendar,
   LuClock,
   LuHeart,
@@ -29,8 +30,8 @@ interface DetailItemProps {
 }
 
 const EventDetailPage: NextPageWithLayout = () => {
-  const { query } = useRouter();
-  const { eventId } = query;
+  const router = useRouter();
+  const { eventId } = router.query;
 
   const { events, isLoading: eventLoading } = useEvents();
   const { event, isLoading } = useEvent(Number.parseInt(eventId as string));
@@ -43,6 +44,12 @@ const EventDetailPage: NextPageWithLayout = () => {
     <div>
       {/* HEADER */}
       <div className="w-full py-[120px] px-[132px] relative">
+        <div
+          onClick={() => router.back()}
+          className="w-9 h-9 rounded-full flex items-center justify-center text-neutral-700 absolute z-50 top-9 left-8 bg-white hover:bg-slate-100 cursor-pointer"
+        >
+          <LuArrowLeft />
+        </div>
         <Image
           fill
           src={event?.coverImage ?? ''}
@@ -184,7 +191,7 @@ const EventDetailPage: NextPageWithLayout = () => {
                   {event.promotionPlan > 0 && (
                     <div className="p-[6px] flex items-center text-white gap-1 text-xs bg-secondary-500 rounded-full">
                       <MdOutlineDiscount />
-                      10% GIẢM
+                      {event.promotionPlan}% GIẢM
                     </div>
                   )}
                 </div>
@@ -194,7 +201,12 @@ const EventDetailPage: NextPageWithLayout = () => {
                 </span>
               )}
             </div>
-            <Button className="text-white w-full">Mua vé</Button>
+            <Button
+              className="text-white w-full"
+              onClick={() => router.push(`/event/${eventId}/checkout`)}
+            >
+              Mua vé
+            </Button>
           </div>
         </div>
       </div>

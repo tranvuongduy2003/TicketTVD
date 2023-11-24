@@ -1,5 +1,6 @@
 import { eventApi } from '@/apis';
 import { QUERY_KEY } from '@/constants';
+import { useEffect, useState } from 'react';
 import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
 
@@ -7,8 +8,11 @@ export function useEvents(
   organizerId?: string,
   options?: Partial<SWRConfiguration>
 ) {
+  const [searchValue, setSearchValue] = useState<string>();
+
   const {
     data: events,
+    mutate,
     error,
     isLoading
   } = useSWR(
@@ -16,7 +20,7 @@ export function useEvents(
     () =>
       organizerId
         ? eventApi.getEventsByOrganizerId(organizerId)
-        : eventApi.getEvents(),
+        : eventApi.getEvents(searchValue),
     {
       revalidateOnMount: true,
       revalidateOnFocus: true,
@@ -25,5 +29,9 @@ export function useEvents(
     }
   );
 
-  return { events, error, isLoading };
+  useEffect(() => {
+    mutate();
+  }, [searchValue]);
+
+  return { events, setSearchValue, error, isLoading };
 }

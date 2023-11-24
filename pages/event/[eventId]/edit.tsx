@@ -24,21 +24,19 @@ import {
   SelectTrigger,
   SelectValue,
   Separator,
-  Skeleton,
   Switch,
   Textarea,
   TimePicker,
   toast
 } from '@/components/ui';
 import { MILLISECOND_PER_SECOND } from '@/constants';
-import { useAuth, useCategories, useEvent } from '@/hooks';
-import { District, Event, NextPageWithLayout, Province } from '@/models';
+import { useCategories, useEvent } from '@/hooks';
+import { District, Event, NextPageWithLayout, Tree } from '@/models';
 import { cn } from '@/types';
 import {
   compressFile,
   concatDateWithTime,
   formatDate,
-  formatDateToLocaleDate,
   getFile,
   getFileName,
   getImageData
@@ -48,7 +46,7 @@ import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import {
   LuAlertCircle,
@@ -76,7 +74,7 @@ const generalInfoFormSchema = z.object({
   name: z.string({ required_error: 'Vui lòng nhập tên sự kiện' }),
   description: z.string({ required_error: 'Vui lòng nhập mô tả sự kiện' }),
   categoryId: z.string({ required_error: 'Vui lòng chọn thể loại' }),
-  album: z.any()
+  album: z.any().optional()
 });
 
 const addressFormSchema = z.object({
@@ -120,7 +118,6 @@ const publishFormSchema = z.object({
 
 const EditEventPage: NextPageWithLayout = () => {
   const { categories } = useCategories();
-  const { profile } = useAuth();
 
   const { query } = useRouter();
   const { eventId } = query;
@@ -134,9 +131,8 @@ const EditEventPage: NextPageWithLayout = () => {
   const [albumPreview, setAlbumPreview] = useState<string[]>([]);
   const [album, setAlbum] = useState<File[]>([]);
   const [step, setStep] = useState<number>(1);
-  const [districts, setDistricts] = useState<District[]>();
-  const [provinces, setProvinces] = useState<Province[]>();
-  const [province, setProvince] = useState<Province>();
+  const [tree, setTree] = useState<Tree[]>();
+  const [province, setProvince] = useState<Tree>();
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isFileLoading, setIsFileLoading] = useState<boolean>(false);
 
@@ -169,81 +165,38 @@ const EditEventPage: NextPageWithLayout = () => {
     })();
   }, [event]);
 
-  if (isLoading && !event) return <></>;
-
   const uploadCoverImageForm = useForm<
     z.infer<typeof uploadCoverImageFormSchema>
   >({
-    resolver: zodResolver(uploadCoverImageFormSchema),
-    defaultValues: {
-      coverImage: coverImage
-    },
     mode: 'onChange'
   });
 
   const generalInfoForm = useForm<z.infer<typeof generalInfoFormSchema>>({
     resolver: zodResolver(generalInfoFormSchema),
-    defaultValues: {
-      album: album,
-      categoryId: JSON.stringify(event?.categoryId),
-      description: event?.description,
-      name: event?.name
-    },
     mode: 'onChange'
   });
 
   const addressForm = useForm<z.infer<typeof addressFormSchema>>({
     resolver: zodResolver(addressFormSchema),
-    defaultValues: {
-      address: event?.location?.split(', ')[0],
-      district: districts?.find(item => {
-        const words = event?.location?.split(', ') || [];
-        return item.name_with_type === words[words.length - 2];
-      })?.code,
-      province: provinces?.find(item => {
-        const words = event?.location?.split(', ') || [];
-        return item.name_with_type === words[words.length - 1];
-      })?.code,
-      endTime: event?.endTime,
-      startTime: event?.startTime,
-      eventDate: event?.eventDate
-    },
     mode: 'onChange'
   });
 
   const ticketInfoForm = useForm<z.infer<typeof ticketInfoFormSchema>>({
     resolver: zodResolver(ticketInfoFormSchema),
-    defaultValues: {
-      isPaid: event?.ticketIsPaid === false ? 'free' : 'paid',
-      quantity: event?.ticketQuantity,
-      price: event?.ticketPrice,
-      ticketStartDate: event?.ticketStartTime,
-      ticketStartTime: event?.ticketStartTime,
-      ticketCloseDate: event?.ticketCloseTime,
-      ticketCloseTime: event?.ticketCloseTime,
-      isPromotion: event?.isPromotion,
-      promotionPlan: event?.promotionPlan
-    },
     mode: 'onChange'
   });
 
   const publishForm = useForm<z.infer<typeof publishFormSchema>>({
     resolver: zodResolver(publishFormSchema),
-    defaultValues: {
-      isPublish: event?.publishTime ? true : false,
-      publishDate: event?.publishTime,
-      publishTime: event?.publishTime
-    },
     mode: 'onChange'
   });
 
   const handleFetchProvinces = useRef<any>(null);
-  const handleFetchDistricts = useRef<any>(null);
 
   useEffect(() => {
     handleFetchProvinces.current = async () => {
       try {
-        fetch('/data/tinh_tp.json', {
+        fetch('/data/tree.json', {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json'
@@ -252,18 +205,24 @@ const EditEventPage: NextPageWithLayout = () => {
           .then(function (response) {
             return response.json();
           })
-          .then(provincesData => setProvinces(provincesData));
+          .then(treeData => {
+            if (event) {
+              const words = event.location?.split(', ') || [];
+              const province = treeData?.find((item: Tree) => {
+                return item.name_with_type === words[words.length - 1];
+              });
+              const district = province?.quan_huyen.find((item: District) => {
+                return item.name_with_type === words[words.length - 2];
+              });
 
-        fetch('/data/quan_huyen.json', {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          }
-        })
-          .then(function (response) {
-            return response.json();
-          })
-          .then(districtsData => setDistricts(districtsData));
+              addressForm.reset({
+                address: words[0],
+                province: province?.code as string,
+                district: district?.code as string
+              });
+            }
+            setTree(treeData);
+          });
       } catch (error) {
         console.log(error);
       }
@@ -273,100 +232,85 @@ const EditEventPage: NextPageWithLayout = () => {
   }, []);
 
   useEffect(() => {
-    if (event) {
-      uploadCoverImageForm.setValue('coverImage', event.coverImage);
-      uploadCoverImageForm.trigger();
+    (async () => {
+      try {
+        if (event) {
+          uploadCoverImageForm.reset({
+            coverImage: event.coverImage
+          });
 
-      generalInfoForm.setValue('album', album);
-      generalInfoForm.setValue('categoryId', JSON.stringify(event.categoryId));
-      generalInfoForm.setValue('description', event.description);
-      generalInfoForm.setValue('name', event.name);
-      generalInfoForm.trigger();
+          generalInfoForm.reset({
+            album: event.album,
+            categoryId: JSON.stringify(event.categoryId),
+            description: event.description,
+            name: event.name
+          });
 
-      addressForm.setValue('address', event.location?.split(', ')[0]);
-      addressForm.setValue(
-        'district',
-        districts?.find(item => {
           const words = event.location?.split(', ') || [];
-          return item.name_with_type === words[words.length - 2];
-        })?.code as string
-      );
-      addressForm.setValue(
-        'province',
-        provinces?.find(item => {
-          const words = event.location?.split(', ') || [];
-          return item.name_with_type === words[words.length - 1];
-        })?.code as string
-      );
-      addressForm.setValue('endTime', event.endTime);
-      addressForm.setValue('startTime', event.startTime);
-      addressForm.setValue('eventDate', event.eventDate);
-      addressForm.trigger();
+          const province = tree?.find((item: Tree) => {
+            return item.name_with_type === words[words.length - 1];
+          });
+          const district = province?.quan_huyen.find((item: District) => {
+            return item.name_with_type === words[words.length - 2];
+          });
+          addressForm.reset({
+            address: words[0] as string,
+            province: province?.code as string,
+            district: district?.code as string,
+            endTime: event.endTime,
+            startTime: event.startTime,
+            eventDate: event.eventDate
+          });
+          await addressForm.trigger();
 
-      ticketInfoForm.setValue(
-        'isPaid',
-        event.ticketIsPaid === false ? 'free' : 'paid'
-      );
-      ticketInfoForm.setValue('quantity', event.ticketQuantity || 0);
-      ticketInfoForm.setValue('price', event.ticketPrice);
-      ticketInfoForm.setValue('ticketStartDate', event.ticketStartTime);
-      ticketInfoForm.setValue('ticketStartTime', event.ticketStartTime);
-      ticketInfoForm.setValue('ticketCloseDate', event.ticketCloseTime);
-      ticketInfoForm.setValue('ticketCloseTime', event.ticketCloseTime);
-      ticketInfoForm.setValue('isPromotion', event.isPromotion);
-      ticketInfoForm.setValue('promotionPlan', event.promotionPlan);
-      ticketInfoForm.trigger();
+          ticketInfoForm.reset({
+            isPaid: event.ticketIsPaid === false ? 'free' : 'paid',
+            quantity: event.ticketQuantity || 0,
+            price: event.ticketPrice,
+            ticketStartDate: event.ticketStartTime,
+            ticketStartTime: event.ticketStartTime,
+            ticketCloseDate: event.ticketCloseTime,
+            ticketCloseTime: event.ticketCloseTime,
+            isPromotion: event.isPromotion,
+            promotionPlan: event.promotionPlan
+          });
+          await ticketInfoForm.trigger();
 
-      publishForm.setValue('isPublish', event.publishTime ? true : false);
-      publishForm.setValue('publishDate', event.publishTime);
-      publishForm.setValue('publishTime', event.publishTime);
-      publishForm.trigger();
-    }
+          publishForm.reset({
+            isPublish: event.publishTime ? true : false
+          });
+          if (event.publishTime) {
+            publishForm.reset({
+              publishDate: new Date(event.publishTime),
+              publishTime: new Date(event.publishTime)
+            });
+          }
+          await publishForm.trigger();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    })();
   }, [event]);
 
   useEffect(() => {
-    if (provinces) {
+    if (tree) {
       setProvince(
-        provinces.find(item => {
+        tree.find(item => {
           const words = event?.location?.split(', ') || [];
           return item.name_with_type === words[words.length - 1];
         })
       );
     }
-  }, [event?.location, provinces]);
+  }, [event?.location, tree]);
 
   useEffect(() => {
-    handleFetchDistricts.current = async () => {
-      if (
-        (!addressForm.watch().province ||
-          addressForm.watch().province === '') &&
-        !province
-      )
-        return;
-      try {
-        const districtsData = await fetch('/data/quan_huyen.json', {
-          headers: {
-            'Content-Type': 'application/json',
-            Accept: 'application/json'
-          }
-        }).then(function (response) {
-          return response.json();
-        });
-        const districtsInProvince = districtsData.filter((item: District) => {
-          if (addressForm.watch().province) {
-            return item.parent_code === addressForm.watch().province;
-          } else {
-            return item.parent_code === province?.code;
-          }
-        });
-        setDistricts(districtsInProvince);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    handleFetchDistricts.current();
-    () => handleFetchDistricts.current;
-  }, [addressForm.watch().province, province]);
+    setProvince(
+      tree?.find(item => {
+        return item.code === addressForm.watch().province;
+      })
+    );
+  }, [addressForm.watch().province]);
 
   async function handleUpdateEvent() {
     setIsLoading(true);
@@ -391,23 +335,30 @@ const EditEventPage: NextPageWithLayout = () => {
       const { isPublish, publishDate, publishTime } = publishForm.getValues();
 
       const data: Partial<Event> = {
+        coverImage: coverImagePreview!,
         name: name,
         description: description,
         categoryId: Number.parseInt(categoryId),
-        location: `${address}, ${districts?.find(item => item.code === district)
-          ?.path_with_type}`,
-        eventDate: new Date(eventDate),
-        startTime: new Date(startTime),
-        endTime: new Date(endTime),
+        location: `${address}, ${tree
+          ?.find(item => item.code === province?.code)
+          ?.quan_huyen.find(item => item.code === district)?.path_with_type}`,
+        eventDate: eventDate,
+        startTime: startTime,
+        endTime: endTime,
         ticketIsPaid: isPaid === 'paid' ? true : false,
         ticketQuantity: quantity,
         ticketPrice: Number.parseInt(price),
-        ticketStartTime: concatDateWithTime(ticketStartDate, ticketStartTime),
-        ticketCloseTime: concatDateWithTime(ticketCloseDate, ticketCloseTime),
+        ticketStartTime: concatDateWithTime(
+          new Date(ticketStartDate),
+          new Date(ticketStartTime)
+        ),
+        ticketCloseTime: concatDateWithTime(
+          new Date(ticketCloseDate),
+          new Date(ticketCloseTime)
+        ),
         isPromotion: isPromotion,
         promotionPlan: isPromotion ? Number.parseInt(promotionPlan) : 0,
-        album: [],
-        creatorId: profile?.id
+        album: albumPreview
       };
 
       if (isPublish) {
@@ -443,33 +394,37 @@ const EditEventPage: NextPageWithLayout = () => {
         data.album = albumUrls;
       }
 
-      await eventApi.createEvent(data);
+      await eventApi.updateEvent(Number.parseInt(eventId as string), data);
 
       setIsLoading(false);
       toast({
-        title: 'Tạo sự kiện mới thành công',
+        title: 'Cập nhật sự kiện mới thành công',
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
     } catch (error: any) {
+      console.log(
+        '🚀 ~ file: edit.tsx:406 ~ handleUpdateEvent ~ error:',
+        error
+      );
       setIsLoading(false);
       toast({
-        title: 'Tạo sự kiện mới thất bại',
-        description: error,
+        title: 'Cập nhật sự kiện mới thất bại',
+        description: JSON.stringify(error),
         variant: 'destructive',
         duration: MILLISECOND_PER_SECOND
       });
     }
   }
 
-  return eventLoading ? (
+  return eventLoading || !event || !tree ? (
     <Loading />
   ) : (
     event && (
       <div className="mx-[132px] my-[34px]">
         {/* HEADER */}
         <h2 className="text-[32px] font-bold leading-[48px] mb-8">
-          Tạo sự kiện mới
+          Chỉnh sửa thông tin sự kiện
         </h2>
 
         {/* CONTENT */}
@@ -592,28 +547,19 @@ const EditEventPage: NextPageWithLayout = () => {
                         name="coverImage"
                         render={({ field: { onChange, value, ...rest } }) => (
                           <FormItem>
-                            {isFileLoading ? (
-                              <Skeleton className="w-full h-[332px]" />
-                            ) : (
-                              coverImagePreview && (
-                                <div className="relative overflow-hidden w-full h-[332px] rounded-m bg-neutral-200 hover:bg-neutral-300 cursor-pointer">
-                                  <Image
-                                    src={coverImagePreview}
-                                    alt="cover-image"
-                                    fill
-                                    objectFit="cover"
-                                  />
-                                </div>
-                              )
+                            {coverImagePreview && (
+                              <div className="relative overflow-hidden w-full h-[332px] rounded-m bg-neutral-200 hover:bg-neutral-300 cursor-pointer">
+                                <Image
+                                  src={coverImagePreview}
+                                  alt="cover-image"
+                                  fill
+                                  objectFit="cover"
+                                />
+                              </div>
                             )}
                             <div className="flex items-center justify-between">
                               <span className="text-sm text-neutral-550">
-                                {isFileLoading ? (
-                                  <Skeleton className="w-full h-[14px]" />
-                                ) : (
-                                  coverImagePreview &&
-                                  getFileName(coverImagePreview)
-                                )}
+                                {getFileName(coverImagePreview!)}
                               </span>
                               <div className="flex items-center gap-4">
                                 <Button
@@ -665,16 +611,15 @@ const EditEventPage: NextPageWithLayout = () => {
                       <FormField
                         control={generalInfoForm.control}
                         name="name"
-                        defaultValue={event.name}
                         render={({ field }) => (
-                          <FormItem defaultValue={event.name}>
+                          <FormItem>
                             <FormLabel>
                               <span className="text-xl font-bold">Tên</span>
                             </FormLabel>
                             <p className="text-sm text-neutral-550 my-2">
                               Đặt tên hấp dẫn và đáng nhớ
                             </p>
-                            <FormControl defaultValue={event.name}>
+                            <FormControl>
                               <Input
                                 type="text"
                                 placeholder="Nhập tên sự kiện"
@@ -688,9 +633,8 @@ const EditEventPage: NextPageWithLayout = () => {
                       <FormField
                         control={generalInfoForm.control}
                         name="description"
-                        defaultValue={event.description}
                         render={({ field }) => (
-                          <FormItem defaultValue={event.description}>
+                          <FormItem>
                             <FormLabel>
                               <span className="text-xl font-bold">Mô tả</span>
                             </FormLabel>
@@ -753,42 +697,28 @@ const EditEventPage: NextPageWithLayout = () => {
                         render={({ field: { onChange, value, ...rest } }) => (
                           <FormItem>
                             <div className="flex items-start gap-4">
-                              {isFileLoading ? (
-                                <>
-                                  <Skeleton className="w-[90px] h-[90px]" />
-                                  <Skeleton className="w-[90px] h-[90px]" />
-                                  <Skeleton className="w-[90px] h-[90px]" />
-                                  <Skeleton className="w-[90px] h-[90px]" />
-                                  <Skeleton className="w-[90px] h-[90px]" />
-                                </>
-                              ) : (
-                                <>
-                                  {albumPreview?.map((item, index) => (
-                                    <div
-                                      key={index}
-                                      className="flex flex-col items-center gap-2 w-[90px]"
-                                    >
-                                      <div className="text-2xl h-[90px] w-[90px] overflow-hidden rounded-m inline-block relative">
-                                        <Image
-                                          src={item}
-                                          alt="album-image"
-                                          fill
-                                          objectFit="cover"
-                                        />
-                                      </div>
-                                      <p className="break-all">
-                                        {album &&
-                                          album.length > 0 &&
-                                          album[index].name}
-                                      </p>
-                                    </div>
-                                  ))}
-                                  {album.length < 5 && (
-                                    <FormLabel className="text-2xl p-8 border rounded-m inline-block border-dashed">
-                                      <LuPlus />
-                                    </FormLabel>
-                                  )}
-                                </>
+                              {albumPreview?.map((item, index) => (
+                                <div
+                                  key={index}
+                                  className="flex flex-col items-center gap-2 w-[90px]"
+                                >
+                                  <div className="text-2xl h-[90px] w-[90px] overflow-hidden rounded-m inline-block relative">
+                                    <Image
+                                      src={item}
+                                      alt="album-image"
+                                      fill
+                                      objectFit="cover"
+                                    />
+                                  </div>
+                                  <p className="break-all">
+                                    {getFileName(item)}
+                                  </p>
+                                </div>
+                              ))}
+                              {albumPreview && albumPreview.length < 5 && (
+                                <FormLabel className="text-2xl p-8 border rounded-m inline-block border-dashed">
+                                  <LuPlus />
+                                </FormLabel>
                               )}
                             </div>
                             <FormControl>
@@ -825,10 +755,7 @@ const EditEventPage: NextPageWithLayout = () => {
                   title="Địa điểm và thời gian"
                 >
                   <Form {...addressForm}>
-                    <form
-                      onSubmit={addressForm.handleSubmit(() => {})}
-                      className="mt-8 flex flex-col gap-8"
-                    >
+                    <form className="mt-8 flex flex-col gap-8">
                       <div>
                         <h6 className="text-xl font-bold">Địa điểm</h6>
                         <p className="text-sm text-neutral-550 my-2">
@@ -861,26 +788,44 @@ const EditEventPage: NextPageWithLayout = () => {
                             control={addressForm.control}
                             name="district"
                             defaultValue={
-                              districts?.find(item => {
-                                const words =
-                                  event?.location?.split(', ') || [];
-                                return (
-                                  item.name_with_type ===
-                                  words[words.length - 2]
-                                );
-                              })?.code
+                              tree
+                                ?.find(item => {
+                                  const words =
+                                    event?.location?.split(', ') || [];
+                                  return (
+                                    item.name_with_type ===
+                                    words[words.length - 1]
+                                  );
+                                })
+                                ?.quan_huyen.find(item => {
+                                  const words =
+                                    event?.location?.split(', ') || [];
+                                  return (
+                                    item.name_with_type ===
+                                    words[words.length - 2]
+                                  );
+                                })?.code
                             }
                             render={({ field }) => (
                               <FormItem
                                 defaultValue={
-                                  districts?.find(item => {
-                                    const words =
-                                      event?.location?.split(', ') || [];
-                                    return (
-                                      item.name_with_type ===
-                                      words[words.length - 2]
-                                    );
-                                  })?.code
+                                  tree
+                                    ?.find(item => {
+                                      const words =
+                                        event?.location?.split(', ') || [];
+                                      return (
+                                        item.name_with_type ===
+                                        words[words.length - 1]
+                                      );
+                                    })
+                                    ?.quan_huyen.find(item => {
+                                      const words =
+                                        event?.location?.split(', ') || [];
+                                      return (
+                                        item.name_with_type ===
+                                        words[words.length - 2]
+                                      );
+                                    })?.code
                                 }
                               >
                                 <FormLabel className="text-sm font-bold">
@@ -897,20 +842,44 @@ const EditEventPage: NextPageWithLayout = () => {
                                   </FormControl>
                                   <SelectContent
                                     className={cn(
-                                      districts &&
-                                        districts.length > 0 &&
-                                        'h-[30vh]'
+                                      (!province && tree) ||
+                                        (province?.quan_huyen &&
+                                          province?.quan_huyen.length > 0 &&
+                                          'h-[30vh]')
                                     )}
                                   >
                                     <SelectGroup>
-                                      {districts?.map(district => (
-                                        <SelectItem
-                                          key={district.code}
-                                          value={district.code}
-                                        >
-                                          {district.name_with_type}
-                                        </SelectItem>
-                                      ))}
+                                      {province &&
+                                      province.quan_huyen &&
+                                      province.quan_huyen.length > 0
+                                        ? province?.quan_huyen?.map(
+                                            district => (
+                                              <SelectItem
+                                                key={district.code}
+                                                value={district.code}
+                                              >
+                                                {district.name_with_type}
+                                              </SelectItem>
+                                            )
+                                          )
+                                        : tree
+                                            ?.find(item => {
+                                              const words =
+                                                event?.location?.split(', ') ||
+                                                [];
+                                              return (
+                                                item.name_with_type ===
+                                                words[words.length - 1]
+                                              );
+                                            })
+                                            ?.quan_huyen.map(district => (
+                                              <SelectItem
+                                                key={district.code}
+                                                value={district.code}
+                                              >
+                                                {district.name_with_type}
+                                              </SelectItem>
+                                            ))}
                                     </SelectGroup>
                                   </SelectContent>
                                 </Select>
@@ -922,7 +891,7 @@ const EditEventPage: NextPageWithLayout = () => {
                             control={addressForm.control}
                             name="province"
                             defaultValue={
-                              provinces?.find(item => {
+                              tree?.find(item => {
                                 const words =
                                   event?.location?.split(', ') || [];
                                 return (
@@ -934,7 +903,7 @@ const EditEventPage: NextPageWithLayout = () => {
                             render={({ field }) => (
                               <FormItem
                                 defaultValue={
-                                  provinces?.find(item => {
+                                  tree?.find(item => {
                                     const words =
                                       event?.location?.split(', ') || [];
                                     return (
@@ -958,7 +927,7 @@ const EditEventPage: NextPageWithLayout = () => {
                                   </FormControl>
                                   <SelectContent className="h-[30vh]">
                                     <SelectGroup>
-                                      {provinces?.map(province => (
+                                      {tree?.map(province => (
                                         <SelectItem
                                           key={province.code}
                                           value={province.code}
@@ -985,9 +954,15 @@ const EditEventPage: NextPageWithLayout = () => {
                           <FormField
                             control={addressForm.control}
                             name="eventDate"
-                            defaultValue={event.eventDate}
+                            {...(event.eventDate
+                              ? { defaultValue: event.eventDate }
+                              : {})}
                             render={({ field }) => (
-                              <FormItem defaultValue={event.eventDate as any}>
+                              <FormItem
+                                {...(event.eventDate
+                                  ? { defaultValue: event.eventDate as any }
+                                  : {})}
+                              >
                                 <FormLabel className="text-sm font-bold">
                                   Ngày tổ chức sự kiện
                                 </FormLabel>
@@ -1042,10 +1017,14 @@ const EditEventPage: NextPageWithLayout = () => {
                               <FormField
                                 control={addressForm.control}
                                 name="startTime"
-                                defaultValue={event.startTime}
+                                {...(event.startTime
+                                  ? { defaultValue: event.startTime }
+                                  : {})}
                                 render={({ field }) => (
                                   <FormItem
-                                    defaultValue={event.startTime as any}
+                                    {...(event.startTime
+                                      ? { defaultValue: event.startTime as any }
+                                      : {})}
                                   >
                                     <FormLabel className="text-sm font-bold">
                                       Thời gian bắt đầu
@@ -1094,9 +1073,15 @@ const EditEventPage: NextPageWithLayout = () => {
                               <FormField
                                 control={addressForm.control}
                                 name="endTime"
-                                defaultValue={event.endTime}
+                                {...(event.endTime
+                                  ? { defaultValue: event.endTime }
+                                  : {})}
                                 render={({ field }) => (
-                                  <FormItem defaultValue={event.endTime as any}>
+                                  <FormItem
+                                    {...(event.endTime
+                                      ? { defaultValue: event.endTime as any }
+                                      : {})}
+                                  >
                                     <FormLabel className="text-sm font-bold">
                                       Thời gian kết thúc
                                     </FormLabel>
@@ -1345,7 +1330,11 @@ const EditEventPage: NextPageWithLayout = () => {
                                         )}
                                       >
                                         {field.value ? (
-                                          format(new Date(field.value), 'HH:mm')
+                                          format(
+                                            new Date(field.value),
+                                            'HH:mm',
+                                            { locale: vi }
+                                          )
                                         ) : (
                                           <span>Chọn thời gian mở cửa</span>
                                         )}
@@ -1449,7 +1438,11 @@ const EditEventPage: NextPageWithLayout = () => {
                                         )}
                                       >
                                         {field.value ? (
-                                          format(new Date(field.value), 'HH:mm')
+                                          format(
+                                            new Date(field.value),
+                                            'HH:mm',
+                                            { locale: vi }
+                                          )
                                         ) : (
                                           <span>Chọn thời gian đóng cửa</span>
                                         )}
@@ -1550,9 +1543,11 @@ const EditEventPage: NextPageWithLayout = () => {
                           new Date(addressForm.watch().eventDate),
                           new Date(addressForm.watch().startTime)
                         ),
-                        location: `${addressForm.watch().address} - ${
-                          addressForm.watch().district
-                        } - ${addressForm.watch().province}}`
+                        location: `${
+                          addressForm.watch().address
+                        }, ${province?.quan_huyen?.find(
+                          item => item.code === addressForm.watch().district
+                        )?.path_with_type}`
                       }}
                     />
                   </div>
@@ -1591,7 +1586,8 @@ const EditEventPage: NextPageWithLayout = () => {
                           Đặt thời gian xuất bản để đảm bảo sự kiện của bạn xuất
                           hiện trên trang web vào thời gian được chỉ định
                         </p>
-                        {publishForm.watch().isPublish && (
+                        {(event.publishTime ||
+                          publishForm.watch().isPublish === true) && (
                           <div className="grid grid-cols-2 grid-rows-2 gap-x-8 gap-y-2">
                             <FormField
                               control={publishForm.control}
@@ -1655,10 +1651,14 @@ const EditEventPage: NextPageWithLayout = () => {
                             <FormField
                               control={publishForm.control}
                               name="publishTime"
-                              defaultValue={event.publishTime}
+                              {...(event.publishTime
+                                ? { defaultValue: event.publishTime }
+                                : {})}
                               render={({ field }) => (
                                 <FormItem
-                                  defaultValue={event.publishTime as any}
+                                  {...(event.publishTime
+                                    ? { defaultValue: event.publishTime as any }
+                                    : {})}
                                 >
                                   <FormLabel className="text-sm font-bold">
                                     Thời gian xuất bản

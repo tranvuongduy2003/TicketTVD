@@ -11,7 +11,6 @@ export function useEvent(id: number, options?: Partial<SWRConfiguration>) {
       revalidateOnMount: true,
       revalidateOnFocus: true,
       revalidateOnReconnect: true,
-      keepPreviousData: false,
       ...options
     }
   );

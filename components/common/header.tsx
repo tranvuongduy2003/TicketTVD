@@ -10,7 +10,15 @@ import {
 } from './header-group';
 
 export function Header() {
-  const { profile } = useAuth();
+  const { profile } = useAuth({
+    revalidateOnFocus: false,
+    revalidateOnMount: false,
+    revalidateOnReconnect: false,
+    revalidateIfStale: false,
+    errorRetryCount: 0,
+    errorRetryInterval: 0,
+    keepPreviousData: false
+  });
 
   return !profile ? (
     <MainHeader />

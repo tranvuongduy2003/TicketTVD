@@ -1,5 +1,5 @@
 import { fileApi, userApi } from '@/apis';
-import { AdminLayout, MainLayout, ProtectedLayout } from '@/components/layout';
+import { ProtectedLayout } from '@/components/layout';
 import { ChangePasswordCard, DeactivateUserCard } from '@/components/profile';
 import {
   Avatar,

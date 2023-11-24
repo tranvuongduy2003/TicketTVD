@@ -34,7 +34,7 @@ const Home: NextPageWithLayout = () => {
         </h1>
         {/* SEARCH */}
         <div className="absolute bottom-0 z-30 px-[293px] w-full translate-y-1/2">
-          <EventSearchBar />
+          <EventSearchBar onSearch={() => router.push('/event/search')} />
         </div>
       </section>
 
@@ -61,9 +61,12 @@ const Home: NextPageWithLayout = () => {
               <Skeleton className="h-[349px]" />
             </>
           ) : (
-            events &&
-            events.length > 0 &&
             events
+              ?.sort(
+                (a, b) =>
+                  new Date(b.createdAt).getTime() -
+                  new Date(a.createdAt).getTime()
+              )
               ?.slice(0, 3)
               .map(event => <EventCard key={event.id} event={event} />)
           )}
@@ -120,6 +123,16 @@ const Home: NextPageWithLayout = () => {
             events &&
             events.length > 0 &&
             events
+              .filter(event => {
+                const currentDate = new Date();
+                const twentyFourHoursLater = new Date(
+                  currentDate.getTime() + 24 * 60 * 60 * 1000
+                );
+                return (
+                  new Date(event.eventDate) > currentDate &&
+                  new Date(event.eventDate) <= twentyFourHoursLater
+                );
+              })
               ?.slice(0, 2)
               .map(event => (
                 <EventCard key={event.id} event={event} size="large" />
