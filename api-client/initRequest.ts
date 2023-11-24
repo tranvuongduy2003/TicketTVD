@@ -3,8 +3,7 @@ import {
   getAccessToken,
   getRefreshToken,
   handleLogOut,
-  handleRefreshToken,
-  logOut
+  handleRefreshToken
 } from '@/utils';
 import axios, {
   AxiosError,
@@ -12,6 +11,7 @@ import axios, {
   AxiosResponse,
   InternalAxiosRequestConfig
 } from 'axios';
+import Router from 'next/router';
 
 const requestConfig: AxiosRequestConfig = {
   baseURL: process.env.BASE_API_URL,
@@ -63,14 +63,17 @@ export default function initRequest() {
             } catch (error: any) {
               console.log(error);
               handleLogOut();
+              Router.push('/auth/login');
             }
           } else {
             handleLogOut();
+            Router.push('/auth/login');
           }
           break;
         }
         case 403: {
-          logOut();
+          handleLogOut();
+          Router.push('/auth/login');
           break;
         }
         case 500: {

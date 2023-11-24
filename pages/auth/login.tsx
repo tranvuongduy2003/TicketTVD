@@ -17,12 +17,10 @@ import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Login: NextPageWithLayout = () => {
-  const router = useRouter();
   const { logIn } = useAuth();
   const { toast } = useToast();
 
@@ -48,7 +46,6 @@ const Login: NextPageWithLayout = () => {
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
-      router.push('/');
     } catch (error: any) {
       setIsLoading(false);
       toast({

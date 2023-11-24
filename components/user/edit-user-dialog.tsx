@@ -104,9 +104,13 @@ export function EditUserDialog({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const { avatar, createdAt, phone, ...rest } = values;
+      const { avatar, createdAt, phone, role, ...rest } = values;
 
-      const payload: Partial<User> = { phoneNumber: phone, ...rest };
+      const payload: Partial<User> = {
+        phoneNumber: phone,
+        role: role as Role,
+        ...rest
+      };
 
       if (Boolean(avatar) && avatar.length > 0) {
         const avatarBlob = await fileApi.uploadFile(avatar[0]);

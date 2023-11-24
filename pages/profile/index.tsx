@@ -1,5 +1,5 @@
 import { fileApi, userApi } from '@/apis';
-import { AdminLayout } from '@/components/layout';
+import { ProtectedLayout } from '@/components/layout';
 import { ChangePasswordCard, DeactivateUserCard } from '@/components/profile';
 import {
   Avatar,
@@ -28,7 +28,7 @@ import {
 import { PHONE_REGEX } from '@/constants';
 import { useAuth } from '@/hooks';
 import { Gender, NextPageWithLayout, User } from '@/models';
-import { useAuthStore } from '@/stores';
+import { useProfileStore } from '@/stores';
 import { cn } from '@/types';
 import { getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -59,7 +59,7 @@ const Profile: NextPageWithLayout = () => {
   const { toast } = useToast();
 
   const { profile, isLoading } = useAuth();
-  const { setProfile } = useAuthStore();
+  const { setProfile } = useProfileStore();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [preview, setPreview] = useState<string>('');
@@ -320,6 +320,6 @@ const Profile: NextPageWithLayout = () => {
   );
 };
 
-Profile.Layout = AdminLayout;
+Profile.Layout = ProtectedLayout;
 
 export default Profile;

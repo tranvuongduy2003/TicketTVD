@@ -1,7 +1,8 @@
 import { authApi } from '@/apis';
-import { ACCESS_TOKEN, REFRESH_TOKEN } from '@/constants';
+import { ACCESS_TOKEN, QUERY_KEY, REFRESH_TOKEN } from '@/constants';
 import Router from 'next/router';
 import { getCookie, removeCookie, setCookie } from './session';
+import { mutate } from 'swr';
 
 export const getAccessToken = () => {
   return getCookie(ACCESS_TOKEN) || '';
@@ -10,13 +11,6 @@ export const getAccessToken = () => {
 export const getRefreshToken = () => {
   return getCookie(REFRESH_TOKEN) || '';
 };
-
-export function logOut() {
-  removeCookie(ACCESS_TOKEN);
-  removeCookie(REFRESH_TOKEN);
-  localStorage.clear();
-  Router.push('/auth/login');
-}
 
 export async function handleRefreshToken() {
   const refreshToken = getRefreshToken();
@@ -30,6 +24,7 @@ export async function handleRefreshToken() {
 }
 
 export function handleLogOut() {
+  mutate(QUERY_KEY.profile, null, false);
   removeCookie(ACCESS_TOKEN);
   removeCookie(REFRESH_TOKEN);
   localStorage.clear();

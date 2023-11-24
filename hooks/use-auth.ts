@@ -5,26 +5,24 @@ import {
   QUERY_KEY,
   REFRESH_TOKEN
 } from '@/constants';
-import { useAuthStore } from '@/stores';
+import { useProfileStore } from '@/stores';
 import { LoginPayload } from '@/types';
-import { getAccessToken, handleLogOut, setCookie } from '@/utils';
-import { useEffect } from 'react';
-import useSWR from 'swr';
-import { SWRConfiguration } from 'swr/_internal';
+import { handleLogOut, setCookie } from '@/utils';
+import Router from 'next/router';
+import useSWR, { SWRConfiguration } from 'swr';
 
 export function useAuth(options?: Partial<SWRConfiguration>) {
-  const { setProfile, reset } = useAuthStore();
+  const { setProfile } = useProfileStore();
 
   const {
+    mutate,
     data: profile,
     isLoading,
-    error,
-    mutate
+    error
   } = useSWR(QUERY_KEY.profile, () => authApi.getUserProfile(), {
     dedupingInterval: MILLISECOND_PER_HOUR,
-    revalidateOnFocus: false,
-    onSuccess: data => {
-      setProfile(data);
+    onSuccess: user => {
+      setProfile(user);
     },
     ...options
   });
@@ -32,31 +30,22 @@ export function useAuth(options?: Partial<SWRConfiguration>) {
   async function logIn(payload: LoginPayload) {
     const { user, accessToken, refreshToken } = await authApi.signIn(payload);
 
-    setProfile(user);
-
     setCookie(ACCESS_TOKEN, accessToken);
     setCookie(REFRESH_TOKEN, refreshToken);
 
     await mutate(user, false);
   }
 
-  useEffect(() => {
-    const accessToken = getAccessToken();
-    if (!Boolean(accessToken)) {
-      logOut();
-    }
-  }, []);
-
-  function logOut() {
-    reset();
+  async function logOut() {
     handleLogOut();
-    mutate(null!, false);
+    await mutate(null!, false);
+    Router.push('/auth/login');
   }
 
   return {
+    error,
     isLoading,
     profile,
-    error,
     logIn,
     logOut,
     signUp: authApi.signUp
