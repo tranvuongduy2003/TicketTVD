@@ -56,7 +56,7 @@ export function CustomerHeader() {
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
                   router.pathname === '/explore' &&
-                    'font-bold border-b-4 border-primary-500'
+                    'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
                 Khám phá
@@ -69,7 +69,7 @@ export function CustomerHeader() {
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
                   router.pathname === '/upcoming' &&
-                    'font-bold border-b-4 border-primary-500'
+                    'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
                 Sắp diễn ra
@@ -82,7 +82,7 @@ export function CustomerHeader() {
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
                   router.pathname === '/my-ticket' &&
-                    'font-bold border-b-4 border-primary-500'
+                    'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
                 Vé của tôi
