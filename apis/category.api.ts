@@ -14,9 +14,13 @@ export const categoryApi = {
     });
   },
   updateCategory: (id: number, data: Partial<Category>) => {
-    return httpRequest.put(`${API_ROUTE.category}/${id}`, data, {
-      baseURL: process.env.CATEGORY_API_URL
-    });
+    return httpRequest.put<any, Partial<Category>>(
+      `${API_ROUTE.category}/${id}`,
+      data,
+      {
+        baseURL: process.env.CATEGORY_API_URL
+      }
+    );
   },
   deleteCategory: (id: number) => {
     return httpRequest.delete(`${API_ROUTE.category}/${id}`, {

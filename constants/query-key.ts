@@ -4,5 +4,7 @@ export const QUERY_KEY = {
   user: 'user',
   events: 'events',
   event: 'event',
-  categories: 'categories'
+  categories: 'categories',
+  myTickets: 'my-tickets',
+  payments: 'payments'
 };

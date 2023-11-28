@@ -22,14 +22,18 @@ export const eventApi = {
     });
   },
   createEvent: (data: Partial<Event>) => {
-    return httpRequest.post(API_ROUTE.event, data, {
+    return httpRequest.post<any, Partial<Event>>(API_ROUTE.event, data, {
       baseURL: process.env.EVENT_API_URL
     });
   },
   updateEvent: (id: number, data: Partial<Event>) => {
-    return httpRequest.put(`${API_ROUTE.event}/${id}`, data, {
-      baseURL: process.env.EVENT_API_URL
-    });
+    return httpRequest.put<any, Partial<Event>>(
+      `${API_ROUTE.event}/${id}`,
+      data,
+      {
+        baseURL: process.env.EVENT_API_URL
+      }
+    );
   },
   deleteEvent: (id: number) => {
     return httpRequest.delete(`${API_ROUTE.event}/${id}`, {

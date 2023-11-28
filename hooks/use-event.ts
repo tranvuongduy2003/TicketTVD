@@ -4,18 +4,18 @@ import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
 
 export function useEvent(id: number, options?: Partial<SWRConfiguration>) {
-  const { data: event, error } = useSWR(
-    [QUERY_KEY.event, id],
-    () => eventApi.getEventById(id),
-    {
-      revalidateOnMount: true,
-      revalidateOnFocus: true,
-      revalidateOnReconnect: true,
-      ...options
-    }
-  );
+  const {
+    data: event,
+    error,
+    mutate
+  } = useSWR([QUERY_KEY.event, id], () => eventApi.getEventById(id), {
+    revalidateOnMount: true,
+    revalidateOnFocus: true,
+    revalidateOnReconnect: true,
+    ...options
+  });
 
   const isLoading = event === undefined && error === undefined;
 
-  return { event, error, isLoading };
+  return { event, mutate, error, isLoading };
 }

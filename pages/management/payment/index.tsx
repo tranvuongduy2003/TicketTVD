@@ -1,10 +1,23 @@
 import { AdminLayout } from '@/components/layout';
+import { columns } from '@/components/payment';
+import { DataTable } from '@/components/payment/data-table';
+import { usePayments } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 
-export interface PaymentProps {}
+const Payment: NextPageWithLayout = () => {
+  const { payments } = usePayments();
 
-const Payment: NextPageWithLayout = (props: PaymentProps) => {
-  return <div>Payment</div>;
+  return (
+    <div className="w-full px-8 py-20">
+      <h1 className="text-[32px] leading-[48px] font-bold mb-7">
+        Quản lý đơn mua
+      </h1>
+
+      <div>
+        <DataTable data={payments || []} columns={columns} />
+      </div>
+    </div>
+  );
 };
 
 Payment.Layout = AdminLayout;

@@ -7,3 +7,4 @@ export * from './event-search-bar';
 export * from './search-event-card';
 export * from './filter-bar';
 export * from './create-event-section';
+export * from './detail-event-item';

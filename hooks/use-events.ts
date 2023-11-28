@@ -9,6 +9,7 @@ export function useEvents(
   options?: Partial<SWRConfiguration>
 ) {
   const [searchValue, setSearchValue] = useState<string>();
+  // const [organizerId, setOrganizerId] = useState<string>();
 
   const {
     data: events,

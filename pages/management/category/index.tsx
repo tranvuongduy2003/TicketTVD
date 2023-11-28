@@ -1,12 +1,53 @@
+import { columns } from '@/components/categories';
+import { DataTable } from '@/components/categories/data-table';
 import { AdminLayout } from '@/components/layout';
-import { NextPageWithLayout } from '@/models';
+import { useCategories, useEvents, usePayments } from '@/hooks';
+import { Category, NextPageWithLayout } from '@/models';
 
-export interface CategoryProps {}
+const CategoryManagementPage: NextPageWithLayout = () => {
+  const { categories } = useCategories();
+  const { payments } = usePayments();
+  const { events } = useEvents();
 
-const Category: NextPageWithLayout = (props: CategoryProps) => {
-  return <div>Category</div>;
+  return (
+    <div className="w-full px-8 py-20">
+      <h1 className="text-[32px] leading-[48px] font-bold mb-7">
+        Quản lý sự kiện
+      </h1>
+
+      <div>
+        <DataTable
+          data={
+            categories?.map(category => {
+              const totalEvents = events?.filter(
+                event => event.categoryId === category.id
+              );
+
+              const totalTickets = payments
+                ?.filter(
+                  payment =>
+                    totalEvents?.some(event => event.id === payment.eventId)
+                )
+                .reduce(
+                  (curQuantity, curPayment) =>
+                    curQuantity + curPayment.quantity,
+                  0
+                );
+
+              return {
+                ...category,
+                totalEvents: totalEvents?.length,
+                totalTickets: totalTickets
+              } as Category;
+            }) ?? []
+          }
+          columns={columns}
+        />
+      </div>
+    </div>
+  );
 };
 
-Category.Layout = AdminLayout;
+CategoryManagementPage.Layout = AdminLayout;
 
-export default Category;
+export default CategoryManagementPage;

@@ -132,7 +132,7 @@ const Profile: NextPageWithLayout = () => {
                           alt="avatar"
                           style={{ objectFit: 'cover' }}
                         />
-                        <AvatarFallback>BU</AvatarFallback>
+                        <AvatarFallback>UIT</AvatarFallback>
                       </Avatar>
                       <div className="opacity-0 transition-all rounded-full absolute top-0 left-0 w-full h-full flex items-center justify-center hover:bg-black hover:opacity-60">
                         <LuUpload className="h-7 w-7 text-white" />

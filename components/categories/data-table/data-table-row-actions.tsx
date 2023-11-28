@@ -10,11 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { Event, Role } from '@/models';
+import { Payment } from '@/models';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
-import { RemoveEventConfirmDialog } from '..';
-import { useAuth } from '@/hooks';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -23,13 +20,9 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
-  const { profile } = useAuth();
   const router = useRouter();
 
-  const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
-    useState<boolean>(false);
-
-  const eventId = (row.original as Event).id;
+  const paymentId = (row.original as Payment).id;
 
   return (
     <>
@@ -44,27 +37,15 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem
-            onClick={() =>
-              profile?.role === Role.ADMIN
-                ? router.push(`/management/event/${eventId}`)
-                : profile?.role === Role.ORGANIZER &&
-                  router.push(`/event/${eventId}/edit`)
-            }
+            onClick={() => router.push(`/management/payment/${paymentId}`)}
           >
             Chỉnh sửa
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>
-            <span className="text-danger-500">Xóa sự kiện</span>
+          <DropdownMenuItem>
+            <span className="text-danger-500">Hủy vé</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      {isConfirmationDialogOpen && (
-        <RemoveEventConfirmDialog
-          open={isConfirmationDialogOpen}
-          onOpenChange={setIsConfirmationDialogOpen}
-          eventId={eventId}
-        />
-      )}
     </>
   );
 }

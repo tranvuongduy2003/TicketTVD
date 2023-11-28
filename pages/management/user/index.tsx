@@ -2,11 +2,13 @@ import { AdminLayout } from '@/components/layout';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
 import { customerColumns, organizerColumns } from '@/components/user';
 import { DataTable } from '@/components/user/data-table';
-import { useUsers } from '@/hooks';
-import { NextPageWithLayout, Role } from '@/models';
+import { useEvents, usePayments, useUsers } from '@/hooks';
+import { NextPageWithLayout, Role, User } from '@/models';
 
 const UserPage: NextPageWithLayout = () => {
   const { users } = useUsers();
+  const { payments } = usePayments();
+  const { events } = useEvents();
 
   return (
     <div className="w-full px-8 py-20">
@@ -33,7 +35,19 @@ const UserPage: NextPageWithLayout = () => {
           <TabsContent value="customer">
             <DataTable
               data={
-                users?.filter((user: any) => user.role === Role.CUSTOMER) ?? []
+                users
+                  ?.filter((user: User) => user.role === Role.CUSTOMER)
+                  .map(user => {
+                    const totalTickets = payments
+                      ?.filter(payment => payment.userId === user.id)
+                      ?.reduce(
+                        (curQuantity, curPayment) =>
+                          curQuantity + curPayment.quantity,
+                        0
+                      );
+
+                    return { ...user, totalBuyedTickets: totalTickets } as User;
+                  }) ?? []
               }
               columns={customerColumns}
             />
@@ -41,7 +55,32 @@ const UserPage: NextPageWithLayout = () => {
           <TabsContent value="organizer">
             <DataTable
               data={
-                users?.filter((user: any) => user.role === Role.ORGANIZER) ?? []
+                users
+                  ?.filter((user: User) => user.role === Role.ORGANIZER)
+                  .map(user => {
+                    const totalEvents = events?.filter(
+                      event => event.creatorId === user.id
+                    );
+
+                    const totalTickets = payments
+                      ?.filter(
+                        payment =>
+                          totalEvents?.some(
+                            event => event.id === payment.eventId
+                          )
+                      )
+                      .reduce(
+                        (curQuantity, curPayment) =>
+                          curQuantity + curPayment.quantity,
+                        0
+                      );
+
+                    return {
+                      ...user,
+                      totalEvents: totalEvents?.length,
+                      totalSoldTickets: totalTickets
+                    } as User;
+                  }) ?? []
               }
               columns={organizerColumns}
             />

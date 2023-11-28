@@ -3,5 +3,6 @@ export const API_ROUTE = {
   user: '/user',
   file: '/file',
   event: '/event',
-  category: '/category'
+  category: '/category',
+  payment: '/payment'
 };

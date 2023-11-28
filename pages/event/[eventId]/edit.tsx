@@ -403,10 +403,6 @@ const EditEventPage: NextPageWithLayout = () => {
         duration: MILLISECOND_PER_SECOND * 0.5
       });
     } catch (error: any) {
-      console.log(
-        '🚀 ~ file: edit.tsx:406 ~ handleUpdateEvent ~ error:',
-        error
-      );
       setIsLoading(false);
       toast({
         title: 'Cập nhật sự kiện mới thất bại',
@@ -1743,7 +1739,7 @@ const EditEventPage: NextPageWithLayout = () => {
               )}
               {step === 2 && (
                 <Button
-                  type="submit"
+                  type="button"
                   className="text-white gap-[6px]"
                   onClick={handleUpdateEvent}
                   loading={isLoading}
