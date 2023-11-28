@@ -1,8 +1,8 @@
-import { EventCard } from '@/components/event';
+import { DetailItem, EventCard } from '@/components/event';
 import { MainLayout } from '@/components/layout';
 import { Badge, Button, Loading, Skeleton } from '@/components/ui';
-import { useEvent, useEvents } from '@/hooks';
-import { NextPageWithLayout } from '@/models';
+import { useAuth, useEvent, useEvents } from '@/hooks';
+import { NextPageWithLayout, Role } from '@/models';
 import { cn } from '@/types';
 import {
   calculateTime,
@@ -11,7 +11,7 @@ import {
 } from '@/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
-import { ReactElement, ReactNode, useState } from 'react';
+import { useState } from 'react';
 import {
   LuArrowLeft,
   LuCalendar,
@@ -23,13 +23,8 @@ import {
 } from 'react-icons/lu';
 import { MdOutlineDiscount } from 'react-icons/md';
 
-interface DetailItemProps {
-  icon: ReactElement;
-  title: ReactNode;
-  description: ReactNode;
-}
-
 const EventDetailPage: NextPageWithLayout = () => {
+  const { profile } = useAuth();
   const router = useRouter();
   const { eventId } = router.query;
 
@@ -38,7 +33,7 @@ const EventDetailPage: NextPageWithLayout = () => {
 
   const [isShowMoreDesc, setIsShowMoreDesc] = useState<boolean>(false);
 
-  return isLoading && !event ? (
+  return !eventId || isLoading || !event ? (
     <Loading />
   ) : (
     <div>
@@ -178,7 +173,7 @@ const EventDetailPage: NextPageWithLayout = () => {
         {/* RIGHT */}
         <div className="w-1/3">
           <div className="p-8 rounded-m bg-neutral-100">
-            <div className="bg-white rounded-m shadow-m p-5 mb-7">
+            <div className="bg-white rounded-m shadow-m p-5">
               <h5 className="font-bold text-neutral-650 mb-5">Giá</h5>
               {event && event?.ticketPrice > 0 ? (
                 <div className="flex items-center justify-between">
@@ -201,12 +196,15 @@ const EventDetailPage: NextPageWithLayout = () => {
                 </span>
               )}
             </div>
-            <Button
-              className="text-white w-full"
-              onClick={() => router.push(`/event/${eventId}/checkout`)}
-            >
-              Mua vé
-            </Button>
+            {profile?.role === Role.CUSTOMER && (
+              <Button
+                type="button"
+                className="text-white w-full mt-7"
+                onClick={() => router.push(`/event/${eventId}/checkout`)}
+              >
+                Mua vé
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -244,20 +242,6 @@ const EventDetailPage: NextPageWithLayout = () => {
     </div>
   );
 };
-
-function DetailItem({ icon, title, description }: DetailItemProps) {
-  return (
-    <div className="flex items-center gap-6">
-      <div className="text-primary-500 text-[32px] p-6 rounded-m bg-primary-100">
-        {icon}
-      </div>
-      <div className="flex flex-col justify-between">
-        <h4 className="uppercase font-bold leading-[26px]">{title}</h4>
-        <div className="text-neutral-550 leading-[26px]">{description}</div>
-      </div>
-    </div>
-  );
-}
 
 EventDetailPage.Layout = MainLayout;
 

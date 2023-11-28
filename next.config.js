@@ -7,7 +7,8 @@ const nextConfig = {
     AUTH_API_URL: process.env.AUTH_API_URL,
     FILE_API_URL: process.env.FILE_API_URL,
     EVENT_API_URL: process.env.EVENT_API_URL,
-    CATEGORY_API_URL: process.env.CATEGORY_API_URL
+    CATEGORY_API_URL: process.env.CATEGORY_API_URL,
+    PAYMENT_API_URL: process.env.PAYMENT_API_URL
   },
   images: {
     domains: [

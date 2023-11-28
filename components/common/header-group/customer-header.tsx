@@ -55,7 +55,7 @@ export function CustomerHeader() {
               <NavigationMenuLink
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
-                  router.pathname === '/explore' &&
+                  router.pathname.includes('/explore') &&
                     'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
@@ -68,7 +68,7 @@ export function CustomerHeader() {
               <NavigationMenuLink
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
-                  router.pathname === '/upcoming' &&
+                  router.pathname.includes('/upcoming') &&
                     'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
@@ -77,11 +77,11 @@ export function CustomerHeader() {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/my-ticket" legacyBehavior passHref>
+            <Link href="/my-tickets" legacyBehavior passHref>
               <NavigationMenuLink
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
-                  router.pathname === '/my-ticket' &&
+                  router.pathname.includes('/my-tickets') &&
                     'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
