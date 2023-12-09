@@ -1,3 +1,5 @@
+'use client';
+
 import { Event } from '@/models';
 import { formatDate } from '@/utils';
 import Image from 'next/image';

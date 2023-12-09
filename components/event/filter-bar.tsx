@@ -1,3 +1,5 @@
+'use client';
+
 import { cn } from '@/types';
 import { ReactNode, useEffect, useState } from 'react';
 import { LuChevronDown } from 'react-icons/lu';

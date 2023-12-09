@@ -63,11 +63,11 @@ export default function initRequest() {
             } catch (error: any) {
               console.log(error);
               handleLogOut();
-              Router.push('/auth/login');
+              // Router.push('/auth/login');
             }
           } else {
             handleLogOut();
-            Router.push('/auth/login');
+            // Router.push('/auth/login');
           }
           break;
         }

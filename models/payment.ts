@@ -1,7 +1,10 @@
+import { User } from '.';
+
 export type Payment = {
   id: number;
   eventId: number;
   userId: string;
+  user?: User;
   quantity: number;
   totalPrice: number;
   discount: number;

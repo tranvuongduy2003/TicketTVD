@@ -1,3 +1,5 @@
+'use client';
+
 import { fileApi, userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
 import { useUser } from '@/hooks';

@@ -3,11 +3,12 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Payment } from '@/models';
-import { DataTableRowActions } from './data-table';
+import Image from 'next/image';
+import { EventDateTag } from '../event/event-date-tag';
 import { DataTableColumnHeader } from './data-table/data-table-column-header';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui';
 
-export const columns: ColumnDef<Payment>[] = [
+export const paymentColumns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'id',
     header: ({ column }) => (
@@ -22,10 +23,10 @@ export const columns: ColumnDef<Payment>[] = [
   {
     accessorKey: 'customerName',
     header: ({ column }) => (
-      <DataTableColumnHeader column={column} title="Thông tin liên hệ" />
+      <DataTableColumnHeader column={column} title="Người mua" />
     ),
     cell: ({ row }) => (
-      <div className="flex items-center gap-2">
+      <div className="flex gap-2 items-center">
         <Avatar>
           <AvatarImage
             src={row.original.user?.avatar || ''}
@@ -34,11 +35,7 @@ export const columns: ColumnDef<Payment>[] = [
           />
           <AvatarFallback>AV</AvatarFallback>
         </Avatar>
-        <div className="flex gap-1 flex-col">
-          <span className="font-bold">{row.original.customerName}</span>
-          <span>{row.original.customerEmail}</span>
-          <span>{row.original.customerPhone}</span>
-        </div>
+        <span className="font-bold">{row.original.customerName}</span>
       </div>
     ),
     enableSorting: true,
@@ -93,11 +90,5 @@ export const columns: ColumnDef<Payment>[] = [
     ),
     enableSorting: true,
     enableHiding: false
-  },
-  {
-    accessorKey: 'action',
-    header: () => <></>,
-    cell: ({ row }) => <DataTableRowActions row={row} />,
-    enableSorting: false
   }
 ];

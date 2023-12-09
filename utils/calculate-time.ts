@@ -7,3 +7,7 @@ export function calculateTime(startTime: Date, endTime: Date) {
   });
   return distance;
 }
+
+export function dayDiffFromNow(date: Date) {
+  return formatDistance(new Date(date), new Date(), { locale: vi });
+}

@@ -6,5 +6,8 @@ export const QUERY_KEY = {
   event: 'event',
   categories: 'categories',
   myTickets: 'my-tickets',
-  payments: 'payments'
+  payments: 'payments',
+  revenue: 'revenue',
+  tickets: 'tickets',
+  eventStatistic: 'eventStatistic'
 };

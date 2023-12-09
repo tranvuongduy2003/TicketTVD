@@ -1,3 +1,5 @@
+'use client';
+
 import { LayoutProps } from '@/models';
 
 export function EmptyLayout({ children }: LayoutProps) {

@@ -194,7 +194,7 @@ const EventDetailPage: NextPageWithLayout = () => {
     } catch (error: any) {
       toast({
         title: 'Thanh toán thất bại',
-        description: error.message,
+        description: error,
         variant: 'destructive',
         duration: MILLISECOND_PER_SECOND
       });

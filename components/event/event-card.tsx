@@ -1,3 +1,5 @@
+'use client';
+
 import { Event } from '@/models';
 import { cn } from '@/types';
 import { formatDate } from '@/utils';

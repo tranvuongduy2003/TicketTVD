@@ -4,5 +4,7 @@ export const API_ROUTE = {
   file: '/file',
   event: '/event',
   category: '/category',
-  payment: '/payment'
+  payment: '/payment',
+  statistic: '/statistic',
+  ticket: '/ticket'
 };

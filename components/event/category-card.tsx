@@ -1,3 +1,5 @@
+'use client';
+
 import { categoryIcons } from '@/constants';
 import { Category } from '@/models';
 

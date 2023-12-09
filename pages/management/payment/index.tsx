@@ -1,11 +1,12 @@
 import { AdminLayout } from '@/components/layout';
 import { columns } from '@/components/payment';
 import { DataTable } from '@/components/payment/data-table';
-import { usePayments } from '@/hooks';
+import { usePayments, useUsers } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 
 const Payment: NextPageWithLayout = () => {
   const { payments } = usePayments();
+  const { users } = useUsers();
 
   return (
     <div className="w-full px-8 py-20">
@@ -14,7 +15,16 @@ const Payment: NextPageWithLayout = () => {
       </h1>
 
       <div>
-        <DataTable data={payments || []} columns={columns} />
+        <DataTable
+          data={
+            payments?.map(item => {
+              const user = users?.find(u => u.id == item.userId);
+
+              return { ...item, user: user };
+            }) || []
+          }
+          columns={columns}
+        />
       </div>
     </div>
   );
