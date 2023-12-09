@@ -1,1 +1,1 @@
-export * from './TicketForm';
+export * from './ticket-form';

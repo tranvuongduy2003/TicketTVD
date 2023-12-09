@@ -5,3 +5,5 @@ export * from './event';
 export * from './category';
 export * from './address';
 export * from './payment';
+export * from './statistic';
+export * from './ticket';

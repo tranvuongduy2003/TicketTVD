@@ -1,3 +1,5 @@
+'use client';
+
 import { eventApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, QUERY_KEY } from '@/constants';
 import { useState } from 'react';

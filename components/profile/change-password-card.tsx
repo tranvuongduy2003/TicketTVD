@@ -1,3 +1,5 @@
+'use client';
+
 import { userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PASSWORD_REGEX } from '@/constants';
 import { zodResolver } from '@hookform/resolvers/zod';

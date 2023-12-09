@@ -1,3 +1,5 @@
+'use client';
+
 import { userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, QUERY_KEY } from '@/constants';
 import { Status } from '@/models';

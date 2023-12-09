@@ -6,3 +6,6 @@ export * from './use-events';
 export * from './use-categories';
 export * from './use-my-tickets';
 export * from './use-payments';
+export * from './use-revenue';
+export * from './use-tickets';
+export * from './use-events-by-category';

@@ -1,3 +1,5 @@
+'use client';
+
 import { useRef } from 'react';
 import { LuSearch } from 'react-icons/lu';
 import { Button, Input } from '../ui';

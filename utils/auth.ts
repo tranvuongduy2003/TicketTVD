@@ -1,8 +1,7 @@
 import { authApi } from '@/apis';
 import { ACCESS_TOKEN, QUERY_KEY, REFRESH_TOKEN } from '@/constants';
-import Router from 'next/router';
-import { getCookie, removeCookie, setCookie } from './session';
 import { mutate } from 'swr';
+import { getCookie, removeCookie, setCookie } from './session';
 
 export const getAccessToken = () => {
   return getCookie(ACCESS_TOKEN) || '';

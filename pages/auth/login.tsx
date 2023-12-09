@@ -117,27 +117,6 @@ const Login: NextPageWithLayout = () => {
           </form>
         </Form>
 
-        {/* OTHER CHOICES */}
-        {/* <div className="mt-[50px] mb-10">
-          <p className="text-center text-sm text-neutral-500 mb-[18px]">
-            Hoặc đăng nhập với
-          </p>
-          <div className="flex items-center justify-between gap-4 px-2">
-            <Button
-              onClick={() => logInWithGoogle()}
-              className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full"
-            >
-              <FaGoogle />
-            </Button>
-            <Button
-              onClick={() => logInWithFacebook()}
-              className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full"
-            >
-              <FaFacebookF />
-            </Button>
-          </div>
-        </div> */}
-
         {/* SIGNUP CHOICE */}
         <p className="text-center mt-10">
           Bạn vẫn chưa có tài khoản?{' '}

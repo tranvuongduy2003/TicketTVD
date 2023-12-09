@@ -1,3 +1,5 @@
+'use client';
+
 import { useAuth } from '@/hooks';
 import { LayoutProps, Role } from '@/models';
 import Router from 'next/router';

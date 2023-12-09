@@ -1,1 +1,1 @@
-export * from './MyTicketCard';
+export * from './my-ticket-card';

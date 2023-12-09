@@ -1,3 +1,5 @@
+'use client';
+
 import * as React from 'react';
 import { Badge } from '../ui';
 import { MILLISECOND_PER_DAY, MILLISECOND_PER_HOUR } from '@/constants';
