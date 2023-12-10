@@ -65,6 +65,13 @@ const EventSearchPage: NextPageWithLayout = () => {
               filteredEvents &&
               filteredEvents.length > 0 &&
               filteredEvents
+                .map(item => {
+                  const category = categories?.find(
+                    c => c.id === item.categoryId
+                  );
+
+                  return { ...item, category: category };
+                })
                 .slice(0, page * PER_PAGE)
                 .map(event => <SearchEventCard key={event.id} event={event} />)
             )}
@@ -117,7 +124,7 @@ const EventSearchPage: NextPageWithLayout = () => {
             events &&
             events.length > 0 &&
             events
-              ?.slice(0, 2)
+              .slice(0, 2)
               .map(event => (
                 <EventCard key={event.id} event={event} size="large" />
               ))

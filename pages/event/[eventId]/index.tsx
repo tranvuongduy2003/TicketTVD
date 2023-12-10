@@ -196,15 +196,13 @@ const EventDetailPage: NextPageWithLayout = () => {
                 </span>
               )}
             </div>
-            {profile?.role === Role.CUSTOMER && (
-              <Button
-                type="button"
-                className="text-white w-full mt-7"
-                onClick={() => router.push(`/event/${eventId}/checkout`)}
-              >
-                Mua vé
-              </Button>
-            )}
+            <Button
+              type="button"
+              className="text-white w-full mt-7"
+              onClick={() => router.push(`/event/${eventId}/checkout`)}
+            >
+              Mua vé
+            </Button>
           </div>
         </div>
       </div>

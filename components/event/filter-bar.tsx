@@ -15,6 +15,9 @@ import {
 } from '../ui';
 import { Category, Event } from '@/models';
 import { useForm } from 'react-hook-form';
+import clsx from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import css from 'styled-jsx/css';
 
 export interface FilterBarProps {
   events: Event[];
@@ -27,17 +30,6 @@ export interface FilterSectionProps {
   children?: ReactNode;
 }
 
-const generalItems = [
-  {
-    id: 'all',
-    label: 'Tất cả'
-  },
-  {
-    id: 'upcoming',
-    label: 'Sắp diễn ra'
-  }
-];
-
 const paidItems = [
   {
     id: 'free',
@@ -49,8 +41,35 @@ const paidItems = [
   }
 ];
 
+const timeItems = [
+  {
+    id: 'upcoming',
+    label: 'Sắp diễn ra'
+  },
+  {
+    id: 'opening',
+    label: 'Đang điễn ra'
+  },
+  {
+    id: 'closed',
+    label: 'Đã kết thúc'
+  }
+];
+
 export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
   const form = useForm<{ items: string[] }>({
+    defaultValues: {
+      items: ['all']
+    }
+  });
+
+  const priceForm = useForm<{ items: string[] }>({
+    defaultValues: {
+      items: ['all']
+    }
+  });
+
+  const timeForm = useForm<{ items: string[] }>({
     defaultValues: {
       items: ['all']
     }
@@ -61,29 +80,61 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
       return true;
     }
 
+    let isCategoryValid = false;
+    let isPriceValid = false;
+    let isTimeValid = false;
+
     for (let index = 0; index < form.watch().items.length; index++) {
       const key = form.watch().items[index];
 
       switch (key) {
         case 'all':
-          return true;
-        case 'upcoming':
-          if (new Date(event.eventDate) > new Date()) return true;
-          break;
-        case 'free':
-          if (event.ticketPrice === 0) return true;
-          break;
-        case 'paid':
-          if (event.ticketPrice !== 0) return true;
-          break;
+          isCategoryValid = true;
 
         default:
-          if (key === event.categoryId?.toString()) return true;
+          if (key === event.categoryId?.toString()) isCategoryValid = true;
           break;
       }
     }
 
-    return false;
+    for (let index = 0; index < priceForm.watch().items.length; index++) {
+      const key = priceForm.watch().items[index];
+
+      switch (key) {
+        case 'all':
+          isPriceValid = true;
+        case 'free':
+          if (event.ticketPrice === 0) isPriceValid = true;
+          break;
+        case 'paid':
+          if (event.ticketPrice > 0) isPriceValid = true;
+          break;
+      }
+    }
+
+    for (let index = 0; index < timeForm.watch().items.length; index++) {
+      const key = timeForm.watch().items[index];
+
+      switch (key) {
+        case 'all':
+          isTimeValid = true;
+        case 'upcoming':
+          if (new Date(event.eventDate) > new Date()) isTimeValid = true;
+          break;
+        case 'opening':
+          if (
+            new Date() > new Date(event.eventDate) &&
+            new Date() < new Date(event.endTime)
+          )
+            isTimeValid = true;
+          break;
+        case 'closed':
+          if (new Date() > new Date(event.eventDate)) isTimeValid = true;
+          break;
+      }
+    }
+
+    return isCategoryValid && isPriceValid && isTimeValid;
   };
 
   useEffect(() => {
@@ -93,6 +144,22 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
       }
     })();
   }, [form.watch().items]);
+
+  useEffect(() => {
+    (() => {
+      if (priceForm.watch().items.length <= 0) {
+        priceForm.setValue('items', ['all']);
+      }
+    })();
+  }, [priceForm.watch().items]);
+
+  useEffect(() => {
+    (() => {
+      if (timeForm.watch().items.length <= 0) {
+        timeForm.setValue('items', ['all']);
+      }
+    })();
+  }, [timeForm.watch().items]);
 
   return (
     <div className="w-[276px] bg-neutral-100 rounded-m">
@@ -104,46 +171,43 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
           <div className="flex flex-col gap-2">
             <Form {...form}>
               <form className="flex flex-col gap-2">
-                {generalItems.map(item => (
-                  <FormField
-                    key={item.id}
-                    control={form.control}
-                    name="items"
-                    render={({ field }) => {
-                      return (
-                        <FormItem className="flex items-center gap-2">
-                          <FormControl>
-                            <Checkbox
-                              checked={field.value?.includes(item.id)}
-                              onCheckedChange={checked => {
-                                if (item.id === 'all' && checked) {
-                                  return field.onChange(['all']);
-                                }
+                <FormField
+                  key="all"
+                  control={form.control}
+                  name="items"
+                  render={({ field }) => {
+                    return (
+                      <FormItem className="flex items-center gap-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes('all')}
+                            onCheckedChange={checked => {
+                              if (checked) {
+                                return field.onChange(['all']);
+                              }
 
-                                return checked
-                                  ? field.onChange([
-                                      ...field.value.filter(
-                                        item => item !== 'all'
-                                      ),
-                                      ,
-                                      item.id
-                                    ])
-                                  : field.onChange(
-                                      field.value?.filter(
-                                        value => value !== item.id
-                                      )
-                                    );
-                              }}
-                            />
-                          </FormControl>
-                          <FormLabel className="text-base !mt-0">
-                            {item.label}
-                          </FormLabel>
-                        </FormItem>
-                      );
-                    }}
-                  />
-                ))}
+                              return checked
+                                ? field.onChange([
+                                    ...field.value.filter(
+                                      item => item !== 'all'
+                                    ),
+                                    'all'
+                                  ])
+                                : field.onChange(
+                                    field.value?.filter(
+                                      value => value !== 'all'
+                                    )
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-base !mt-0">
+                          Tất cả
+                        </FormLabel>
+                      </FormItem>
+                    );
+                  }}
+                />
               </form>
             </Form>
             <Form {...form}>
@@ -192,12 +256,116 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
         </FilterSection>
         <Separator className="my-4" />
         <FilterSection title="Giá">
-          <Form {...form}>
-            <form className="flex justify-between items-center">
+          <Form {...priceForm}>
+            <form className="flex flex-col gap-2">
+              <FormField
+                key="all"
+                control={priceForm.control}
+                name="items"
+                render={({ field }) => {
+                  return (
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value?.includes('all')}
+                          onCheckedChange={checked => {
+                            if (checked) {
+                              return field.onChange(['all']);
+                            }
+
+                            return checked
+                              ? field.onChange([
+                                  ...field.value.filter(item => item !== 'all'),
+                                  'all'
+                                ])
+                              : field.onChange(
+                                  field.value?.filter(value => value !== 'all')
+                                );
+                          }}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-base !mt-0">Tất cả</FormLabel>
+                    </FormItem>
+                  );
+                }}
+              />
               {paidItems.map(item => (
                 <FormField
                   key={item.id}
-                  control={form.control}
+                  control={priceForm.control}
+                  name="items"
+                  render={({ field }) => {
+                    return (
+                      <FormItem className="flex items-center gap-2">
+                        <FormControl>
+                          <Checkbox
+                            checked={field.value?.includes(item.id)}
+                            onCheckedChange={checked => {
+                              return checked
+                                ? field.onChange([
+                                    ...field.value.filter(
+                                      item => item !== 'all'
+                                    ),
+                                    item.id
+                                  ])
+                                : field.onChange(
+                                    field.value?.filter(
+                                      value => value !== item.id
+                                    )
+                                  );
+                            }}
+                          />
+                        </FormControl>
+                        <FormLabel className="text-base !mt-0">
+                          {item.label}
+                        </FormLabel>
+                      </FormItem>
+                    );
+                  }}
+                />
+              ))}
+            </form>
+          </Form>
+        </FilterSection>
+        <Separator className="my-4" />
+        <FilterSection title="Thời gian">
+          <Form {...timeForm}>
+            <form className="flex flex-col gap-2">
+              <FormField
+                key="all"
+                control={timeForm.control}
+                name="items"
+                render={({ field }) => {
+                  return (
+                    <FormItem className="flex items-center gap-2">
+                      <FormControl>
+                        <Checkbox
+                          checked={field.value?.includes('all')}
+                          onCheckedChange={checked => {
+                            if (checked) {
+                              return field.onChange(['all']);
+                            }
+
+                            return checked
+                              ? field.onChange([
+                                  ...field.value.filter(item => item !== 'all'),
+                                  'all'
+                                ])
+                              : field.onChange(
+                                  field.value?.filter(value => value !== 'all')
+                                );
+                          }}
+                        />
+                      </FormControl>
+                      <FormLabel className="text-base !mt-0">Tất cả</FormLabel>
+                    </FormItem>
+                  );
+                }}
+              />
+              {timeItems.map(item => (
+                <FormField
+                  key={item.id}
+                  control={timeForm.control}
                   name="items"
                   render={({ field }) => {
                     return (
