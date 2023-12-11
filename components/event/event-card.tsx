@@ -2,7 +2,7 @@
 
 import { Event } from '@/models';
 import { cn } from '@/types';
-import { formatDate } from '@/utils';
+import { convertToISODate, formatDate } from '@/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { LuCalendar, LuMapPin } from 'react-icons/lu';
@@ -62,7 +62,9 @@ export function EventCard({
         </div>
         <p className="mb-2 flex items-center gap-2 text-primary-500 font-bold text-sm">
           <LuCalendar />{' '}
-          {event && event.eventDate && formatDate(new Date(event.eventDate))}
+          {event &&
+            event.eventDate &&
+            formatDate(convertToISODate(new Date(event.eventDate + '.000Z')))}
         </p>
         <p className="flex items-center gap-2 text-neutral-500 text-sm">
           <LuMapPin /> {event?.location}

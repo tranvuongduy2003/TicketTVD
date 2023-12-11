@@ -3,23 +3,28 @@
 import * as React from 'react';
 import { Badge } from '../ui';
 import { MILLISECOND_PER_DAY, MILLISECOND_PER_HOUR } from '@/constants';
+import { convertToISODate } from '@/utils';
 
 export interface EventDateTagProps {
   eventDate: Date;
 }
 
 export function EventDateTag({ eventDate }: EventDateTagProps) {
+  const eventISODate = convertToISODate(eventDate);
+
   const diffDays = Math.round(
-    Math.abs((new Date().getTime() - eventDate.getTime()) / MILLISECOND_PER_DAY)
+    Math.abs(
+      (new Date().getTime() - eventISODate.getTime()) / MILLISECOND_PER_DAY
+    )
   );
 
   const daysInMonth = new Date(
-    eventDate.getFullYear(),
-    eventDate.getMonth(),
+    eventISODate.getFullYear(),
+    eventISODate.getMonth(),
     0
   ).getDate();
 
-  return eventDate < new Date() ? (
+  return eventISODate < new Date() ? (
     <Badge className="bg-danger-100 text-danger-500 hover:bg-danger-100 hover:text-danger-500">
       Đã kết thúc
     </Badge>

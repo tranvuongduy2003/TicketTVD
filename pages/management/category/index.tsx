@@ -12,7 +12,7 @@ const CategoryManagementPage: NextPageWithLayout = () => {
   return (
     <div className="w-full px-8 py-20">
       <h1 className="text-[32px] leading-[48px] font-bold mb-7">
-        Quản lý sự kiện
+        Quản lý thể loại
       </h1>
 
       <div>
