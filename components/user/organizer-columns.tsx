@@ -3,11 +3,27 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Status, User } from '@/models';
-import { Badge } from '../ui';
+import { Avatar, AvatarFallback, AvatarImage, Badge } from '../ui';
 import { DataTableRowActions } from './data-table';
 import { DataTableColumnHeader } from './data-table/data-table-column-header';
 
 export const organizerColumns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'avatar',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
+    cell: ({ row }) => (
+      <Avatar>
+        <AvatarImage
+          src={row.getValue('avatar') || ''}
+          suppressHydrationWarning
+          style={{ objectFit: 'cover' }}
+        />
+        <AvatarFallback>AV</AvatarFallback>
+      </Avatar>
+    ),
+    enableSorting: false,
+    enableHiding: false
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => (

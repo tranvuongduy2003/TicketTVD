@@ -1,3 +1,5 @@
+'use client';
+
 import { userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND } from '@/constants';
 import { useState } from 'react';

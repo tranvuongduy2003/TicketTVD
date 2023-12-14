@@ -1,5 +1,5 @@
 import { fileApi, userApi } from '@/apis';
-import { AdminLayout } from '@/components/layout';
+import { ProtectedLayout } from '@/components/layout';
 import { ChangePasswordCard, DeactivateUserCard } from '@/components/profile';
 import {
   Avatar,
@@ -28,9 +28,9 @@ import {
 import { PHONE_REGEX } from '@/constants';
 import { useAuth } from '@/hooks';
 import { Gender, NextPageWithLayout, User } from '@/models';
-import { useAuthStore } from '@/stores';
+import { useProfileStore } from '@/stores';
 import { cn } from '@/types';
-import { getImageData } from '@/utils';
+import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -50,7 +50,7 @@ const formSchema = z.object({
     .min(1, 'Số điện thoại không được để trống')
     .regex(PHONE_REGEX, 'Số điện thoại không hợp lệ')
     .max(100, { message: 'Số điện thoại không được vượt quá 100 kí tự' }),
-  dob: z.date(),
+  dob: z.any(),
   gender: z.string(),
   avatar: z.any()
 });
@@ -59,16 +59,11 @@ const Profile: NextPageWithLayout = () => {
   const { toast } = useToast();
 
   const { profile, isLoading } = useAuth();
-  const { setProfile } = useAuthStore();
+  const { setProfile } = useProfileStore();
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [preview, setPreview] = useState<string>('');
-
-  useEffect(() => {
-    if (profile) {
-      setPreview(profile.avatar);
-    }
-  }, [profile]);
+  const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [avatar, setAvatar] = useState<File | null>();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema)
@@ -78,13 +73,22 @@ const Profile: NextPageWithLayout = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const { avatar, phone, ...rest } = values;
+      const { phone, dob, email, gender, name } = values;
 
-      const payload: Partial<User> = { phoneNumber: phone, ...rest };
+      const payload: Partial<User> = {
+        avatar: avatarPreview,
+        email: email,
+        name: name,
+        phoneNumber: phone,
+        dob: convertToISODate(dob),
+        gender: gender
+      };
 
-      if (Boolean(avatar) && avatar.length > 0) {
-        const avatarBlob = await fileApi.uploadFile(avatar[0]);
-        payload.avatar = avatarBlob.blob.uri;
+      // Upload avatar
+      if (avatar) {
+        const compressedAvatar = await compressFile(avatar);
+        const avatarUrl = await fileApi.uploadFile(compressedAvatar);
+        payload.avatar = avatarUrl.blob.uri;
       }
 
       await userApi.updateUser(profile?.id ?? '', payload);
@@ -98,6 +102,7 @@ const Profile: NextPageWithLayout = () => {
         duration: 500
       });
     } catch (error: any) {
+      console.log('🚀 ~ file: index.tsx:105 ~ onSubmit ~ error:', error);
       setLoading(false);
       toast({
         title: 'Chỉnh sửa thông tin cá nhân thất bại',
@@ -106,6 +111,27 @@ const Profile: NextPageWithLayout = () => {
       });
     }
   }
+
+  useEffect(() => {
+    (async () => {
+      if (profile) {
+        form.reset({
+          avatar: profile.avatar,
+          name: profile.name,
+          email: profile.email,
+          phone: profile.phoneNumber,
+          gender: profile.gender,
+          dob: profile.dob
+        });
+        if (profile.avatar) {
+          setAvatarPreview(profile.avatar);
+          const avatarFile = await getFile(profile.avatar);
+          setAvatar(avatarFile);
+        }
+      }
+    })();
+  }, [profile]);
+
   return (
     <div className="mx-36 my-9">
       <h1 className="text-[32px] leading-[48px] font-bold text-neutral-900 mb-6">
@@ -128,11 +154,11 @@ const Profile: NextPageWithLayout = () => {
                     <FormLabel className="relative block mx-auto w-[138px] h-[138px] rounded-full">
                       <Avatar className="w-full h-full">
                         <AvatarImage
-                          src={preview}
+                          src={avatarPreview}
                           alt="avatar"
                           style={{ objectFit: 'cover' }}
                         />
-                        <AvatarFallback>BU</AvatarFallback>
+                        <AvatarFallback>AV</AvatarFallback>
                       </Avatar>
                       <div className="opacity-0 transition-all rounded-full absolute top-0 left-0 w-full h-full flex items-center justify-center hover:bg-black hover:opacity-60">
                         <LuUpload className="h-7 w-7 text-white" />
@@ -143,9 +169,11 @@ const Profile: NextPageWithLayout = () => {
                         className="hidden"
                         type="file"
                         {...rest}
+                        multiple={false}
                         onChange={event => {
                           const { files, displayUrl } = getImageData(event);
-                          setPreview(displayUrl);
+                          setAvatarPreview(displayUrl);
+                          setAvatar(files[0]);
                           onChange(files);
                         }}
                       />
@@ -155,7 +183,6 @@ const Profile: NextPageWithLayout = () => {
                 )}
               />
               <FormField
-                defaultValue={profile?.name}
                 control={form.control}
                 name="name"
                 render={({ field }) => (
@@ -169,7 +196,6 @@ const Profile: NextPageWithLayout = () => {
                 )}
               />
               <FormField
-                defaultValue={profile.email}
                 control={form.control}
                 name="email"
                 render={({ field }) => (
@@ -188,7 +214,6 @@ const Profile: NextPageWithLayout = () => {
                 )}
               />
               <FormField
-                defaultValue={profile.phoneNumber}
                 control={form.control}
                 name="phone"
                 render={({ field }) => (
@@ -206,11 +231,14 @@ const Profile: NextPageWithLayout = () => {
                 )}
               />
               <FormField
-                defaultValue={profile?.dob && new Date(profile?.dob)}
                 control={form.control}
                 name="dob"
+                defaultValue={profile.dob}
                 render={({ field }) => (
-                  <FormItem className="flex flex-col">
+                  <FormItem
+                    className="flex flex-col"
+                    defaultValue={profile.dob as any}
+                  >
                     <FormLabel>Ngày sinh</FormLabel>
                     <Popover>
                       <PopoverTrigger asChild>
@@ -223,7 +251,7 @@ const Profile: NextPageWithLayout = () => {
                             )}
                           >
                             {field.value ? (
-                              format(field.value, 'dd/MM/yyyy')
+                              format(new Date(field.value), 'dd/MM/yyyy')
                             ) : (
                               <span>Chọn ngày sinh</span>
                             )}
@@ -256,7 +284,7 @@ const Profile: NextPageWithLayout = () => {
                 control={form.control}
                 name="gender"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem defaultValue={profile.gender}>
                     <FormLabel>Giới tính</FormLabel>
                     <Select
                       onValueChange={field.onChange}
@@ -269,14 +297,10 @@ const Profile: NextPageWithLayout = () => {
                       </FormControl>
                       <SelectContent>
                         <SelectItem value={Gender.MALE}>
-                          <span className="capitalize">
-                            {Gender.MALE.toLowerCase()}
-                          </span>
+                          <span className="capitalize">Nam</span>
                         </SelectItem>
                         <SelectItem value={Gender.FEMALE}>
-                          <span className="capitalize">
-                            {Gender.FEMALE.toLowerCase()}
-                          </span>
+                          <span className="capitalize">Nữ</span>
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -320,6 +344,6 @@ const Profile: NextPageWithLayout = () => {
   );
 };
 
-Profile.Layout = AdminLayout;
+Profile.Layout = ProtectedLayout;
 
 export default Profile;

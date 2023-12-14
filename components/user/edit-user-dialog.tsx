@@ -1,9 +1,11 @@
+'use client';
+
 import { fileApi, userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
-import { useUser } from '@/hooks';
+import { useEvents, usePayments, useUser } from '@/hooks';
 import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
-import { getImageData } from '@/utils';
+import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
@@ -63,11 +65,11 @@ const formSchema = z.object({
     .min(1, 'Số điện thoại không được để trống')
     .regex(PHONE_REGEX, 'Số điện thoại không hợp lệ')
     .max(100, { message: 'Số điện thoại không được vượt quá 100 kí tự' }),
-  dob: z.date(),
+  dob: z.any(),
   gender: z.string(),
   status: z.string(),
   role: z.string(),
-  createdAt: z.date().optional(),
+  createdAt: z.any().optional(),
   avatar: z.any()
 });
 
@@ -78,7 +80,9 @@ export function EditUserDialog({
 }: EditUserDialogProps) {
   const { toast } = useToast();
 
-  const { user, isLoading } = useUser(userId ?? '');
+  const { user, isLoading, mutate: userMutate } = useUser(userId ?? '');
+  const { payments } = usePayments();
+  const { events } = useEvents();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
@@ -87,13 +91,8 @@ export function EditUserDialog({
     useState<boolean>(false);
   const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
     useState<boolean>(false);
-  const [preview, setPreview] = useState<string>('');
-
-  useEffect(() => {
-    if (user) {
-      setPreview(user.avatar);
-    }
-  }, [user]);
+  const [avatarPreview, setAvatarPreview] = useState<string>('');
+  const [avatar, setAvatar] = useState<File | null>();
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -104,15 +103,24 @@ export function EditUserDialog({
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setLoading(true);
     try {
-      const { avatar, createdAt, phone, ...rest } = values;
+      const { phone, dob, email, gender, name, role, ...rest } = values;
 
-      const payload: Partial<User> = { phoneNumber: phone, ...rest };
+      const payload: Partial<User> = {
+        avatar: avatarPreview,
+        email: email,
+        name: name,
+        phoneNumber: phone,
+        dob: convertToISODate(dob),
+        gender: gender,
+        role: role as Role,
+        ...rest
+      };
 
-      if (Boolean(avatar) && avatar.length > 0) {
-        const avatarBlob = await fileApi.uploadFile(avatar[0]);
-        payload.avatar = avatarBlob.blob.uri;
-      } else {
-        payload.avatar = user?.avatar;
+      // Upload avatar
+      if (avatar) {
+        const compressedAvatar = await compressFile(avatar);
+        const avatarUrl = await fileApi.uploadFile(compressedAvatar);
+        payload.avatar = avatarUrl.blob.uri;
       }
 
       await userApi.updateUser(user?.id ?? '', payload);
@@ -136,6 +144,60 @@ export function EditUserDialog({
       });
     }
   }
+
+  useEffect(() => {
+    (async () => {
+      if (user) {
+        form.reset({
+          avatar: user.avatar,
+          name: user.name,
+          email: user.email,
+          phone: user.phoneNumber,
+          gender: user.gender,
+          dob: user.dob,
+          status: user.status
+        });
+
+        if (user.role === Role.CUSTOMER) {
+          const totalTickets = payments
+            ?.filter(payment => payment.userId === user.id)
+            ?.reduce(
+              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
+              0
+            );
+          userMutate({ ...user, totalBuyedTickets: totalTickets as number });
+        }
+
+        if (user.role === Role.ORGANIZER) {
+          const totalEvents = events?.filter(
+            event => event.creatorId === user.id
+          );
+
+          const totalTickets = payments
+            ?.filter(
+              payment =>
+                totalEvents?.some(event => event.id === payment.eventId)
+            )
+            .reduce(
+              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
+              0
+            );
+
+          userMutate({
+            ...user,
+            totalEvents: totalEvents?.length as number,
+            totalSoldTickets: totalTickets as number
+          });
+        }
+
+        if (user.avatar) {
+          setAvatarPreview(user.avatar);
+          const avatarFile = await getFile(user.avatar);
+          setAvatar(avatarFile);
+        }
+      }
+    })();
+  }, [user]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -164,11 +226,11 @@ export function EditUserDialog({
                         <FormLabel className="relative block mx-auto w-32 h-32 rounded-full">
                           <Avatar className="w-full h-full">
                             <AvatarImage
-                              src={preview}
+                              src={avatarPreview}
                               alt="avatar"
                               style={{ objectFit: 'cover' }}
                             />
-                            <AvatarFallback>BU</AvatarFallback>
+                            <AvatarFallback>AV</AvatarFallback>
                           </Avatar>
                           <div className="opacity-0 transition-all rounded-full absolute top-0 left-0 w-full h-full flex items-center justify-center hover:bg-black hover:opacity-60">
                             <LuUpload className="h-7 w-7 text-white" />
@@ -182,7 +244,8 @@ export function EditUserDialog({
                             multiple={false}
                             onChange={event => {
                               const { files, displayUrl } = getImageData(event);
-                              setPreview(displayUrl);
+                              setAvatarPreview(displayUrl);
+                              setAvatar(files[0]);
                               onChange(files);
                             }}
                           />
@@ -193,7 +256,6 @@ export function EditUserDialog({
                   />
                 </div>
                 <FormField
-                  defaultValue={user.name}
                   control={form.control}
                   name="name"
                   render={({ field }) => (
@@ -211,7 +273,6 @@ export function EditUserDialog({
                   )}
                 />
                 <FormField
-                  defaultValue={user.email}
                   control={form.control}
                   name="email"
                   render={({ field }) => (
@@ -230,7 +291,6 @@ export function EditUserDialog({
                   )}
                 />
                 <FormField
-                  defaultValue={user.phoneNumber}
                   control={form.control}
                   name="phone"
                   render={({ field }) => (
@@ -248,11 +308,14 @@ export function EditUserDialog({
                   )}
                 />
                 <FormField
-                  defaultValue={new Date(user.dob)}
                   control={form.control}
                   name="dob"
+                  defaultValue={user.dob}
                   render={({ field }) => (
-                    <FormItem className="flex flex-col">
+                    <FormItem
+                      className="flex flex-col"
+                      defaultValue={user.dob as any}
+                    >
                       <FormLabel>Ngày sinh</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -265,7 +328,7 @@ export function EditUserDialog({
                               )}
                             >
                               {field.value ? (
-                                format(field.value, 'dd/MM/yyyy')
+                                format(new Date(field.value), 'dd/MM/yyyy')
                               ) : (
                                 <span>Chọn ngày sinh</span>
                               )}
@@ -298,7 +361,7 @@ export function EditUserDialog({
                   control={form.control}
                   name="gender"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem defaultValue={user.gender}>
                       <FormLabel>Giới tính</FormLabel>
                       <Select
                         onValueChange={field.onChange}
@@ -323,7 +386,6 @@ export function EditUserDialog({
                   )}
                 />
                 <FormField
-                  defaultValue={user.status}
                   control={form.control}
                   name="status"
                   render={({ field }) => (
@@ -378,12 +440,12 @@ export function EditUserDialog({
                   )}
                 />
                 <FormField
-                  defaultValue={new Date(user.createdAt)}
+                  defaultValue={user.createdAt}
                   control={form.control}
                   name="createdAt"
                   disabled={true}
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem defaultValue={user.createdAt as any}>
                       <FormLabel>Ngày tham gia</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
@@ -397,7 +459,7 @@ export function EditUserDialog({
                               )}
                             >
                               {field.value
-                                ? format(field.value, 'dd/MM/yyyy')
+                                ? format(new Date(field.value), 'dd/MM/yyyy')
                                 : format(new Date(), 'dd/MM/yyyy')}
                               <LuCalendar className="ml-auto h-4 w-4 opacity-50" />
                             </Button>

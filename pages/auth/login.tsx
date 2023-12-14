@@ -17,12 +17,10 @@ import { NextPageWithLayout } from '@/models';
 import { LoginPayload } from '@/types';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 
 const Login: NextPageWithLayout = () => {
-  const router = useRouter();
   const { logIn } = useAuth();
   const { toast } = useToast();
 
@@ -48,7 +46,6 @@ const Login: NextPageWithLayout = () => {
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
-      router.push('/');
     } catch (error: any) {
       setIsLoading(false);
       toast({
@@ -119,27 +116,6 @@ const Login: NextPageWithLayout = () => {
             </Button>
           </form>
         </Form>
-
-        {/* OTHER CHOICES */}
-        {/* <div className="mt-[50px] mb-10">
-          <p className="text-center text-sm text-neutral-500 mb-[18px]">
-            Hoặc đăng nhập với
-          </p>
-          <div className="flex items-center justify-between gap-4 px-2">
-            <Button
-              onClick={() => logInWithGoogle()}
-              className="text-[#C71610FF] bg-[#FEF1F1FF] hover:bg-[#FDEEEDFF] active:bg-[#FDEEEDFF] w-full"
-            >
-              <FaGoogle />
-            </Button>
-            <Button
-              onClick={() => logInWithFacebook()}
-              className="text-[#335CA6FF] bg-[#F3F6FBFF] hover:bg-[#F0F4FAFF] active:bg-[#E7ECF7FF] w-full"
-            >
-              <FaFacebookF />
-            </Button>
-          </div>
-        </div> */}
 
         {/* SIGNUP CHOICE */}
         <p className="text-center mt-10">

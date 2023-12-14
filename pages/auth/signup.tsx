@@ -233,29 +233,6 @@ const SignUp: NextPageWithLayout = () => {
             <span className="text-primary-500 font-bold">Đăng nhập</span>
           </Link>
         </p>
-
-        {/* DIVIDER */}
-        {/* <div className="border-solid border relative">
-          <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-white px-2">
-            Hoặc
-          </span>
-        </div> */}
-
-        {/* OTHER CHOICES */}
-        {/* <div className="gap-4 flex justify-center mt-8">
-          <Button
-            onClick={() => logInWithGoogle()}
-            className="w-12 h-12 rounded-full text-white text-4xl bg-[#C71610FF] hover:bg-[#8A0F0BFF] active:bg-[#5C0A07FF]"
-          >
-            <FaGoogle />
-          </Button>
-          <Button
-            onClick={() => logInWithFacebook()}
-            className="w-12 h-12 rounded-full text-white text-4xl bg-[#335CA6FF] hover:bg-[#233F72FF] active:bg-[#172A4CFF]"
-          >
-            <FaFacebook />
-          </Button>
-        </div> */}
       </div>
     </div>
   );

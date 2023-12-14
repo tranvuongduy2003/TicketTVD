@@ -10,7 +10,7 @@ export type User = {
   totalEvents: number;
   totalSoldTickets: number;
   status: Status | string;
-  role: Role | string;
+  role: Role;
   createdAt: Date;
   updatedAt: Date;
 };
