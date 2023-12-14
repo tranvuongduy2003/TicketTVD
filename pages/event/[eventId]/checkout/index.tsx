@@ -107,7 +107,7 @@ const EventDetailPage: NextPageWithLayout = () => {
   }
 
   function handleIncreaseQuantity() {
-    if (quantity < (event?.ticketQuantity || 0) && quantity < 3) {
+    if (quantity < (event?.ticketQuantity || 0)) {
       setQuantity(quantity + 1);
       const tickets = ticketForm.watch().tickets;
       tickets.push({
@@ -364,10 +364,7 @@ const EventDetailPage: NextPageWithLayout = () => {
                       {quantity}
                     </span>
                     <Button
-                      disabled={
-                        quantity >= (event?.ticketQuantity || 0) ||
-                        quantity >= 3
-                      }
+                      disabled={quantity >= (event?.ticketQuantity || 0)}
                       onClick={e => {
                         e.preventDefault();
                         handleIncreaseQuantity();
@@ -388,9 +385,7 @@ const EventDetailPage: NextPageWithLayout = () => {
                     />
                   ))}
                   <Button
-                    disabled={
-                      quantity >= (event?.ticketQuantity || 0) || quantity >= 3
-                    }
+                    disabled={quantity >= (event?.ticketQuantity || 0)}
                     onClick={e => {
                       e.preventDefault();
                       handleIncreaseQuantity();

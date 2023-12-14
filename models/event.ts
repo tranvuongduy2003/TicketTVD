@@ -1,3 +1,5 @@
+import { Category } from '.';
+
 export enum UserStatus {
   UPCOMING = 'UPCOMING',
   OPENING = 'OPENING',
@@ -31,4 +33,5 @@ export type Event = {
   status: UserStatus;
   createdAt: Date;
   updatedAt: Date;
+  category?: Category;
 };

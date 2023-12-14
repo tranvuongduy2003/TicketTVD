@@ -60,8 +60,7 @@ export const columns: ColumnDef<Event>[] = [
     ),
     cell: ({ row }) => (
       <div>
-        {row.getValue('ticketSoldQuantity') || 0} /{' '}
-        {row.getValue('ticketQuantity')}
+        {row.original.ticketSoldQuantity} / {row.getValue('ticketQuantity')}
       </div>
     ),
     enableSorting: true,

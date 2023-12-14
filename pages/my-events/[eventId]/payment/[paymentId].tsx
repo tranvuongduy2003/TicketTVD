@@ -1,6 +1,6 @@
 import { eventApi, paymentApi, ticketApi } from '@/apis';
 import { DetailItem } from '@/components/event';
-import { AdminLayout } from '@/components/layout';
+import { OrganizerLayout } from '@/components/layout';
 import { TerminateTicketDialog } from '@/components/payment';
 import {
   Button,
@@ -65,7 +65,7 @@ const ticketFormSchema = z.object({
     .max(100, { message: 'Số điện thoại không được vượt quá 100 kí tự' })
 });
 
-const MyTicketDetailsPage: NextPageWithLayout = () => {
+const MyEventTicketDetailsPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { paymentId } = router.query;
 
@@ -485,6 +485,6 @@ function TicketItem({ index, ticket, tickets, setTickets }: TicketItemProps) {
   );
 }
 
-MyTicketDetailsPage.Layout = AdminLayout;
+MyEventTicketDetailsPage.Layout = OrganizerLayout;
 
-export default MyTicketDetailsPage;
+export default MyEventTicketDetailsPage;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Event } from '@/models';
-import { formatDate } from '@/utils';
+import { convertToISODate, formatDate } from '@/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { LuCalendar, LuMapPin } from 'react-icons/lu';
@@ -18,6 +18,9 @@ export function SearchEventCard({ event }: SearchEventCardProps) {
     <div
       onClick={() => event.id && router.push(`/event/${event.id}`)}
       className="cursor-pointer rounded-m overflow-hidden hover:scale-105 transition-all bg-white border-solid border border-neutral-200 flex items-center relative"
+      style={{
+        backgroundColor: event.category?.color
+      }}
     >
       {event.ticketPrice &&
       event.ticketPrice > 0 &&
@@ -36,10 +39,10 @@ export function SearchEventCard({ event }: SearchEventCardProps) {
           width={0}
           height={0}
           sizes="100vw"
-          style={{ width: '100%', height: '221px', objectFit: 'cover' }}
+          style={{ width: '100%', height: '230px', objectFit: 'cover' }}
         />
       </div>
-      <div className=" w-1/2 px-10 py-[50px]">
+      <div className=" w-1/2 mx-6 px-4 my-11 py-3 rounded-m bg-white">
         {event && event.ticketPrice && event.ticketPrice > 0 ? (
           <span className="text-primary-500 text-sm">
             Từ {event.ticketPrice.toLocaleString()} VNĐ
@@ -50,7 +53,7 @@ export function SearchEventCard({ event }: SearchEventCardProps) {
         <h3 className="font-bold my-3">{event.name}</h3>
         <p className="mb-2 flex items-center gap-2 text-primary-500 font-bold text-sm">
           <LuCalendar />{' '}
-          {event && event.eventDate && formatDate(new Date(event.eventDate))}
+          {event && event.eventDate && formatDate(event.eventDate)}
         </p>
         <p className="flex items-center gap-2 text-neutral-500 text-sm">
           <LuMapPin /> {event.location}

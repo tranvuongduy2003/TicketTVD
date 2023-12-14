@@ -8,6 +8,7 @@ import { MainLayout } from '@/components/layout';
 import { Button, Skeleton } from '@/components/ui';
 import { useCategories, useEvents } from '@/hooks';
 import { Event, NextPageWithLayout } from '@/models';
+import { convertToISODate } from '@/utils';
 import { useEffect, useState } from 'react';
 
 const PER_PAGE = 3;
@@ -65,6 +66,19 @@ const EventSearchPage: NextPageWithLayout = () => {
               filteredEvents &&
               filteredEvents.length > 0 &&
               filteredEvents
+                .map(item => {
+                  const category = categories?.find(
+                    c => c.id === item.categoryId
+                  );
+
+                  return {
+                    ...item,
+                    category: category,
+                    eventDate: convertToISODate(
+                      new Date(item.eventDate + '.000Z')
+                    )
+                  };
+                })
                 .slice(0, page * PER_PAGE)
                 .map(event => <SearchEventCard key={event.id} event={event} />)
             )}
@@ -117,7 +131,7 @@ const EventSearchPage: NextPageWithLayout = () => {
             events &&
             events.length > 0 &&
             events
-              ?.slice(0, 2)
+              .slice(0, 2)
               .map(event => (
                 <EventCard key={event.id} event={event} size="large" />
               ))

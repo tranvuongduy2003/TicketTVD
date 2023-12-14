@@ -6,5 +6,6 @@ export const API_ROUTE = {
   category: '/category',
   payment: '/payment',
   statistic: '/statistic',
-  ticket: '/ticket'
+  ticket: '/ticket',
+  ticketDetail: '/ticket-detail'
 };

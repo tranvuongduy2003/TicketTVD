@@ -3,10 +3,8 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Payment } from '@/models';
-import Image from 'next/image';
-import { EventDateTag } from '../event/event-date-tag';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui';
+import { DataTableColumnHeader } from './data-table/data-table-column-header';
 
 export const paymentColumns: ColumnDef<Payment>[] = [
   {

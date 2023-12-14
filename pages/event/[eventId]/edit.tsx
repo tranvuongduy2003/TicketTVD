@@ -36,6 +36,7 @@ import { cn } from '@/types';
 import {
   compressFile,
   concatDateWithTime,
+  convertToISODate,
   formatDate,
   getFile,
   getFileName,
@@ -281,8 +282,8 @@ const EditEventPage: NextPageWithLayout = () => {
           });
           if (event.publishTime) {
             publishForm.reset({
-              publishDate: new Date(event.publishTime),
-              publishTime: new Date(event.publishTime)
+              publishDate: event.publishTime,
+              publishTime: event.publishTime
             });
           }
           await publishForm.trigger();
@@ -342,9 +343,9 @@ const EditEventPage: NextPageWithLayout = () => {
         location: `${address}, ${tree
           ?.find(item => item.code === province?.code)
           ?.quan_huyen.find(item => item.code === district)?.path_with_type}`,
-        eventDate: eventDate,
-        startTime: startTime,
-        endTime: endTime,
+        eventDate: concatDateWithTime(new Date(eventDate), new Date(startTime)),
+        startTime: convertToISODate(startTime),
+        endTime: convertToISODate(endTime),
         ticketIsPaid: isPaid === 'paid' ? true : false,
         ticketQuantity: quantity,
         ticketPrice: Number.parseInt(price),
@@ -361,30 +362,32 @@ const EditEventPage: NextPageWithLayout = () => {
         album: albumPreview
       };
 
-      if (isPublish) {
+      if (isPublish && publishDate && publishTime) {
         data.publishTime = concatDateWithTime(
-          publishDate || new Date(),
-          publishTime || new Date()
+          new Date(publishDate),
+          new Date(publishTime)
         );
       }
 
       // Upload cover image
       if (coverImage) {
-        const compressedCoverImage = await compressFile(coverImage!);
+        const compressedCoverImage = await compressFile(coverImage);
         const coverImageUrl = await fileApi.uploadFile(compressedCoverImage);
         data.coverImage = coverImageUrl.blob.uri;
       }
       // Upload albums
-      if (album && album.length > 0) {
+      if (album && album.length > 0 && !album.some(item => !item)) {
         const albumUrls = await Promise.all(
           album.map(
             async item =>
               new Promise<string>(async (resolve, reject) => {
                 try {
-                  const compressedCoverImage = await compressFile(item);
-                  const coverImageUrl =
-                    await fileApi.uploadFile(compressedCoverImage);
-                  resolve(coverImageUrl.blob.uri);
+                  if (item) {
+                    const compressedCoverImage = await compressFile(item);
+                    const coverImageUrl =
+                      await fileApi.uploadFile(compressedCoverImage);
+                    resolve(coverImageUrl.blob.uri);
+                  }
                 } catch (error) {
                   reject(error);
                 }
@@ -950,15 +953,9 @@ const EditEventPage: NextPageWithLayout = () => {
                           <FormField
                             control={addressForm.control}
                             name="eventDate"
-                            {...(event.eventDate
-                              ? { defaultValue: event.eventDate }
-                              : {})}
+                            defaultValue={event.eventDate}
                             render={({ field }) => (
-                              <FormItem
-                                {...(event.eventDate
-                                  ? { defaultValue: event.eventDate as any }
-                                  : {})}
-                              >
+                              <FormItem defaultValue={event.eventDate as any}>
                                 <FormLabel className="text-sm font-bold">
                                   Ngày tổ chức sự kiện
                                 </FormLabel>
@@ -1306,10 +1303,16 @@ const EditEventPage: NextPageWithLayout = () => {
                           <FormField
                             control={ticketInfoForm.control}
                             name="ticketStartTime"
-                            defaultValue={event.ticketStartTime}
+                            {...(event.ticketStartTime
+                              ? { defaultValue: event.ticketStartTime }
+                              : {})}
                             render={({ field }) => (
                               <FormItem
-                                defaultValue={event.ticketStartTime as any}
+                                {...(event.ticketStartTime
+                                  ? {
+                                      defaultValue: event.ticketStartTime as any
+                                    }
+                                  : {})}
                               >
                                 <FormLabel className="text-sm font-bold">
                                   Giờ mở cửa
@@ -1414,10 +1417,16 @@ const EditEventPage: NextPageWithLayout = () => {
                           <FormField
                             control={ticketInfoForm.control}
                             name="ticketCloseTime"
-                            defaultValue={event.ticketCloseTime}
+                            {...(event.ticketCloseTime
+                              ? { defaultValue: event.ticketCloseTime }
+                              : {})}
                             render={({ field }) => (
                               <FormItem
-                                defaultValue={event.ticketCloseTime as any}
+                                {...(event.ticketCloseTime
+                                  ? {
+                                      defaultValue: event.ticketCloseTime as any
+                                    }
+                                  : {})}
                               >
                                 <FormLabel className="text-sm font-bold">
                                   Giờ đóng cửa
@@ -1530,6 +1539,9 @@ const EditEventPage: NextPageWithLayout = () => {
                   <div className="mt-5 mb-9">
                     <SearchEventCard
                       event={{
+                        category: categories?.find(
+                          item => item.id === event.categoryId
+                        ),
                         ticketPrice: ticketInfoForm.watch().price || 0,
                         promotionPlan:
                           ticketInfoForm.watch().promotionPlan || 0,

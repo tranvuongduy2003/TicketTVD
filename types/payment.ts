@@ -1,4 +1,4 @@
-import { PaymentStatus, Status } from '@/models';
+import { PaymentStatus, Status, TicketStatus } from '@/models';
 
 export type CheckoutPayload = {
   eventId: number;
@@ -18,6 +18,7 @@ export type PaymentTicket = {
   ownerPhone: string;
   eventId: number;
   price: number;
+  status?: TicketStatus;
   startTime: Date;
   closeTime: Date;
   createdAt?: Date;
