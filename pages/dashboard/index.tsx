@@ -114,8 +114,8 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
             {dayDiffFromNow(
               events?.sort(
                 (a, b) =>
-                  new Date(b.eventDate).getTime() -
-                  new Date(a.eventDate).getTime()
+                  (b.eventDate ? new Date(b.eventDate) : new Date()).getTime() -
+                  (a.eventDate ? new Date(a.eventDate) : new Date()).getTime()
               )[0].eventDate ?? new Date()
             )}
           </p>
@@ -124,8 +124,8 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
           data={
             events?.sort(
               (a, b) =>
-                new Date(b.eventDate).getTime() -
-                new Date(a.eventDate).getTime()
+                (b.eventDate ? new Date(b.eventDate) : new Date()).getTime() -
+                (a.eventDate ? new Date(a.eventDate) : new Date()).getTime()
             ) || []
           }
           columns={eventColumns}
@@ -143,8 +143,8 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
             {dayDiffFromNow(
               payments?.sort(
                 (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
+                  (b.createdAt ? new Date(b.createdAt) : new Date()).getTime() -
+                  (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
               )[0].createdAt ?? new Date()
             )}
           </p>
@@ -159,8 +159,8 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
               })
               .sort(
                 (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
+                  (b.createdAt ? new Date(b.createdAt) : new Date()).getTime() -
+                  (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
               ) || []
           }
           columns={paymentColumns}
