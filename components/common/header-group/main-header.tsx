@@ -11,7 +11,7 @@ export function MainHeader() {
   return (
     <header className="px-8 h-14 flex items-center shadow-xs justify-between">
       {/* LEFT */}
-      <Link href={'/explore'} className="flex items-center gap-[6px]">
+      <Link href={'/'} className="flex items-center gap-[6px]">
         <div>
           <Image
             src="/images/logo.png"
