@@ -5,31 +5,18 @@ import { UpdateTicketPayload } from '@/types';
 
 export const ticketApi = {
   getAllTickets: () => {
-    return httpRequest.get<Ticket[]>(API_ROUTE.ticket, {
-      baseURL: process.env.TICKET_API_URL
-    });
+    return httpRequest.get<Ticket[]>(API_ROUTE.ticket);
   },
   getAllTicketDetails: () => {
-    return httpRequest.get<TicketDetail[]>(API_ROUTE.ticketDetail, {
-      baseURL: process.env.TICKET_API_URL
-    });
+    return httpRequest.get<TicketDetail[]>(API_ROUTE.ticketDetail);
   },
   updateTicketInfo: (id: number, ticket: UpdateTicketPayload) => {
     return httpRequest.patch<Ticket, UpdateTicketPayload>(
       `${API_ROUTE.ticket}/${id}`,
-      ticket,
-      {
-        baseURL: process.env.TICKET_API_URL
-      }
+      ticket
     );
   },
   terminateTicket: (id: number) => {
-    return httpRequest.patch<Ticket>(
-      `${API_ROUTE.ticket}/terminate/${id}`,
-      {},
-      {
-        baseURL: process.env.TICKET_API_URL
-      }
-    );
+    return httpRequest.patch<Ticket>(`${API_ROUTE.ticket}/terminate/${id}`, {});
   }
 };
