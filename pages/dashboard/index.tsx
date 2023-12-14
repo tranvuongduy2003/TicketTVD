@@ -147,7 +147,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
                 (a, b) =>
                   (b.createdAt ? new Date(b.createdAt) : new Date()).getTime() -
                   (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
-              )[0].createdAt ?? new Date()
+              )[0]?.createdAt ?? new Date()
             )}
           </p>
         </div>
