@@ -30,6 +30,8 @@ export function useAuth(options?: Partial<SWRConfiguration>) {
   async function logIn(payload: LoginPayload) {
     const { user, accessToken, refreshToken } = await authApi.signIn(payload);
 
+    setProfile(user);
+
     setCookie(ACCESS_TOKEN, accessToken);
     setCookie(REFRESH_TOKEN, refreshToken);
 
