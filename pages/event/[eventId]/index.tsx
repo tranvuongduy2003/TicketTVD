@@ -90,7 +90,7 @@ const EventDetailPage: NextPageWithLayout = () => {
             {event?.name}
           </h2>
           <p className="text-sm text-neutral-550 mb-8">{event?.description}</p>
-          {/* <div className="flex items-center justify-center gap-6">                           
+          {/* <div className="flex items-center justify-center gap-6">
             <Badge
               className="flex gap-2 items-center text-sm text-white shadow-m px-6 h-9 bg-danger-500"
               onClick={handleIncreaseFavourire}
