@@ -53,6 +53,11 @@ export function DataTableRowActions<TData>({
           >
             Chỉnh sửa
           </DropdownMenuItem>
+          <DropdownMenuItem
+            onClick={() => router.push(`/my-events/${eventId}/payment`)}
+          >
+            Đơn mua
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>
             <span className="text-danger-500">Xóa sự kiện</span>
           </DropdownMenuItem>

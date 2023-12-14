@@ -32,7 +32,8 @@ const ticketFormSchema = z.object({
 });
 
 interface TicketFormProps {
-  contactForm: UseFormReturn<
+  isEditted?: boolean;
+  contactForm?: UseFormReturn<
     {
       fullname: string;
       email: string;
@@ -52,6 +53,7 @@ interface TicketFormProps {
 }
 
 export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
+  isEditted,
   contactForm,
   ticketsForm,
   index
@@ -63,7 +65,7 @@ export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
   });
 
   useEffect(() => {
-    if (index === 0) {
+    if (index === 0 && contactForm) {
       ticketForm.setValue('email', contactForm.watch().email);
       ticketForm.setValue('fullname', contactForm.watch().fullname);
       ticketForm.setValue('phone', contactForm.watch().phone);
@@ -82,11 +84,13 @@ export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
   return (
     <div className="px-6 py-[30px] rounded-m border border-solid border-neutral-200">
       <div className="flex items-center justify-between mb-[22px]">
-        <div className="flex items-center gap-3">
-          <LuTicket className="text-2xl text-primary-500" />
-          <span className="font-bold text-neutral-650">Vé {index + 1}</span>
-        </div>
-        {index === 0 && (
+        {!isEditted && (
+          <div className="flex items-center gap-3">
+            <LuTicket className="text-2xl text-primary-500" />
+            <span className="font-bold text-neutral-650">Vé {index + 1}</span>
+          </div>
+        )}
+        {index === 0 && contactForm && (
           <div className="flex items-center gap-2">
             <Checkbox
               id="repeat"

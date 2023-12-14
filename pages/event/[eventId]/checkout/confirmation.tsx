@@ -143,12 +143,14 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
                 {(bill?.totalPrice as number)?.toLocaleString('vi-VN')} VNĐ
               </div>
             </div>
-            <div className="flex flex-col gap-[5px] items-start">
-              <div className="text-neutral-550">Phương thức thanh toán</div>
-              <div className="capitalize">
-                {bill?.paymentMethod.card} - **** {bill?.paymentMethod.last4}
+            {bill?.paymentMethod && (
+              <div className="flex flex-col gap-[5px] items-start">
+                <div className="text-neutral-550">Phương thức thanh toán</div>
+                <div className="capitalize">
+                  {bill?.paymentMethod.card} - **** {bill?.paymentMethod.last4}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="mt-[58px]">

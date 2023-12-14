@@ -29,3 +29,4 @@ export * from './time-picker-input';
 export * from './time-picker';
 export * from './switch';
 export * from './skeleton';
+export * from './tooltip';

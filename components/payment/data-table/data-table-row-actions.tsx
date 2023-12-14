@@ -10,8 +10,9 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { Payment } from '@/models';
+import { Payment, Role } from '@/models';
 import { useRouter } from 'next/router';
+import { useAuth } from '@/hooks';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -21,6 +22,9 @@ export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
   const router = useRouter();
+  const { eventId } = router.query;
+
+  const { profile } = useAuth();
 
   const paymentId = (row.original as Payment).id;
 
@@ -37,12 +41,14 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem
-            onClick={() => router.push(`/management/payment/${paymentId}`)}
+            onClick={() =>
+              profile?.role === Role.ADMIN
+                ? router.push(`/management/payment/${paymentId}`)
+                : profile?.role === Role.ORGANIZER &&
+                  router.push(`/my-events/${eventId}/payment/${paymentId}`)
+            }
           >
             Chỉnh sửa
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span className="text-danger-500">Hủy vé</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

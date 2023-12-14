@@ -9,3 +9,6 @@ export * from './use-payments';
 export * from './use-revenue';
 export * from './use-tickets';
 export * from './use-events-by-category';
+export * from './use-ticket-details';
+export * from './use-payments-by-event-id';
+export * from './use-payments-by-user-id';

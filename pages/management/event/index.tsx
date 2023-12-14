@@ -1,6 +1,6 @@
 import { columns } from '@/components/event';
-import { AdminLayout } from '@/components/layout';
 import { DataTable } from '@/components/event/data-table';
+import { AdminLayout } from '@/components/layout';
 import { useEvents } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 

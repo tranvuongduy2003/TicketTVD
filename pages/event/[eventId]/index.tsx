@@ -1,8 +1,10 @@
+import { eventApi } from '@/apis';
 import { DetailItem, EventCard } from '@/components/event';
 import { MainLayout } from '@/components/layout';
-import { Badge, Button, Loading, Skeleton } from '@/components/ui';
+import { Badge, Button, Loading, Skeleton, useToast } from '@/components/ui';
+import { MILLISECOND_PER_SECOND } from '@/constants';
 import { useAuth, useEvent, useEvents } from '@/hooks';
-import { NextPageWithLayout, Role } from '@/models';
+import { NextPageWithLayout } from '@/models';
 import { cn } from '@/types';
 import {
   calculateTime,
@@ -25,6 +27,7 @@ import { MdOutlineDiscount } from 'react-icons/md';
 
 const EventDetailPage: NextPageWithLayout = () => {
   const { profile } = useAuth();
+  const { toast } = useToast();
   const router = useRouter();
   const { eventId } = router.query;
 
@@ -32,6 +35,33 @@ const EventDetailPage: NextPageWithLayout = () => {
   const { event, isLoading } = useEvent(Number.parseInt(eventId as string));
 
   const [isShowMoreDesc, setIsShowMoreDesc] = useState<boolean>(false);
+  // const [isFavourite, setIsFavourite] = useState<boolean>(false);
+
+  async function handleIncreaseFavourire() {
+    try {
+      await eventApi.increaseFavourite(Number.parseInt(eventId as string));
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Đã xảy ra lỗi',
+        variant: 'destructive',
+        duration: MILLISECOND_PER_SECOND
+      });
+    }
+  }
+
+  async function handleDecreaseFavourire() {
+    try {
+      await eventApi.decreaseFavourite(Number.parseInt(eventId as string));
+    } catch (error) {
+      console.log(error);
+      toast({
+        title: 'Đã xảy ra lỗi',
+        variant: 'destructive',
+        duration: MILLISECOND_PER_SECOND
+      });
+    }
+  }
 
   return !eventId || isLoading || !event ? (
     <Loading />
@@ -60,14 +90,17 @@ const EventDetailPage: NextPageWithLayout = () => {
             {event?.name}
           </h2>
           <p className="text-sm text-neutral-550 mb-8">{event?.description}</p>
-          <div className="flex items-center justify-center gap-6">
-            <Badge className="flex gap-2 items-center text-sm text-white shadow-m px-6 h-9 bg-danger-500">
-              <LuHeart /> {event?.favourite}
+          {/* <div className="flex items-center justify-center gap-6">
+            <Badge
+              className="flex gap-2 items-center text-sm text-white shadow-m px-6 h-9 bg-danger-500"
+              onClick={handleIncreaseFavourire}
+            >
+              <FaRegHeart /> {event?.favourite}
             </Badge>
             <Badge className="flex gap-2 items-center text-sm text-white shadow-m px-6 h-9">
               <LuShare2 /> {event?.share}
             </Badge>
-          </div>
+          </div> */}
         </div>
       </div>
 
@@ -196,13 +229,19 @@ const EventDetailPage: NextPageWithLayout = () => {
                 </span>
               )}
             </div>
-            <Button
-              type="button"
-              className="text-white w-full mt-7"
-              onClick={() => router.push(`/event/${eventId}/checkout`)}
-            >
-              Mua vé
-            </Button>
+            {event.ticketSoldQuantity < event.ticketQuantity ? (
+              <Button
+                type="button"
+                className="text-white w-full mt-7"
+                onClick={() => router.push(`/event/${eventId}/checkout`)}
+              >
+                Mua vé
+              </Button>
+            ) : (
+              <div className="text-danger-500 font-bold w-full mt-7 border-2 rounded-md border-solid border-danger-500 text-center h-10 px-4 py-2">
+                Hết vé
+              </div>
+            )}
           </div>
         </div>
       </div>

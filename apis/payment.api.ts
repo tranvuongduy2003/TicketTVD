@@ -14,6 +14,16 @@ export const paymentApi = {
       baseURL: process.env.PAYMENT_API_URL
     });
   },
+  getPaymentsByEventId: (eventId: number) => {
+    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/event/${eventId}`, {
+      baseURL: process.env.PAYMENT_API_URL
+    });
+  },
+  getPaymentsByUserId: (userId: string) => {
+    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/${userId}`, {
+      baseURL: process.env.PAYMENT_API_URL
+    });
+  },
   checkout: (data: CheckoutPayload) => {
     return httpRequest.post<Payment, CheckoutPayload>(
       API_ROUTE.payment + '/checkout',

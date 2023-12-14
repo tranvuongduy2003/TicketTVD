@@ -3,11 +3,27 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Status, User } from '@/models';
-import { Badge } from '../ui';
+import { Avatar, AvatarFallback, AvatarImage, Badge } from '../ui';
 import { DataTableRowActions } from './data-table';
 import { DataTableColumnHeader } from './data-table/data-table-column-header';
 
 export const customerColumns: ColumnDef<User>[] = [
+  {
+    accessorKey: 'avatar',
+    header: ({ column }) => <DataTableColumnHeader column={column} title="" />,
+    cell: ({ row }) => (
+      <Avatar>
+        <AvatarImage
+          src={row.getValue('avatar') || ''}
+          suppressHydrationWarning
+          style={{ objectFit: 'cover' }}
+        />
+        <AvatarFallback>AV</AvatarFallback>
+      </Avatar>
+    ),
+    enableSorting: false,
+    enableHiding: false
+  },
   {
     accessorKey: 'name',
     header: ({ column }) => (
@@ -98,22 +114,4 @@ export const customerColumns: ColumnDef<User>[] = [
     cell: ({ row }) => <DataTableRowActions row={row} />,
     enableSorting: false
   }
-  // {
-  //   accessorKey: 'action',
-  //   header: ({ column }) => (
-  //     <DataTableColumnHeader column={column} title="Thao tác" />
-  //   ),
-  //   cell: () => {
-  //     return (
-  //       <div className="w-[168px] flex justify-between gap-2">
-  //         <Button type="button" className="text-white">
-  //           Chỉnh sửa
-  //         </Button>
-  //         <Button type="button">Vô hiệu hóa</Button>
-  //       </div>
-  //     );
-  //   },
-  //   enableSorting: false,
-  //   enableHiding: false
-  // }
 ];

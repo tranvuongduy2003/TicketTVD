@@ -120,8 +120,8 @@ const publishFormSchema = z.object({
 const AdminEventDetailPage: NextPageWithLayout = () => {
   const { categories } = useCategories();
 
-  const { query } = useRouter();
-  const { eventId } = query;
+  const router = useRouter();
+  const { eventId } = router.query;
 
   const { event, isLoading: eventLoading } = useEvent(
     Number.parseInt(eventId as string)
@@ -420,6 +420,12 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
   ) : (
     event && (
       <div className="mx-[132px] my-[34px]">
+        <span
+          className="flex item-center gap-2 text-neutral-550 leading-none mb-5 hover:text-neutral-700 cursor-pointer"
+          onClick={() => router.back()}
+        >
+          <LuArrowLeft /> Quay lại
+        </span>
         {/* HEADER */}
         <h2 className="text-[32px] font-bold leading-[48px] mb-8">
           Chỉnh sửa thông tin sự kiện
