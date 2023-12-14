@@ -4,27 +4,18 @@ import { Category } from '@/models';
 
 export const categoryApi = {
   getCategories: () => {
-    return httpRequest.get<Category[]>(API_ROUTE.category, {
-      baseURL: process.env.CATEGORY_API_URL
-    });
+    return httpRequest.get<Category[]>(API_ROUTE.category);
   },
   getCategoryById: (id: number) => {
-    return httpRequest.get<Category>(`${API_ROUTE.category}/${id}`, {
-      baseURL: process.env.CATEGORY_API_URL
-    });
+    return httpRequest.get<Category>(`${API_ROUTE.category}/${id}`);
   },
   updateCategory: (id: number, data: Partial<Category>) => {
     return httpRequest.put<any, Partial<Category>>(
       `${API_ROUTE.category}/${id}`,
-      data,
-      {
-        baseURL: process.env.CATEGORY_API_URL
-      }
+      data
     );
   },
   deleteCategory: (id: number) => {
-    return httpRequest.delete(`${API_ROUTE.category}/${id}`, {
-      baseURL: process.env.CATEGORY_API_URL
-    });
+    return httpRequest.delete(`${API_ROUTE.category}/${id}`);
   }
 };

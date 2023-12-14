@@ -59,7 +59,7 @@ export const eventColumns: ColumnDef<Event>[] = [
     ),
     cell: ({ row }) => (
       <div>
-        {row.getValue('ticketSoldQuantity') || 0} /{' '}
+        {row.original.ticketSoldQuantity || 0} /{' '}
         {row.getValue('ticketQuantity')}
       </div>
     ),
