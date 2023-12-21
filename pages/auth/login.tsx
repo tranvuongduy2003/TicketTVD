@@ -71,6 +71,28 @@ const Login: NextPageWithLayout = () => {
 
       {/* LOGIN FORM */}
       <div className="bg-white shadow-xs rounded-m px-20 py-16 w-[550px] z-20">
+        {/* LOGO */}
+        <Link
+          href={'/'}
+          className="flex items-center gap-[6px] justify-center mb-4"
+        >
+          <div>
+            <Image
+              src="/images/logo.png"
+              alt="Logo"
+              width={43}
+              height={60}
+              style={{
+                objectFit: 'cover'
+              }}
+            />
+          </div>
+          <h2 className="text-lg font-bold leading-7">
+            <span className="text-neutral-700">Ticket</span>
+            <span className="text-primary-500">TVD</span>
+          </h2>
+        </Link>
+
         {/* TITLE */}
         <h2 className="text-center text-[40px] font-bold mb-10">Đăng nhập</h2>
 
