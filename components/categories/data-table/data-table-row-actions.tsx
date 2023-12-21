@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { useRouter } from 'next/router';
 import { Category } from '@/models';
+import Link from 'next/link';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -20,8 +20,6 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
-  const router = useRouter();
-
   const categoryId = (row.original as Category).id;
 
   return (
@@ -35,13 +33,11 @@ export function DataTableRowActions<TData>({
             <LuMoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            onClick={() => router.push(`/management/category/${categoryId}`)}
-          >
-            Chỉnh sửa
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+        <Link href={`/management/category/${categoryId}`}>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+          </DropdownMenuContent>
+        </Link>
       </DropdownMenu>
     </>
   );

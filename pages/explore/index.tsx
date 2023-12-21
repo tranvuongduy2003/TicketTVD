@@ -9,11 +9,9 @@ import { Button, Skeleton } from '@/components/ui';
 import { useCategories, useEvents } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const ExplorePage: NextPageWithLayout = () => {
-  const router = useRouter();
-
   const { events, isLoading: eventLoading } = useEvents();
   const { categories, isLoading: categoryLoading } = useCategories();
 
@@ -33,11 +31,10 @@ const ExplorePage: NextPageWithLayout = () => {
         </h1>
 
         {/* SEARCH */}
-        <div
-          className="px-72 w-full z-20 mt-10 mb-[150px] cursor-pointer"
-          onClick={() => router.push('/event/search')}
-        >
-          <EventSearchBar />
+        <div className="px-72 w-full z-20 mt-10 mb-[150px] cursor-pointer">
+          <Link href={'/event/search'}>
+            <EventSearchBar />
+          </Link>
         </div>
 
         <h4 className="text-white text-[32px] font-bold leading-[48px] mx-auto text-center z-20 mb-12">
@@ -69,13 +66,14 @@ const ExplorePage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">mới nhất</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-8">
@@ -131,13 +129,14 @@ const ExplorePage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sắp diễn ra <span className="text-primary-500">trong 24h</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
@@ -164,13 +163,14 @@ const ExplorePage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Điểm nhấn <span className="text-primary-500">trong tuần</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="w-full p-[60px] bg-slate-600 grid grid-cols-2 gap-[60px]">
@@ -192,13 +192,14 @@ const ExplorePage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Nhiều sự kiện hơn
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-8">

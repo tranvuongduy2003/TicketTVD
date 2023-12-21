@@ -2,7 +2,7 @@ import { eventApi, paymentApi } from '@/apis';
 import { DetailItem, EventCard } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
 import { Button, Loading, Separator, Skeleton } from '@/components/ui';
-import { useEvent, useEvents } from '@/hooks';
+import { useEvents } from '@/hooks';
 import { Event, NextPageWithLayout } from '@/models';
 import { PaymentTicket, ValidateStripeSessionResponse } from '@/types';
 import {
@@ -10,6 +10,7 @@ import {
   formatDateToLocaleDate,
   formatDateToTime
 } from '@/utils';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -191,13 +192,11 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
               ))}
           </div>
         </div>
-        <Button
-          type="button"
-          className="text-white mt-10"
-          onClick={() => router.push('/my-tickets')}
-        >
-          Đi đến vé của tôi
-        </Button>
+        <Link href={'/my-tickets'}>
+          <Button type="button" className="text-white mt-10">
+            Đi đến vé của tôi
+          </Button>
+        </Link>
       </div>
 
       <div className="px-[132px] py-12 mt-[88px]">
@@ -205,13 +204,14 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">tương tự</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-6">

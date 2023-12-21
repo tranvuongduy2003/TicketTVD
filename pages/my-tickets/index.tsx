@@ -13,15 +13,13 @@ import {
 import { useEvents, useMyTickets } from '@/hooks';
 import { MyTicket, NextPageWithLayout } from '@/models';
 import { useProfileStore } from '@/stores';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { LuPen } from 'react-icons/lu';
 
 const PER_PAGE = 3;
 
 const MyTicketsPage: NextPageWithLayout = () => {
-  const router = useRouter();
-
   const [page, setPage] = useState<number>(1);
   const [searchedMyTickets, setSearchedMyTickets] = useState<MyTicket[]>([]);
 
@@ -80,13 +78,14 @@ const MyTicketsPage: NextPageWithLayout = () => {
                   {myTickets?.length} đơn mua
                 </Badge>
               </div>
-              <Button
-                type="button"
-                className="flex items-center gap-[6px] text-white w-full"
-                onClick={() => router.push('/profile')}
-              >
-                <LuPen /> <span>Chỉnh sửa thông tin</span>
-              </Button>
+              <Link href={'/profile'}>
+                <Button
+                  type="button"
+                  className="flex items-center gap-[6px] text-white w-full"
+                >
+                  <LuPen /> <span>Chỉnh sửa thông tin</span>
+                </Button>
+              </Link>
             </div>
           </div>
           <div className="w-2/3">
@@ -149,13 +148,14 @@ const MyTicketsPage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">tương tự</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-6">

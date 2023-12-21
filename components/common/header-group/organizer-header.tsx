@@ -94,13 +94,14 @@ export function OrganizerHeader() {
       </div>
 
       {/* RIGHT */}
-      <Button
-        type="button"
-        className="text-white flex gap-2 items-center text-sm font-normal mr-6"
-        onClick={() => router.push('/event/create')}
-      >
-        <LuPlus /> Tạo sự kiện
-      </Button>
+      <Link href={'/event/create'}>
+        <Button
+          type="button"
+          className="text-white flex gap-2 items-center text-sm font-normal mr-6"
+        >
+          <LuPlus /> Tạo sự kiện
+        </Button>
+      </Link>
       <DropdownMenu>
         <DropdownMenuTrigger>
           <div className="flex items-center gap-3">
@@ -124,13 +125,12 @@ export function OrganizerHeader() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuItem
-            className="cursor-pointer px-3 py-2"
-            onClick={() => router.push('/profile')}
-          >
-            <LuUser className="mr-2 text-base" />
-            <span className="text-base">Thông tin cá nhân</span>
-          </DropdownMenuItem>
+          <Link href={'/profile'}>
+            <DropdownMenuItem className="cursor-pointer px-3 py-2">
+              <LuUser className="mr-2 text-base" />
+              <span className="text-base">Thông tin cá nhân</span>
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem
             className="cursor-pointer px-3 py-2"
             onClick={() => logOut()}

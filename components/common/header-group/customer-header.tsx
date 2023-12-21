@@ -116,13 +116,12 @@ export function CustomerHeader() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56">
-          <DropdownMenuItem
-            className="cursor-pointer px-3 py-2"
-            onClick={() => router.push('/profile')}
-          >
-            <LuUser className="mr-2 text-base" />
-            <span className="text-base">Thông tin cá nhân</span>
-          </DropdownMenuItem>
+          <Link href={'/profile'}>
+            <DropdownMenuItem className="cursor-pointer px-3 py-2">
+              <LuUser className="mr-2 text-base" />
+              <span className="text-base">Thông tin cá nhân</span>
+            </DropdownMenuItem>
+          </Link>
           <DropdownMenuItem
             className="cursor-pointer px-3 py-2"
             onClick={() => logOut()}
