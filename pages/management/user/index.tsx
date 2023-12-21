@@ -23,7 +23,7 @@ const UserPage: NextPageWithLayout = () => {
               value="customer"
               className="border-b-[3px] border-solid border-transparent px-3 py-[15px] data-[state=active]:border-b-[3px] data-[state=active]:border-solid data-[state=active]:border-primary-500 data-[state=active]:text-primary-500 rounded-none"
             >
-              Khán giả
+              Khách hàng
             </TabsTrigger>
             <TabsTrigger
               value="organizer"
