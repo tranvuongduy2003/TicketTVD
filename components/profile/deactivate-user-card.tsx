@@ -4,12 +4,14 @@ import { userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND } from '@/constants';
 import { useState } from 'react';
 import { Button, Card, CardContent, toast } from '../ui';
+import { useRouter } from 'next/router';
 
 export interface DeactivateUserCardProps {
   userId: string;
 }
 
 export function DeactivateUserCard({ userId }: DeactivateUserCardProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   async function onDeactivateUser() {
@@ -23,6 +25,7 @@ export function DeactivateUserCard({ userId }: DeactivateUserCardProps) {
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
+      router.reload();
     } catch (error: any) {
       setIsLoading(false);
       toast({
