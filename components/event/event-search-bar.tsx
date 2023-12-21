@@ -5,7 +5,7 @@ import { LuSearch } from 'react-icons/lu';
 import { Button, Input } from '../ui';
 
 export interface EventSearchBarProps {
-  onSearch: Function;
+  onSearch?: Function;
 }
 
 export function EventSearchBar({ onSearch }: EventSearchBarProps) {
@@ -23,7 +23,7 @@ export function EventSearchBar({ onSearch }: EventSearchBarProps) {
       <Button
         type="button"
         className="text-white w-[124px]"
-        onClick={() => onSearch(inputRef.current.value)}
+        onClick={() => onSearch && onSearch(inputRef.current.value)}
       >
         Tìm kiếm
       </Button>

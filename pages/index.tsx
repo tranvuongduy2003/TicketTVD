@@ -33,8 +33,11 @@ const Home: NextPageWithLayout = () => {
           nhất cho chính mình
         </h1>
         {/* SEARCH */}
-        <div className="absolute bottom-0 z-30 px-[293px] w-full translate-y-1/2">
-          <EventSearchBar onSearch={() => router.push('/event/search')} />
+        <div
+          className="absolute bottom-0 z-30 px-[293px] w-full translate-y-1/2 cursor-pointer"
+          onClick={() => router.push('/event/search')}
+        >
+          <EventSearchBar />
         </div>
       </section>
 

@@ -33,8 +33,11 @@ const ExplorePage: NextPageWithLayout = () => {
         </h1>
 
         {/* SEARCH */}
-        <div className="px-72 w-full z-20 mt-10 mb-[150px]">
-          <EventSearchBar onSearch={() => router.push('/event/search')} />
+        <div
+          className="px-72 w-full z-20 mt-10 mb-[150px] cursor-pointer"
+          onClick={() => router.push('/event/search')}
+        >
+          <EventSearchBar />
         </div>
 
         <h4 className="text-white text-[32px] font-bold leading-[48px] mx-auto text-center z-20 mb-12">
