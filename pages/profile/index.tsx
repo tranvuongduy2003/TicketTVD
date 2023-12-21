@@ -1,6 +1,10 @@
 import { fileApi, userApi } from '@/apis';
 import { ProtectedLayout } from '@/components/layout';
-import { ChangePasswordCard, DeactivateUserCard } from '@/components/profile';
+import {
+  ActivateUserCard,
+  ChangePasswordCard,
+  DeactivateUserCard
+} from '@/components/profile';
 import {
   Avatar,
   AvatarFallback,
@@ -27,7 +31,7 @@ import {
 } from '@/components/ui';
 import { PHONE_REGEX } from '@/constants';
 import { useAuth } from '@/hooks';
-import { Gender, NextPageWithLayout, User } from '@/models';
+import { Gender, NextPageWithLayout, Status, User } from '@/models';
 import { useProfileStore } from '@/stores';
 import { cn } from '@/types';
 import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
@@ -332,10 +336,16 @@ const Profile: NextPageWithLayout = () => {
           </div>
           <div className="flex justify-between mt-12">
             <h2 className="mt-2 text-xl leading-[30px] font-bold text-neutral-900">
-              Vô hiệu hóa
+              {profile.status === Status.DEACTIVE && 'Kích hoạt'}
+              {profile.status === Status.ACTIVE && 'Vô hiệu hóa'}
             </h2>
             <div className="w-2/3">
-              <DeactivateUserCard userId={profile.id} />
+              {profile.status === Status.ACTIVE && (
+                <DeactivateUserCard userId={profile.id} />
+              )}
+              {profile.status === Status.DEACTIVE && (
+                <ActivateUserCard userId={profile.id} />
+              )}
             </div>
           </div>
         </>
