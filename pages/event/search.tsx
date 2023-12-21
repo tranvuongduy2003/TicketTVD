@@ -9,11 +9,14 @@ import { Button, Skeleton } from '@/components/ui';
 import { useCategories, useEvents } from '@/hooks';
 import { Event, NextPageWithLayout } from '@/models';
 import { convertToISODate } from '@/utils';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
 const PER_PAGE = 3;
 
 const EventSearchPage: NextPageWithLayout = () => {
+  const router = useRouter();
+
   const [page, setPage] = useState<number>(1);
   const [filteredEvents, setFilteredEvents] = useState<Event[]>();
 
@@ -116,6 +119,7 @@ const EventSearchPage: NextPageWithLayout = () => {
           <Button
             type="button"
             className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            onClick={() => router.push('/event/search')}
           >
             Xem thêm
           </Button>

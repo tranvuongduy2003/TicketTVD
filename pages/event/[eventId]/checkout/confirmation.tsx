@@ -208,6 +208,7 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
           <Button
             type="button"
             className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            onClick={() => router.push('/event/search')}
           >
             Xem thêm
           </Button>

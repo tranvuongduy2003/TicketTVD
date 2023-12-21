@@ -1,31 +1,71 @@
-import { eventApi, paymentApi } from '@/apis';
+import { eventApi, paymentApi, ticketApi } from '@/apis';
 import { DetailItem, EventCard } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
-import { Button, Loading, Separator, Skeleton } from '@/components/ui';
-import { useEvent, useEvents } from '@/hooks';
-import { Event, NextPageWithLayout } from '@/models';
+import { TerminateTicketDialog } from '@/components/payment';
+import {
+  Button,
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+  Input,
+  Loading,
+  Separator,
+  Skeleton,
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+  useToast
+} from '@/components/ui';
+import { MILLISECOND_PER_SECOND, PHONE_REGEX } from '@/constants';
+import { useEvents } from '@/hooks';
+import { Event, NextPageWithLayout, TicketStatus } from '@/models';
 import { PaymentTicket, ValidateStripeSessionResponse } from '@/types';
 import {
   calculateTime,
   formatDateToLocaleDate,
   formatDateToTime
 } from '@/utils';
-import { useRouter } from 'next/router';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Router, useRouter } from 'next/router';
 import { useEffect, useRef, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import {
   LuArrowLeft,
   LuCalendar,
-  LuCheckCircle2,
   LuClock,
+  LuCopy,
   LuMapPin,
+  LuPenSquare,
   LuTicket
 } from 'react-icons/lu';
 import QRCode from 'react-qr-code';
+import * as z from 'zod';
 
 interface TicketItemProps {
+  tickets: PaymentTicket[];
+  setTickets: Function;
   index: number;
   ticket: PaymentTicket;
 }
+
+const ticketFormSchema = z.object({
+  id: z.number().optional(),
+  fullname: z.string({ required_error: 'Vui lòng nhập tên sự kiện' }),
+  email: z
+    .string()
+    .min(1, { message: 'Email không được để trống' })
+    .max(100, { message: 'Email không được vượt quá 100 kí tự' })
+    .email('Email không hợp lệ'),
+  phone: z
+    .string()
+    .min(1, 'Số điện thoại không được để trống')
+    .regex(PHONE_REGEX, 'Số điện thoại không hợp lệ')
+    .max(100, { message: 'Số điện thoại không được vượt quá 100 kí tự' })
+});
 
 const MyTicketDetailsPage: NextPageWithLayout = () => {
   const router = useRouter();
@@ -144,12 +184,14 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
                 {(bill?.totalPrice as number)?.toLocaleString('vi-VN')} VNĐ
               </div>
             </div>
-            <div className="flex flex-col gap-[5px] items-start">
-              <div className="text-neutral-550">Phương thức thanh toán</div>
-              <div className="capitalize">
-                {bill?.paymentMethod.card} - **** {bill?.paymentMethod.last4}
+            {bill?.paymentMethod && (
+              <div className="flex flex-col gap-[5px] items-start">
+                <div className="text-neutral-550">Phương thức thanh toán</div>
+                <div className="capitalize">
+                  {bill?.paymentMethod.card} - **** {bill?.paymentMethod.last4}
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
         <div className="mt-[58px]">
@@ -186,7 +228,22 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
               bill.tickets &&
               bill.tickets.length > 0 &&
               bill.tickets.map((ticket, index) => (
-                <TicketItem key={index} index={index} ticket={ticket} />
+                <TicketItem
+                  key={index}
+                  index={index}
+                  ticket={ticket}
+                  tickets={bill.tickets}
+                  setTickets={(tickets: PaymentTicket[]) =>
+                    setBill(prevBill => {
+                      const curBill = {
+                        ...prevBill
+                      } as ValidateStripeSessionResponse;
+                      curBill.tickets = tickets;
+
+                      return curBill;
+                    })
+                  }
+                />
               ))}
           </div>
         </div>
@@ -200,6 +257,7 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
           <Button
             type="button"
             className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            onClick={() => router.push('/event/search')}
           >
             Xem thêm
           </Button>
@@ -226,40 +284,241 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
   );
 };
 
-function TicketItem({ index, ticket }: TicketItemProps) {
+function TicketItem({ index, ticket, tickets, setTickets }: TicketItemProps) {
+  const { toast } = useToast();
+
+  const [isEditted, setIsEditted] = useState<boolean>(false);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+
+  const editTicketForm = useForm<z.infer<typeof ticketFormSchema>>({
+    resolver: zodResolver(ticketFormSchema),
+    defaultValues: {
+      id: ticket.id,
+      fullname: ticket.ownerName,
+      email: ticket.ownerEmail,
+      phone: ticket.ownerPhone
+    },
+    mode: 'onChange'
+  });
+
+  async function handleCopyTicketCode(code: string) {
+    try {
+      await navigator.clipboard.writeText(code);
+      toast({
+        title: 'Đã copy mã vé',
+        description: '',
+        duration: MILLISECOND_PER_SECOND * 0.25
+      });
+    } catch (err: any) {
+      toast({
+        title: 'Copy mã vé thất bại',
+        description: err,
+        duration: MILLISECOND_PER_SECOND * 0.25
+      });
+    }
+  }
+
+  async function handleUpdateTicketInfo() {
+    try {
+      await ticketApi.updateTicketInfo(ticket.id as number, {
+        fullname: editTicketForm.watch().fullname,
+        email: editTicketForm.watch().email,
+        phone: editTicketForm.watch().phone
+      });
+
+      // TODO: Set new tickets
+      const ticketsList = JSON.parse(JSON.stringify(tickets));
+
+      ticketsList[index].ownerName = editTicketForm.watch().fullname;
+      ticketsList[index].ownerEmail = editTicketForm.watch().email;
+      ticketsList[index].ownerPhone = editTicketForm.watch().phone;
+
+      setTickets(ticketsList);
+
+      setIsEditted(false);
+
+      toast({
+        title: 'Chỉnh sửa thông tin vé thành công',
+        description: '',
+        duration: MILLISECOND_PER_SECOND * 0.25
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Chỉnh sửa thông tin vé thất bại',
+        description: error,
+        duration: MILLISECOND_PER_SECOND * 0.25
+      });
+    }
+  }
+
   return (
-    <div className="py-5 px-[30px] rounded-m bg-neutral-100 border-neutral-200">
+    <div className="py-5 px-[30px] rounded-m bg-neutral-100 border-neutral-200 relative">
+      {ticket.status === TicketStatus.TERMINATED && (
+        <div className="flex items-center justify-center w-full h-full rounded-m absolute z-0 top-0 left-0 overflow-hidden">
+          <div className="w-full h-full bg-neutral-500 opacity-25 z-10 absolute"></div>
+          <div className=" z-20 p-8 text-4xl rounded-md text-danger-500 border-2 border-solid border-danger-500 inline-block font-extrabold">
+            Vé không hợp lệ
+          </div>
+        </div>
+      )}
       <h4 className="flex items-center gap-4 font-bold">
         <LuTicket className="text-2xl text-primary-500" />
         <span>Vé {index + 1}</span>
+        {ticket.status !== TicketStatus.TERMINATED && (
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger
+                className="font-bold text-primary-500"
+                onClick={() => setIsEditted(true)}
+              >
+                <LuPenSquare />
+              </TooltipTrigger>
+              <TooltipContent>Chỉnh sửa thông tin vé</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        )}
       </h4>
-      <div className="flex items-center">
-        <div className="flex flex-1 items-center justify-between mr-14 ml-7">
-          <div className="flex flex-col gap-[5px] items-start">
-            <div className="text-neutral-550">Họ tên</div>
-            <div>{ticket.ownerName}</div>
-          </div>
-          <div className="flex flex-col gap-[5px] items-start">
-            <div className="text-neutral-550">Email</div>
-            <div>{ticket.ownerEmail}</div>
-          </div>
-          <div className="flex flex-col gap-[5px] items-start">
-            <div className="text-neutral-550">Số điện thoại</div>
-            <div>{ticket.ownerPhone}</div>
-          </div>
+      {isEditted ? (
+        <div className="px-6">
+          <Form {...editTicketForm}>
+            <form
+              className="grid grid-cols-2 grid-rows-2 gap-6 py-[30px]"
+              onSubmit={editTicketForm.handleSubmit(handleUpdateTicketInfo)}
+            >
+              <div className="col-span-2">
+                <FormField
+                  control={editTicketForm.control}
+                  name="fullname"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Họ tên</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          placeholder="Nhập họ tên"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <FormField
+                control={editTicketForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="email"
+                        placeholder="example.email@gmail.com"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={editTicketForm.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Số điện thoại</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="text"
+                        placeholder="Nhập số điện thoại"
+                        {...field}
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <div className="flex justify-end gap-2 col-span-2 ">
+                <Button
+                  className="text-neutral-700 bg-neutral-300 hover:bg-neutral-400"
+                  onClick={() => setIsEditted(false)}
+                >
+                  Hủy
+                </Button>
+                <Button type="submit" className="text-white">
+                  Lưu
+                </Button>
+              </div>
+            </form>
+          </Form>
         </div>
-        <div className="bg-white rounded-xl flex items-center p-5 gap-5">
-          <div className="flex-1 flex flex-col items-center text-primary-500 ">
-            <span>Mã vé</span>
-            <span className="font-bold truncate w-[105px]">
-              {ticket.ticketCode}
-            </span>
+      ) : (
+        <div className="flex items-center">
+          <div className="flex flex-1 items-center justify-between mr-14 ml-7">
+            <div className="flex flex-col gap-[5px] items-start">
+              <div className="text-neutral-550">Họ tên</div>
+              <div>{ticket.ownerName}</div>
+            </div>
+            <div className="flex flex-col gap-[5px] items-start">
+              <div className="text-neutral-550">Email</div>
+              <div>{ticket.ownerEmail}</div>
+            </div>
+            <div className="flex flex-col gap-[5px] items-start">
+              <div className="text-neutral-550">Số điện thoại</div>
+              <div>{ticket.ownerPhone}</div>
+            </div>
           </div>
-          <div className="w-[105px] h-[105px]">
-            <QRCode value={ticket.ticketCode || ''} className="w-full h-full" />
+          <div className="bg-white rounded-xl flex items-center p-5 gap-5">
+            <div className="flex-1 flex flex-col items-center text-primary-500 ">
+              <span>Mã vé</span>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="font-bold truncate w-[105px]">
+                    {ticket.ticketCode}
+                  </TooltipTrigger>
+                  <TooltipContent>{ticket.ticketCode}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger className="font-bold text-center">
+                    <div
+                      onClick={() => handleCopyTicketCode(ticket.ticketCode!)}
+                    >
+                      <LuCopy />
+                    </div>
+                  </TooltipTrigger>
+                  <TooltipContent>Sao chép mã vé</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+            <div className="w-[105px] h-[105px]">
+              <QRCode
+                value={ticket.ticketCode || ''}
+                className="w-full h-full"
+              />
+            </div>
           </div>
+          {ticket.status !== TicketStatus.TERMINATED && (
+            <Button
+              variant={'destructive'}
+              size={'sm'}
+              className="ml-4"
+              onClick={() => setIsDialogOpen(true)}
+            >
+              Hủy vé
+            </Button>
+          )}
         </div>
-      </div>
+      )}
+      {isDialogOpen && (
+        <TerminateTicketDialog
+          open={isDialogOpen}
+          onOpenChange={setIsDialogOpen}
+          ticketId={ticket.id!}
+        />
+      )}
     </div>
   );
 }
