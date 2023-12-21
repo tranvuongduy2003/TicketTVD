@@ -64,15 +64,15 @@ export function CustomerHeader() {
             </Link>
           </NavigationMenuItem>
           <NavigationMenuItem>
-            <Link href="/upcoming" legacyBehavior passHref>
+            <Link href="/event/search" legacyBehavior passHref>
               <NavigationMenuLink
                 className={twMerge(
                   'ease-linear transition-all bg-transparent hover:bg-slate-200 px-6 py-4 text-sm font-normal leading-6 text-neutral-600',
-                  router.pathname.includes('/upcoming') &&
+                  router.pathname.includes('/event/search') &&
                     'font-bold border-b-4 border-primary-500 text-primary-500'
                 )}
               >
-                Sắp diễn ra
+                Sự kiện
               </NavigationMenuLink>
             </Link>
           </NavigationMenuItem>
