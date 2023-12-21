@@ -1,7 +1,9 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { Input } from '../../ui';
+import { Button, Input } from '../../ui';
+import { LuPlus } from 'react-icons/lu';
+import Link from 'next/link';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -21,6 +23,13 @@ export function DataTableToolbar<TData>({
           }
           className="h-10 w-[150px] lg:w-[300px]"
         />
+      </div>
+      <div>
+        <Link href={'category/create'}>
+          <Button className="text-white gap-2">
+            <LuPlus /> Tạo thể loại mới
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -9,6 +9,12 @@ export const categoryApi = {
   getCategoryById: (id: number) => {
     return httpRequest.get<Category>(`${API_ROUTE.category}/${id}`);
   },
+  createCategory: (data: Partial<Category>) => {
+    return httpRequest.post<any, Partial<Category>>(
+      `${API_ROUTE.category}`,
+      data
+    );
+  },
   updateCategory: (id: number, data: Partial<Category>) => {
     return httpRequest.put<any, Partial<Category>>(
       `${API_ROUTE.category}/${id}`,

@@ -36,7 +36,6 @@ import {
   compressFile,
   concatDateWithTime,
   formatDate,
-  formatDateToLocaleDate,
   getImageData
 } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';

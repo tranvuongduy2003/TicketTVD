@@ -14,7 +14,7 @@ import { useForm } from 'react-hook-form';
 import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
 import { mutate } from 'swr';
 import * as z from 'zod';
-import { ChangePasswordCard, DeactivateUserCard } from '../profile';
+import { ActivateUserCard, DeactivateUserCard } from '../profile';
 import {
   Avatar,
   AvatarFallback,
@@ -86,8 +86,6 @@ export function EditUserDialog({
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
-    useState<boolean>(false);
-  const [isShowExtensiveChangePassword, setIsShowExtensiveChangePassword] =
     useState<boolean>(false);
   const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
     useState<boolean>(false);
@@ -487,10 +485,10 @@ export function EditUserDialog({
             </Form>
             <div className="mt-5">
               <div
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-2 cursor-pointer mb-3"
                 onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
               >
-                <h3 className="text-lg font-semibold mb-3">Thông tin thêm</h3>
+                <h3 className="text-lg font-semibold">Thông tin thêm</h3>
                 <LuChevronDown />
               </div>
               {isShowExtensiveInfo && (
@@ -517,35 +515,28 @@ export function EditUserDialog({
             </div>
             <div className="mt-3">
               <div
-                className="flex items-center gap-2 cursor-pointer"
-                onClick={() =>
-                  setIsShowExtensiveChangePassword(
-                    !isShowExtensiveChangePassword
-                  )
-                }
-              >
-                <h3 className="text-lg font-semibold mb-3">
-                  Thay đổi mật khẩu
-                </h3>
-                <LuChevronDown />
-              </div>
-              {isShowExtensiveChangePassword && (
-                <ChangePasswordCard userId={user.id} />
-              )}
-            </div>
-            <div className="mt-3">
-              <div
-                className="flex items-center gap-2 cursor-pointer"
+                className="flex items-center gap-2 cursor-pointer mb-3"
                 onClick={() =>
                   setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
                 }
               >
-                <h3 className="text-lg font-semibold mb-3">Vô hiệu hóa</h3>
+                <h3 className="text-lg font-semibold">
+                  {user.status === Status.DEACTIVE
+                    ? 'Kích hoạt'
+                    : user.status === Status.ACTIVE
+                    ? 'Vô hiệu hóa'
+                    : ''}
+                </h3>
                 <LuChevronDown />
               </div>
-              {isShowExtensiveDeactiveUser && (
-                <DeactivateUserCard userId={user.id} />
-              )}
+              {isShowExtensiveDeactiveUser &&
+                (user.status === Status.ACTIVE ? (
+                  <DeactivateUserCard userId={user.id} />
+                ) : user.status === Status.DEACTIVE ? (
+                  <ActivateUserCard userId={user.id} />
+                ) : (
+                  <></>
+                ))}
             </div>
           </>
         )}
