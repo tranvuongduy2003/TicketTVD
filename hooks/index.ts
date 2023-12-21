@@ -12,3 +12,4 @@ export * from './use-events-by-category';
 export * from './use-ticket-details';
 export * from './use-payments-by-event-id';
 export * from './use-payments-by-user-id';
+export * from './use-category';

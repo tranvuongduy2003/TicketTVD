@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { Payment } from '@/models';
 import { useRouter } from 'next/router';
+import { Category } from '@/models';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -22,7 +22,7 @@ export function DataTableRowActions<TData>({
 }: DataTableRowActionsProps<TData>) {
   const router = useRouter();
 
-  const paymentId = (row.original as Payment).id;
+  const categoryId = (row.original as Category).id;
 
   return (
     <>
@@ -37,12 +37,9 @@ export function DataTableRowActions<TData>({
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
           <DropdownMenuItem
-            onClick={() => router.push(`/management/payment/${paymentId}`)}
+            onClick={() => router.push(`/management/category/${categoryId}`)}
           >
             Chỉnh sửa
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span className="text-danger-500">Hủy vé</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

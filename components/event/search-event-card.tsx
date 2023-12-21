@@ -19,7 +19,7 @@ export function SearchEventCard({ event }: SearchEventCardProps) {
       onClick={() => event.id && router.push(`/event/${event.id}`)}
       className="cursor-pointer rounded-m overflow-hidden hover:scale-105 transition-all bg-white border-solid border border-neutral-200 flex items-center relative"
       style={{
-        backgroundColor: event.category?.color
+        background: event.category?.color
       }}
     >
       {event.ticketPrice &&
