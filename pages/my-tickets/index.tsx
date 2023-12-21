@@ -11,10 +11,10 @@ import {
   Skeleton
 } from '@/components/ui';
 import { useEvents, useMyTickets } from '@/hooks';
-import { NextPageWithLayout } from '@/models';
+import { MyTicket, NextPageWithLayout } from '@/models';
 import { useProfileStore } from '@/stores';
 import { useRouter } from 'next/router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { LuPen } from 'react-icons/lu';
 
 const PER_PAGE = 3;
@@ -23,10 +23,29 @@ const MyTicketsPage: NextPageWithLayout = () => {
   const router = useRouter();
 
   const [page, setPage] = useState<number>(1);
+  const [searchedMyTickets, setSearchedMyTickets] = useState<MyTicket[]>([]);
 
   const { profile } = useProfileStore();
   const { myTickets, isLoading: myTicketsLoading } = useMyTickets(profile?.id);
   const { events, isLoading: eventLoading } = useEvents();
+
+  useEffect(() => {
+    if (myTickets) {
+      setSearchedMyTickets(myTickets);
+    }
+  }, [myTickets]);
+
+  function handleSearchMyTicket(value: string) {
+    if (value && value !== '') {
+      const searchedValue =
+        myTickets?.filter(ticket =>
+          ticket.name.toLowerCase().includes(value.toLowerCase())
+        ) || [];
+      setSearchedMyTickets(searchedValue);
+    } else {
+      setSearchedMyTickets(myTickets || []);
+    }
+  }
 
   return (
     <div>
@@ -58,13 +77,7 @@ const MyTicketsPage: NextPageWithLayout = () => {
               </p>
               <div className="flex justify-center mt-6 mb-[30px] w-full gap-2">
                 <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
-                  24 đơn mua
-                </Badge>
-                <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
-                  4 đang theo dõi
-                </Badge>
-                <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
-                  24 yêu thích
+                  {myTickets?.length} đơn mua
                 </Badge>
               </div>
               <Button
@@ -79,10 +92,13 @@ const MyTicketsPage: NextPageWithLayout = () => {
           <div className="w-2/3">
             <div className="flex items-center justify-between">
               <span className="text-sm">
-                <b>{myTickets?.length}</b> sự kiện
+                <b>{myTickets?.length}</b> đơn mua
               </span>
               <div className="w-1/2">
-                <Input placeholder="Tìm kiếm" />
+                <Input
+                  placeholder="Tìm kiếm"
+                  onChange={e => handleSearchMyTicket(e.target.value)}
+                />
               </div>
             </div>
 
@@ -94,9 +110,9 @@ const MyTicketsPage: NextPageWithLayout = () => {
                   <Skeleton className="h-[221px]" />
                 </>
               ) : (
-                myTickets &&
-                myTickets.length > 0 &&
-                myTickets
+                searchedMyTickets &&
+                searchedMyTickets.length > 0 &&
+                searchedMyTickets
                   .slice(0, page * PER_PAGE)
                   .map(myTicket => (
                     <MyTicketCard key={myTicket.id} myTicket={myTicket} />
