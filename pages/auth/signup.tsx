@@ -1,6 +1,7 @@
 import { AuthLayout } from '@/components/layout';
 import {
   Button,
+  Checkbox,
   Form,
   FormControl,
   FormField,
@@ -14,7 +15,7 @@ import {
 import { MILLISECOND_PER_SECOND } from '@/constants';
 import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
-import { NextPageWithLayout } from '@/models';
+import { NextPageWithLayout, Role, UserStatus } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -56,7 +57,8 @@ const formSchema = z
       .min(1, 'Số điện thoại không được để trống')
       .regex(PHONE_REGEX, 'Số điện thoại không hợp lệ')
       .max(100, { message: 'Số điện thoại không được vượt quá 100 kí tự' }),
-    confirmPassword: z.string()
+    confirmPassword: z.string(),
+    isOrganizer: z.boolean()
   })
   .superRefine(({ confirmPassword, password }, ctx) => {
     if (confirmPassword !== password) {
@@ -82,7 +84,8 @@ const SignUp: NextPageWithLayout = () => {
       name: '',
       phone: '',
       password: '',
-      confirmPassword: ''
+      confirmPassword: '',
+      isOrganizer: false
     }
   });
 
@@ -90,14 +93,14 @@ const SignUp: NextPageWithLayout = () => {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const { email, name, phone, password } = values;
+      const { email, name, phone, password, isOrganizer } = values;
 
       await signUp({
         email: email,
         name: name,
         phoneNumber: phone,
         password: password,
-        role: 'CUSTOMER'
+        role: isOrganizer ? Role.ORGANIZER : Role.CUSTOMER
       });
 
       setIsLoading(false);
@@ -237,6 +240,27 @@ const SignUp: NextPageWithLayout = () => {
                   <FormMessage />
                 </FormItem>
               )}
+            />
+            <FormField
+              control={form.control}
+              name="isOrganizer"
+              render={({ field }) => {
+                return (
+                  <FormItem className="flex items-center gap-2">
+                    <FormControl>
+                      <Checkbox
+                        checked={field.value}
+                        onCheckedChange={checked => {
+                          field.onChange(checked);
+                        }}
+                      />
+                    </FormControl>
+                    <FormLabel className="text-base !mt-0">
+                      Tôi muốn đăng kí tài khoản Chủ sự kiện
+                    </FormLabel>
+                  </FormItem>
+                );
+              }}
             />
             <Button
               loading={isLoading}

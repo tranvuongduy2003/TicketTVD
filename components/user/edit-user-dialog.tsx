@@ -1,15 +1,18 @@
-'use client';
-
 import { fileApi, userApi } from '@/apis';
-import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
+import {
+  MILLISECOND_PER_HOUR,
+  MILLISECOND_PER_SECOND,
+  PHONE_REGEX,
+  QUERY_KEY
+} from '@/constants';
 import { useEvents, usePayments, useUser } from '@/hooks';
 import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
 import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { vi } from 'date-fns/locale';
-import { useEffect, useState } from 'react';
+import { tr, vi } from 'date-fns/locale';
+import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
 import { mutate } from 'swr';
@@ -80,17 +83,46 @@ export function EditUserDialog({
 }: EditUserDialogProps) {
   const { toast } = useToast();
 
-  const { user, isLoading, mutate: userMutate } = useUser(userId ?? '');
+  const { mutate: userMutate } = useUser(userId ?? '', {
+    revalidateOnFocus: false,
+    revalidateOnMount: false,
+    revalidateOnReconnect: false,
+    refreshWhenOffline: false,
+    refreshWhenHidden: false,
+    refreshInterval: 0
+  });
   const { payments } = usePayments();
   const { events } = useEvents();
 
   const [loading, setLoading] = useState<boolean>(false);
+  const [user, setUser] = useState<User>();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
     useState<boolean>(false);
   const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
     useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>();
+
+  const handleFetchUser = useRef<any>(null);
+
+  useEffect(() => {
+    handleFetchUser.current = async () => {
+      setIsLoading(true);
+      try {
+        if (userId) {
+          const user = await userApi.getUserById(userId);
+          setUser(user);
+          setIsLoading(false);
+        }
+      } catch (error) {
+        setIsLoading(false);
+        console.log(error);
+      }
+    };
+    handleFetchUser.current();
+    () => handleFetchUser.current;
+  }, []);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -198,19 +230,19 @@ export function EditUserDialog({
   }, [user]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        {...form}
-        className="max-w-screen-md overflow-y-scroll max-h-[80vh]"
-      >
-        <DialogHeader>
-          <DialogTitle>Thông tin người dùng</DialogTitle>
-        </DialogHeader>
-        {isLoading || !user ? (
-          <Loading />
-        ) : (
-          <>
-            <Form {...form}>
+    <Form {...form}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          // {...form}
+          className="max-w-screen-md overflow-y-scroll max-h-[80vh]"
+        >
+          <DialogHeader>
+            <DialogTitle>Thông tin người dùng</DialogTitle>
+          </DialogHeader>
+          {isLoading || !user ? (
+            <Loading />
+          ) : (
+            <>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="grid grid-cols-2 gap-8"
@@ -482,78 +514,78 @@ export function EditUserDialog({
                   )}
                 />
               </form>
-            </Form>
-            <div className="mt-5">
-              <div
-                className="flex items-center gap-2 cursor-pointer mb-3"
-                onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
-              >
-                <h3 className="text-lg font-semibold">Thông tin thêm</h3>
-                <LuChevronDown />
+              <div className="mt-5">
+                <div
+                  className="flex items-center gap-2 cursor-pointer mb-3"
+                  onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
+                >
+                  <h3 className="text-lg font-semibold">Thông tin thêm</h3>
+                  <LuChevronDown />
+                </div>
+                {isShowExtensiveInfo && (
+                  <Card className="pt-6 transition-all">
+                    <CardContent>
+                      {user.totalBuyedTickets !== null && (
+                        <div className="mb-2">
+                          Tổng số vé đã mua: {user.totalBuyedTickets}
+                        </div>
+                      )}
+                      {user.totalEvents !== null && (
+                        <div className="mb-2">
+                          Tổng sự kiện: {user.totalEvents}
+                        </div>
+                      )}
+                      {user.totalSoldTickets !== null && (
+                        <div className="mb-2">
+                          Tổng số vé đã đã bán: {user.totalSoldTickets}
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+                )}
               </div>
-              {isShowExtensiveInfo && (
-                <Card className="pt-6 transition-all">
-                  <CardContent>
-                    {user.totalBuyedTickets !== null && (
-                      <div className="mb-2">
-                        Tổng số vé đã mua: {user.totalBuyedTickets}
-                      </div>
-                    )}
-                    {user.totalEvents !== null && (
-                      <div className="mb-2">
-                        Tổng sự kiện: {user.totalEvents}
-                      </div>
-                    )}
-                    {user.totalSoldTickets !== null && (
-                      <div className="mb-2">
-                        Tổng số vé đã đã bán: {user.totalSoldTickets}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-            <div className="mt-3">
-              <div
-                className="flex items-center gap-2 cursor-pointer mb-3"
-                onClick={() =>
-                  setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
-                }
-              >
-                <h3 className="text-lg font-semibold">
-                  {user.status === Status.DEACTIVE
-                    ? 'Kích hoạt'
-                    : user.status === Status.ACTIVE
-                    ? 'Vô hiệu hóa'
-                    : ''}
-                </h3>
-                <LuChevronDown />
+              <div className="mt-3">
+                <div
+                  className="flex items-center gap-2 cursor-pointer mb-3"
+                  onClick={() =>
+                    setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
+                  }
+                >
+                  <h3 className="text-lg font-semibold">
+                    {user.status === Status.DEACTIVE
+                      ? 'Kích hoạt'
+                      : user.status === Status.ACTIVE
+                      ? 'Vô hiệu hóa'
+                      : ''}
+                  </h3>
+                  <LuChevronDown />
+                </div>
+                {isShowExtensiveDeactiveUser &&
+                  (user.status === Status.ACTIVE ? (
+                    <DeactivateUserCard userId={user.id} />
+                  ) : user.status === Status.DEACTIVE ? (
+                    <ActivateUserCard userId={user.id} />
+                  ) : (
+                    <></>
+                  ))}
               </div>
-              {isShowExtensiveDeactiveUser &&
-                (user.status === Status.ACTIVE ? (
-                  <DeactivateUserCard userId={user.id} />
-                ) : user.status === Status.DEACTIVE ? (
-                  <ActivateUserCard userId={user.id} />
-                ) : (
-                  <></>
-                ))}
-            </div>
-          </>
-        )}
-        <DialogFooter>
-          <Button
-            loading={loading}
-            type="submit"
-            className="text-white"
-            onClick={form.handleSubmit(onSubmit)}
-          >
-            Lưu
-          </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Đóng
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            </>
+          )}
+          <DialogFooter>
+            <Button
+              loading={loading}
+              type="submit"
+              className="text-white"
+              onClick={form.handleSubmit(onSubmit)}
+            >
+              Lưu
+            </Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Đóng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Form>
   );
 }

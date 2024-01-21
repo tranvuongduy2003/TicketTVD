@@ -60,7 +60,6 @@ export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
 }) => {
   const ticketForm = useForm<z.infer<typeof ticketFormSchema>>({
     resolver: zodResolver(ticketFormSchema),
-    defaultValues: ticketsForm.watch().tickets[index],
     mode: 'onChange'
   });
 
@@ -70,7 +69,7 @@ export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
       ticketForm.setValue('fullname', contactForm.watch().fullname);
       ticketForm.setValue('phone', contactForm.watch().phone);
     }
-  }, []);
+  }, [index, contactForm]);
 
   useEffect(() => {
     ticketsForm.setValue(
@@ -79,7 +78,12 @@ export const TicketForm: React.FunctionComponent<TicketFormProps> = ({
     );
     ticketsForm.setValue(`tickets.${index}.email`, ticketForm.watch().email);
     ticketsForm.setValue(`tickets.${index}.phone`, ticketForm.watch().phone);
-  }, [ticketForm.watch()]);
+    console.log('log');
+  }, [
+    ticketForm.watch().fullname,
+    ticketForm.watch().email,
+    ticketForm.watch().phone
+  ]);
 
   return (
     <div className="px-6 py-[30px] rounded-m border border-solid border-neutral-200">
