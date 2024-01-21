@@ -49,26 +49,27 @@ export default function initRequest() {
 
       switch (statusCode) {
         case 401: {
-          const refreshTkn = getRefreshToken();
-          if (!originalConfig._retry && refreshTkn) {
-            originalConfig._retry = true;
-            try {
-              console.log('retry');
-              const token = await handleRefreshToken();
-              axios.defaults.headers.common = {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${token}`
-              };
-              return axiosInstance(originalConfig);
-            } catch (error: any) {
-              console.log(error);
-              handleLogOut();
-              // Router.push('/auth/login');
-            }
-          } else {
-            handleLogOut();
-            // Router.push('/auth/login');
-          }
+          // const refreshTkn = getRefreshToken();
+          // if (!originalConfig._retry && refreshTkn) {
+          //   originalConfig._retry = true;
+          //   try {
+          //     console.log('retry');
+          //     const token = await handleRefreshToken();
+          //     axios.defaults.headers.common = {
+          //       'Content-Type': 'application/json',
+          //       Authorization: `Bearer ${token}`
+          //     };
+          //     return axiosInstance(originalConfig);
+          //   } catch (error: any) {
+          //     console.log(error);
+          //     handleLogOut();
+          //     // Router.push('/auth/login');
+          //   }
+          // } else {
+          //   // Router.push('/auth/login');
+          //   handleLogOut();
+          // }
+          handleLogOut();
           break;
         }
         case 403: {
