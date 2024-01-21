@@ -1,17 +1,12 @@
 import { fileApi, userApi } from '@/apis';
-import {
-  MILLISECOND_PER_HOUR,
-  MILLISECOND_PER_SECOND,
-  PHONE_REGEX,
-  QUERY_KEY
-} from '@/constants';
+import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
 import { useEvents, usePayments, useUser } from '@/hooks';
 import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
 import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
-import { tr, vi } from 'date-fns/locale';
+import { vi } from 'date-fns/locale';
 import { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
