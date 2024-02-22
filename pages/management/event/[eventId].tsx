@@ -318,9 +318,11 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
         name: name,
         description: description,
         categoryId: categoryId,
-        location: `${address}, ${tree
-          ?.find(item => item.code === province?.code)
-          ?.quan_huyen.find(item => item.code === district)?.path_with_type}`,
+        location: `${address}, ${
+          tree
+            ?.find(item => item.code === province?.code)
+            ?.quan_huyen.find(item => item.code === district)?.path_with_type
+        }`,
         startTime: convertToISODate(startTime),
         endTime: convertToISODate(endTime),
         ticketQuantity: quantity,
@@ -1277,11 +1279,11 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                   promotionPlan: ticketInfoForm.watch().promotionPlan || 0,
                   coverImage: coverImagePreview || '',
                   name: generalInfoForm.watch().name,
-                  location: `${
-                    addressForm.watch().address
-                  }, ${province?.quan_huyen?.find(
-                    item => item.code === addressForm.watch().district
-                  )?.path_with_type}`
+                  location: `${addressForm.watch().address}, ${
+                    province?.quan_huyen?.find(
+                      item => item.code === addressForm.watch().district
+                    )?.path_with_type
+                  }`
                 }}
               />
             </div>
