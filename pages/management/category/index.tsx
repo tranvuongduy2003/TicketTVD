@@ -1,13 +1,23 @@
 import { columns } from '@/components/categories';
-import { DataTable } from '@/components/categories/data-table';
 import { AdminLayout } from '@/components/layout';
-import { useCategories, useEvents, usePayments } from '@/hooks';
-import { Category, NextPageWithLayout } from '@/models';
+import { Loading } from '@/components/ui';
+import { DataTable } from '@/components/ui/data-table';
+import { useStatisticCategories } from '@/hooks';
+import { NextPageWithLayout } from '@/models';
+import { PaginationState } from '@tanstack/react-table';
+import { useState } from 'react';
 
 const CategoryManagementPage: NextPageWithLayout = () => {
-  const { categories } = useCategories();
-  const { payments } = usePayments();
-  const { events } = useEvents();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  });
+
+  const { categories, meta, isLoading } = useStatisticCategories({
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
+    takeAll: true
+  });
 
   return (
     <div className="w-full px-8 py-20">
@@ -16,33 +26,17 @@ const CategoryManagementPage: NextPageWithLayout = () => {
       </h1>
 
       <div>
-        <DataTable
-          data={
-            categories?.map(category => {
-              const totalEvents = events?.filter(
-                event => event.categoryId === category.id
-              );
-
-              const totalTickets = payments
-                ?.filter(
-                  payment =>
-                    totalEvents?.some(event => event.id === payment.eventId)
-                )
-                .reduce(
-                  (curQuantity, curPayment) =>
-                    curQuantity + curPayment.quantity,
-                  0
-                );
-
-              return {
-                ...category,
-                totalEvents: totalEvents?.length,
-                totalTickets: totalTickets
-              } as Category;
-            }) ?? []
-          }
-          columns={columns}
-        />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            data={categories ?? []}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+            meta={meta}
+          />
+        )}
       </div>
     </div>
   );

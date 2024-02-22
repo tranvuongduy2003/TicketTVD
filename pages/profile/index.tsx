@@ -87,8 +87,8 @@ const Profile: NextPageWithLayout = () => {
       // Upload avatar
       if (avatar) {
         const compressedAvatar = await compressFile(avatar);
-        const avatarUrl = await fileApi.uploadFile(compressedAvatar);
-        payload.avatar = avatarUrl.blob.uri;
+        const { data: avatarUrl } = await fileApi.uploadFile(compressedAvatar);
+        payload.avatar = avatarUrl!.blob.uri;
       }
 
       await userApi.updateUser(profile?.id ?? '', payload);
@@ -125,7 +125,7 @@ const Profile: NextPageWithLayout = () => {
         });
         if (profile.avatar) {
           setAvatarPreview(profile.avatar);
-          const avatarFile = await getFile(profile.avatar);
+          const { data: avatarFile } = await getFile(profile.avatar);
           setAvatar(avatarFile);
         }
       }

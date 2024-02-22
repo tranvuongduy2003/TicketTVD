@@ -51,7 +51,7 @@ interface TicketItemProps {
 }
 
 const ticketFormSchema = z.object({
-  id: z.number().optional(),
+  id: z.string().optional(),
   fullname: z.string({ required_error: 'Vui lòng nhập tên sự kiện' }),
   email: z
     .string()
@@ -80,12 +80,14 @@ const MyEventTicketDetailsPage: NextPageWithLayout = () => {
       setIsValidating(true);
       try {
         if (paymentId) {
-          const response = await paymentApi.validateStripeSession(
-            Number.parseInt(paymentId as string)
+          const { data: stripeData } = await paymentApi.validateStripeSession(
+            paymentId as string
           );
-          const event = await eventApi.getEventById(response.eventId);
+          const { data: event } = await eventApi.getEventById(
+            stripeData!.eventId
+          );
           setEvent(event);
-          setBill(response);
+          setBill(stripeData);
         }
         setIsValidating(false);
       } catch (error) {
@@ -125,12 +127,12 @@ const MyEventTicketDetailsPage: NextPageWithLayout = () => {
                 description={
                   <div className="flex flex-col">
                     <span>
-                      {event?.eventDate &&
-                        formatDateToLocaleDate(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToLocaleDate(new Date(event?.startTime))}
                     </span>
                     <span>
-                      {event?.eventDate &&
-                        formatDateToTime(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToTime(new Date(event?.startTime))}
                     </span>
                   </div>
                 }
@@ -282,7 +284,7 @@ function TicketItem({ index, ticket, tickets, setTickets }: TicketItemProps) {
 
   async function handleUpdateTicketInfo() {
     try {
-      await ticketApi.updateTicketInfo(ticket.id as number, {
+      await ticketApi.updateTicketInfo(ticket.id!, {
         fullname: editTicketForm.watch().fullname,
         email: editTicketForm.watch().email,
         phone: editTicketForm.watch().phone

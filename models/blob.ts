@@ -1,14 +1,14 @@
 import { Stream } from 'stream';
 
-export type BlobResponse = {
+export interface BlobResponse {
   blob: Blob;
   error: boolean;
   status: string;
-};
+}
 
-export type Blob = {
+export interface Blob {
   uri: string;
   name: string;
   contentType?: string | null;
   content?: Stream | null;
-};
+}

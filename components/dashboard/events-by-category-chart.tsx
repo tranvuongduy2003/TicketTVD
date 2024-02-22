@@ -1,6 +1,6 @@
 'use client';
 
-import { Category, EventStatistic } from '@/models';
+import { EventStatistic } from '@/models';
 import { useState } from 'react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Sector } from 'recharts';
 import { PieSectorDataItem } from 'recharts/types/polar/Pie';
@@ -8,7 +8,6 @@ import { ActiveShape } from 'recharts/types/util/types';
 
 export interface EventsByCategoryChartProps {
   eventsByCategory: EventStatistic[];
-  categories: Category[];
 }
 
 const renderActiveShape: ActiveShape<PieSectorDataItem> = ({
@@ -93,19 +92,8 @@ const renderActiveShape: ActiveShape<PieSectorDataItem> = ({
 };
 
 export function EventsByCategoryChart({
-  eventsByCategory,
-  categories
+  eventsByCategory
 }: EventsByCategoryChartProps) {
-  const data = eventsByCategory.map(item => {
-    const category = categories.find(c => c.id === item.categoryId);
-
-    return {
-      ...item,
-      categoryName: category?.name,
-      categoryColor: category?.color
-    };
-  });
-
   const [activeIndex, setActiveIndex] = useState<number>(0);
 
   return (
@@ -118,15 +106,18 @@ export function EventsByCategoryChart({
         <Pie
           activeIndex={activeIndex}
           activeShape={renderActiveShape}
-          data={data}
+          data={eventsByCategory}
           outerRadius={90}
           fill="#f26298"
-          nameKey="categoryName"
           dataKey="eventQuantity"
           onMouseEnter={(_, index) => setActiveIndex(index)}
         >
-          {data.map((entry, index) => (
-            <Cell key={`cell-${index}`} fill={entry.categoryColor} />
+          {eventsByCategory.map((entry, index) => (
+            <Cell
+              key={`cell-${index}`}
+              fill={entry.category.color}
+              name={entry.category.name}
+            />
           ))}
         </Pie>
       </PieChart>

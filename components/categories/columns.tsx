@@ -1,9 +1,8 @@
 'use client';
 
 import { ColumnDef } from '@tanstack/react-table';
-
+import { DataTableColumnHeader } from '../ui/data-table/data-table-column-header';
 import { Category } from '@/models';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
 
 export const columns: ColumnDef<Category>[] = [
   {
@@ -21,7 +20,7 @@ export const columns: ColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Tên thể loại" />
     ),
     cell: ({ row }) => <div>{row.getValue('name')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -30,7 +29,7 @@ export const columns: ColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Tổng sự kiện" />
     ),
     cell: ({ row }) => <div>{row.getValue('totalEvents')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -39,7 +38,7 @@ export const columns: ColumnDef<Category>[] = [
       <DataTableColumnHeader column={column} title="Tổng vé đã bán" />
     ),
     cell: ({ row }) => <div>{row.getValue('totalTickets')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   }
 ];

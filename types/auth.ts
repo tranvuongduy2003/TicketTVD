@@ -21,9 +21,9 @@ export interface OAuthLoginPayload {
 
 export interface SignUpPayload {
   email: string;
-  password: string;
   name: string;
   phoneNumber: string;
+  password: string;
   role?: 'CUSTOMER' | 'ORGANIZER';
 }
 

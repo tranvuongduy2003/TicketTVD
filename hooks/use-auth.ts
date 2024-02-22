@@ -19,16 +19,24 @@ export function useAuth(options?: Partial<SWRConfiguration>) {
     data: profile,
     isLoading,
     error
-  } = useSWR(QUERY_KEY.profile, () => authApi.getUserProfile(), {
-    dedupingInterval: MILLISECOND_PER_HOUR,
-    onSuccess: user => {
-      setProfile(user);
+  } = useSWR(
+    QUERY_KEY.profile,
+    async () => {
+      const { data } = await authApi.getUserProfile();
+      return data!;
     },
-    ...options
-  });
+    {
+      dedupingInterval: MILLISECOND_PER_HOUR,
+      onSuccess: user => {
+        setProfile(user);
+      },
+      ...options
+    }
+  );
 
   async function logIn(payload: LoginPayload) {
-    const { user, accessToken, refreshToken } = await authApi.signIn(payload);
+    const { data } = await authApi.signIn(payload);
+    const { user, accessToken, refreshToken } = data!;
 
     setProfile(user);
 

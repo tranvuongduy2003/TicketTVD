@@ -25,8 +25,7 @@ const MyTicketsPage: NextPageWithLayout = () => {
   const [page, setPage] = useState<number>(1);
 
   const { profile } = useProfileStore();
-  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(profile?.id);
-  const { events, isLoading: eventLoading } = useEvents();
+  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(profile!.id);
 
   return (
     <div>
@@ -141,7 +140,7 @@ const MyTicketsPage: NextPageWithLayout = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -156,7 +155,7 @@ const MyTicketsPage: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

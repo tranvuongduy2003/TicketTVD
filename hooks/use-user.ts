@@ -8,15 +8,20 @@ export function useUser(id: string, options?: Partial<SWRConfiguration>) {
     data: user,
     error,
     mutate
-  } = useSWR([QUERY_KEY.user, id], () => userApi.getUserById(id), {
-    revalidateOnMount: true,
-    revalidateOnFocus: true,
-    revalidateOnReconnect: true,
-    keepPreviousData: false,
-    ...options
-  });
+  } = useSWR(
+    [QUERY_KEY.user, id],
+    async () => {
+      const { data } = await userApi.getUserById(id);
+      return data;
+    },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
+      revalidateOnReconnect: true,
+      keepPreviousData: false,
+      ...options
+    }
+  );
 
-  const isLoading = user === undefined && error === undefined;
-
-  return { user, error, isLoading, mutate };
+  return { user, error, isLoading: !error && !user, mutate };
 }

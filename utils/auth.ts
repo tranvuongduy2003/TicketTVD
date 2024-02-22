@@ -13,11 +13,11 @@ export const getRefreshToken = () => {
 
 export async function handleRefreshToken() {
   const refreshToken = getRefreshToken();
-  const newToken = await authApi.refreshToken({
+  const { data: newToken } = await authApi.refreshToken({
     refreshToken: refreshToken!
   });
 
-  setCookie(ACCESS_TOKEN, newToken);
+  setCookie(ACCESS_TOKEN, newToken!);
 
   return newToken;
 }

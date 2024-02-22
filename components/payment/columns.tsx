@@ -3,9 +3,9 @@
 import { ColumnDef } from '@tanstack/react-table';
 
 import { Payment } from '@/models';
-import { DataTableRowActions } from './data-table';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
 import { Avatar, AvatarFallback, AvatarImage } from '../ui';
+import { DataTableColumnHeader } from '../ui/data-table/data-table-column-header';
+import { DataTableRowActions } from './data-table-row-actions';
 
 export const columns: ColumnDef<Payment>[] = [
   {
@@ -41,7 +41,7 @@ export const columns: ColumnDef<Payment>[] = [
         </div>
       </div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -54,7 +54,7 @@ export const columns: ColumnDef<Payment>[] = [
         {new Date(row.getValue('createdAt')).toLocaleDateString('vi-VN')}
       </div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -71,7 +71,7 @@ export const columns: ColumnDef<Payment>[] = [
         })}
       </div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -80,7 +80,7 @@ export const columns: ColumnDef<Payment>[] = [
       <DataTableColumnHeader column={column} title="Số lượng vé" />
     ),
     cell: ({ row }) => <div>{row.getValue('quantity')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -91,7 +91,7 @@ export const columns: ColumnDef<Payment>[] = [
     cell: ({ row }) => (
       <div>{(row.getValue('totalPrice') as number).toLocaleString()} VNĐ</div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {

@@ -1,17 +1,34 @@
 import { DashboardCard } from '@/components/dashboard';
 import { OrganizerLayout } from '@/components/layout';
 import { columns } from '@/components/payment';
-import { DataTable } from '@/components/payment/data-table';
-import { usePaymentsByEventId } from '@/hooks';
+import { Loading } from '@/components/ui';
+import { DataTable } from '@/components/ui/data-table';
+import { usePaymentsByEventId, usePaymentsStatistic } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
+import { PaginationState } from '@tanstack/react-table';
 import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { LuBarChart, LuReceipt, LuTicket } from 'react-icons/lu';
 
 const MyEventsPaymentPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { eventId } = router.query;
 
-  const { payments } = usePaymentsByEventId(Number.parseInt(eventId as string));
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  });
+
+  const { payments, meta, isLoading } = usePaymentsByEventId(
+    eventId as string,
+    {
+      page: pagination.pageIndex + 1,
+      size: pagination.pageSize,
+      takeAll: false
+    }
+  );
+
+  const { paymentsStatistic } = usePaymentsStatistic(eventId as string);
 
   return (
     <div className="w-full px-[132px] py-20">
@@ -25,7 +42,7 @@ const MyEventsPaymentPage: NextPageWithLayout = () => {
           borderColor="#FBCDDEFF"
           bgColor="#FEF1F6FF"
           icon={<LuReceipt />}
-          content={payments?.length}
+          content={paymentsStatistic?.totalPayments || 0}
           title="Tổng số đơn mua"
         />
         <DashboardCard
@@ -33,10 +50,7 @@ const MyEventsPaymentPage: NextPageWithLayout = () => {
           borderColor="#D7E5D5FF"
           bgColor="#F6F9F6FF"
           icon={<LuTicket />}
-          content={payments?.reduce(
-            (prevValue, payment) => prevValue + payment.quantity,
-            0
-          )}
+          content={paymentsStatistic?.totalBoughtTickets || 0}
           title="Vé đã bán"
         />
         <DashboardCard
@@ -44,22 +58,23 @@ const MyEventsPaymentPage: NextPageWithLayout = () => {
           borderColor="#CDD5FBFF"
           bgColor="#F1F3FEFF"
           icon={<LuBarChart />}
-          content={
-            '' +
-            payments
-              ?.reduce(
-                (prevValue, payment) => prevValue + payment.totalPrice,
-                0
-              )
-              .toLocaleString() +
-            ' VNĐ'
-          }
+          content={'' + paymentsStatistic?.totalRevenue || 0 + ' VNĐ'}
           title="Doanh thu"
         />
       </div>
 
       <div>
-        <DataTable data={payments || []} columns={columns} />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            data={payments || []}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+            meta={meta}
+          />
+        )}
       </div>
     </div>
   );

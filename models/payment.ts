@@ -1,10 +1,9 @@
 import { User } from '.';
 
-export type Payment = {
-  id: number;
-  eventId: number;
+export interface Payment {
+  id: string;
+  eventId: string;
   userId: string;
-  user?: User;
   quantity: number;
   totalPrice: number;
   discount: number;
@@ -16,11 +15,17 @@ export type Payment = {
   stripeSessionId?: string;
   createdAt: Date;
   updatedAt: Date;
-};
+  event?: Event;
+  user?: User;
+}
 
-export type MyTicket = {
-  id: number;
-  eventId: number;
+export interface PaymentIndex extends Payment {
+  key: any;
+}
+
+export interface MyTicket {
+  id: string;
+  eventId: string;
   userId: string;
   quantity: number;
   totalPrice: number;
@@ -31,7 +36,7 @@ export type MyTicket = {
   eventDate: Date;
   createdAt: Date;
   updatedAt: Date;
-};
+}
 
 export enum PaymentStatus {
   PENDING = 'PENDING',

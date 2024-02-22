@@ -4,13 +4,13 @@ export enum TicketStatus {
   TERMINATED = 'TERMINATED'
 }
 
-export type Ticket = {
-  id: number;
+export interface Ticket {
+  id: string;
   ticketCode: string;
   ownerName: string;
   ownerEmail: string;
   ownerPhone: string;
-  eventId: number;
+  eventId: string;
   price: number;
   isPaid: boolean;
   status: TicketStatus;
@@ -18,14 +18,4 @@ export type Ticket = {
   closeTime: Date;
   createdAt: Date;
   updatedAt: Date;
-};
-
-export type TicketDetail = {
-  id: number;
-  eventId: number;
-  quantity: number;
-  soldQuantity: number;
-  price: number;
-  startTime: Date;
-  closeTime: Date;
-};
+}

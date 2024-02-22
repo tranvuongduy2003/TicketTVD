@@ -1,7 +1,5 @@
+import { DataTableProps } from '@/models';
 import {
-  ColumnDef,
-  ColumnFiltersState,
-  SortingState,
   VisibilityState,
   flexRender,
   getCoreRowModel,
@@ -20,43 +18,29 @@ import {
   TableHead,
   TableHeader,
   TableRow
-} from '../../ui';
+} from '..';
 import { DataTablePagination } from './data-table-pagination';
 import { DataTableToolbar } from './data-table-toolbar';
 
-export interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
 export function DataTable<TData, TValue>({
   data,
-  columns
+  columns,
+  pagination,
+  setPagination,
+  meta
 }: DataTableProps<TData, TValue>) {
-  const [rowSelection, setRowSelection] = useState({});
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [sorting, setSorting] = useState<SortingState>([]);
 
   const table = useReactTable({
     data,
     columns,
     state: {
-      sorting,
       columnVisibility,
-      rowSelection,
-      columnFilters
+      pagination
     },
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 5
-      }
-    },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onSortingChange: setSorting,
-    onColumnFiltersChange: setColumnFilters,
+    manualPagination: true,
+    pageCount: meta?.totalPages || 0,
+    onPaginationChange: setPagination,
     onColumnVisibilityChange: setColumnVisibility,
     getCoreRowModel: getCoreRowModel(),
     getFilteredRowModel: getFilteredRowModel(),

@@ -27,8 +27,8 @@ export function EventCard({
         mode === 'light'
           ? 'bg-white border-solid border border-neutral-300'
           : mode === 'dark'
-          ? 'bg-neutral-700'
-          : ''
+            ? 'bg-neutral-700'
+            : ''
       )}
       onClick={() => router.push(`/event/${event.id}`)}
     >
@@ -61,10 +61,10 @@ export function EventCard({
           )}
         </div>
         <p className="mb-2 flex items-center gap-2 text-primary-500 font-bold text-sm">
-          <LuCalendar />{' '}
-          {event &&
-            event.eventDate &&
-            formatDate(convertToISODate(new Date(event.eventDate + '.000Z')))}
+          <LuCalendar /> {new Date(event.startTime).toLocaleDateString()}
+          {/* {event &&
+            event.startTime &&
+            formatDate(convertToISODate(new Date(event.startTime + '.000Z')))} */}
         </p>
         <p className="flex items-center gap-2 text-neutral-500 text-sm">
           <LuMapPin /> {event?.location}

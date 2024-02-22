@@ -1,6 +1,6 @@
 import { eventApi, fileApi } from '@/apis';
 import { CreateEventSection, SearchEventCard } from '@/components/event';
-import { AdminLayout, OrganizerLayout } from '@/components/layout';
+import { AdminLayout } from '@/components/layout';
 import {
   Button,
   Calendar,
@@ -30,14 +30,18 @@ import {
   toast
 } from '@/components/ui';
 import { MILLISECOND_PER_SECOND } from '@/constants';
-import { useCategories, useEvent } from '@/hooks';
-import { District, Event, NextPageWithLayout, Tree } from '@/models';
+import { useAuth, useCategories, useEvent } from '@/hooks';
+import {
+  CreateEventPayload,
+  District,
+  NextPageWithLayout,
+  Tree
+} from '@/models';
 import { cn } from '@/types';
 import {
   compressFile,
   concatDateWithTime,
   convertToISODate,
-  formatDate,
   getFile,
   getFileName,
   getImageData
@@ -52,7 +56,6 @@ import { useForm } from 'react-hook-form';
 import {
   LuAlertCircle,
   LuArrowLeft,
-  LuArrowRight,
   LuCalendar,
   LuCheck,
   LuClock,
@@ -111,21 +114,14 @@ const ticketInfoFormSchema = z.object({
   promotionPlan: z.any().optional()
 });
 
-const publishFormSchema = z.object({
-  isPublish: z.boolean().default(false),
-  publishTime: z.date().optional(),
-  publishDate: z.date().optional()
-});
-
 const AdminEventDetailPage: NextPageWithLayout = () => {
   const { categories } = useCategories();
+  const { profile } = useAuth();
 
   const router = useRouter();
   const { eventId } = router.query;
 
-  const { event, isLoading: eventLoading } = useEvent(
-    Number.parseInt(eventId as string)
-  );
+  const { event, isLoading: eventLoading } = useEvent(eventId as string);
 
   const [coverImagePreview, setCoverImagePreview] = useState<string | null>('');
   const [coverImage, setCoverImage] = useState<File | null>();
@@ -145,16 +141,19 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
           setAlbumPreview(event.album);
           await Promise.all([
             event.coverImage &&
-              getFile(event.coverImage).then(coverImageFile => {
+              getFile(event.coverImage).then(({ data: coverImageFile }) => {
                 setCoverImage(coverImageFile);
               }),
             event.album &&
               event.album.length > 0 &&
-              Promise.all(event.album.map(item => getFile(item))).then(
-                albumFiles => {
-                  setAlbum(albumFiles);
-                }
-              )
+              Promise.all(
+                event.album.map(async item => {
+                  const { data } = await getFile(item);
+                  return data;
+                })
+              ).then(albumFiles => {
+                setAlbum(albumFiles);
+              })
           ]);
         }
         setIsFileLoading(false);
@@ -183,11 +182,6 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
 
   const ticketInfoForm = useForm<z.infer<typeof ticketInfoFormSchema>>({
     resolver: zodResolver(ticketInfoFormSchema),
-    mode: 'onChange'
-  });
-
-  const publishForm = useForm<z.infer<typeof publishFormSchema>>({
-    resolver: zodResolver(publishFormSchema),
     mode: 'onChange'
   });
 
@@ -258,13 +252,11 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
             province: province?.code as string,
             district: district?.code as string,
             endTime: event.endTime,
-            startTime: event.startTime,
-            eventDate: event.eventDate
+            startTime: event.startTime
           });
           await addressForm.trigger();
 
           ticketInfoForm.reset({
-            isPaid: event.ticketIsPaid === false ? 'free' : 'paid',
             quantity: event.ticketQuantity || 0,
             price: event.ticketPrice,
             ticketStartDate: event.ticketStartTime,
@@ -275,17 +267,6 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
             promotionPlan: event.promotionPlan
           });
           await ticketInfoForm.trigger();
-
-          publishForm.reset({
-            isPublish: event.publishTime ? true : false
-          });
-          if (event.publishTime) {
-            publishForm.reset({
-              publishDate: event.publishTime,
-              publishTime: event.publishTime
-            });
-          }
-          await publishForm.trigger();
         }
       } catch (error) {
         console.log(error);
@@ -332,20 +313,16 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
         ticketStartTime
       } = ticketInfoForm.getValues();
 
-      const { isPublish, publishDate, publishTime } = publishForm.getValues();
-
-      const data: Partial<Event> = {
+      const data: CreateEventPayload = {
         coverImage: coverImagePreview!,
         name: name,
         description: description,
-        categoryId: Number.parseInt(categoryId),
+        categoryId: categoryId,
         location: `${address}, ${tree
           ?.find(item => item.code === province?.code)
           ?.quan_huyen.find(item => item.code === district)?.path_with_type}`,
-        eventDate: concatDateWithTime(new Date(eventDate), new Date(startTime)),
         startTime: convertToISODate(startTime),
         endTime: convertToISODate(endTime),
-        ticketIsPaid: isPaid === 'paid' ? true : false,
         ticketQuantity: quantity,
         ticketPrice: Number.parseInt(price),
         ticketStartTime: concatDateWithTime(
@@ -358,21 +335,16 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
         ),
         isPromotion: isPromotion,
         promotionPlan: isPromotion ? Number.parseInt(promotionPlan) : 0,
-        album: albumPreview
+        album: albumPreview,
+        creatorId: profile!.id
       };
-
-      if (isPublish && publishDate && publishTime) {
-        data.publishTime = concatDateWithTime(
-          new Date(publishDate),
-          new Date(publishTime)
-        );
-      }
 
       // Upload cover image
       if (coverImage) {
         const compressedCoverImage = await compressFile(coverImage);
-        const coverImageUrl = await fileApi.uploadFile(compressedCoverImage);
-        data.coverImage = coverImageUrl.blob.uri;
+        const { data: coverImageUrl } =
+          await fileApi.uploadFile(compressedCoverImage);
+        data.coverImage = coverImageUrl!.blob.uri;
       }
       // Upload albums
       if (album && album.length > 0 && !album.some(item => !item)) {
@@ -383,9 +355,9 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                 try {
                   if (item) {
                     const compressedCoverImage = await compressFile(item);
-                    const coverImageUrl =
+                    const { data: coverImageUrl } =
                       await fileApi.uploadFile(compressedCoverImage);
-                    resolve(coverImageUrl.blob.uri);
+                    resolve(coverImageUrl!.blob.uri);
                   }
                 } catch (error) {
                   reject(error);
@@ -396,7 +368,7 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
         data.album = albumUrls;
       }
 
-      await eventApi.updateEvent(Number.parseInt(eventId as string), data);
+      await eventApi.updateEvent(eventId as string, data);
 
       setIsLoading(false);
       toast({
@@ -820,55 +792,6 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                     bạn
                   </p>
                   <div className="flex flex-col gap-2">
-                    <FormField
-                      control={addressForm.control}
-                      name="eventDate"
-                      defaultValue={event.eventDate}
-                      render={({ field }) => (
-                        <FormItem defaultValue={event.eventDate as any}>
-                          <FormLabel className="text-sm font-bold">
-                            Ngày tổ chức sự kiện
-                          </FormLabel>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <FormControl>
-                                <Button
-                                  variant={'outline'}
-                                  className={cn(
-                                    'w-full pl-3 text-left font-normal',
-                                    !field.value && 'text-muted-foreground'
-                                  )}
-                                >
-                                  {field.value ? (
-                                    format(new Date(field.value), 'dd/MM/yyyy')
-                                  ) : (
-                                    <span>Chọn ngày tổ chức sự kiện</span>
-                                  )}
-                                  <LuCalendar className="ml-auto h-4 w-4 opacity-50" />
-                                </Button>
-                              </FormControl>
-                            </PopoverTrigger>
-                            <PopoverContent
-                              className="w-auto p-0"
-                              align="start"
-                            >
-                              <Calendar
-                                locale={vi}
-                                lang="vi"
-                                mode="single"
-                                captionLayout="dropdown-buttons"
-                                selected={field.value}
-                                onSelect={field.onChange}
-                                disabled={date => date < new Date('1900-01-01')}
-                                fromYear={1900}
-                                toYear={new Date().getFullYear() + 2}
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
                     <div className="flex gap-9 items-center">
                       <div className="w-1/2">
                         <FormField
@@ -986,12 +909,10 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                 <FormField
                   control={ticketInfoForm.control}
                   name="isPaid"
-                  defaultValue={event.ticketIsPaid === false ? 'free' : 'paid'}
+                  defaultValue={event.ticketPrice === 0 ? 'free' : 'paid'}
                   render={({ field: { onChange, value, ...rest } }) => (
                     <RadioGroup
-                      defaultValue={
-                        event.ticketIsPaid === false ? 'free' : 'paid'
-                      }
+                      defaultValue={event.ticketPrice === 0 ? 'free' : 'paid'}
                       onValueChange={value => {
                         onChange(value);
                         if (value === 'free') {
@@ -1356,10 +1277,6 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                   promotionPlan: ticketInfoForm.watch().promotionPlan || 0,
                   coverImage: coverImagePreview || '',
                   name: generalInfoForm.watch().name,
-                  eventDate: concatDateWithTime(
-                    new Date(addressForm.watch().eventDate || event.eventDate),
-                    new Date(addressForm.watch().startTime || event.startTime)
-                  ),
                   location: `${
                     addressForm.watch().address
                   }, ${province?.quan_huyen?.find(
@@ -1368,146 +1285,6 @@ const AdminEventDetailPage: NextPageWithLayout = () => {
                 }}
               />
             </div>
-            <Form {...publishForm}>
-              <form
-                onSubmit={publishForm.handleSubmit(() => {})}
-                className="mt-8"
-              >
-                <div>
-                  <FormField
-                    control={publishForm.control}
-                    name="isPublish"
-                    defaultValue={event.publishTime ? true : false}
-                    render={({ field: { onChange, value, ...rest } }) => (
-                      <FormItem
-                        className="flex items-center gap-4"
-                        defaultValue={(event.publishTime ? true : false) as any}
-                      >
-                        <FormLabel>
-                          <h6 className="text-xl font-bold">Lịch xuất bản</h6>
-                        </FormLabel>
-                        <FormControl>
-                          <Switch checked={value} onCheckedChange={onChange} />
-                        </FormControl>
-                      </FormItem>
-                    )}
-                  />
-                  <p className="text-sm text-neutral-550 my-2">
-                    Đặt thời gian xuất bản để đảm bảo sự kiện của bạn xuất hiện
-                    trên trang web vào thời gian được chỉ định
-                  </p>
-                  {(event.publishTime ||
-                    publishForm.watch().isPublish === true) && (
-                    <div className="grid grid-cols-2 grid-rows-2 gap-x-8 gap-y-2">
-                      <FormField
-                        control={publishForm.control}
-                        name="publishDate"
-                        defaultValue={event.publishTime}
-                        render={({ field }) => (
-                          <FormItem defaultValue={event.publishTime as any}>
-                            <FormLabel className="text-sm font-bold">
-                              Ngày xuất bản
-                            </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={'outline'}
-                                    className={cn(
-                                      'w-full pl-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(
-                                        new Date(field.value),
-                                        'dd/MM/yyyy'
-                                      )
-                                    ) : (
-                                      <span>Chọn ngày xuất bản sự kiện</span>
-                                    )}
-                                    <LuCalendar className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-0"
-                                align="start"
-                              >
-                                <Calendar
-                                  locale={vi}
-                                  lang="vi"
-                                  mode="single"
-                                  captionLayout="dropdown-buttons"
-                                  selected={field.value}
-                                  onSelect={field.onChange}
-                                  disabled={date =>
-                                    date < new Date('1900-01-01')
-                                  }
-                                  fromYear={1900}
-                                  toYear={new Date().getFullYear() + 2}
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                      <FormField
-                        control={publishForm.control}
-                        name="publishTime"
-                        {...(event.publishTime
-                          ? { defaultValue: event.publishTime }
-                          : {})}
-                        render={({ field }) => (
-                          <FormItem
-                            {...(event.publishTime
-                              ? { defaultValue: event.publishTime as any }
-                              : {})}
-                          >
-                            <FormLabel className="text-sm font-bold">
-                              Thời gian xuất bản
-                            </FormLabel>
-                            <Popover>
-                              <PopoverTrigger asChild>
-                                <FormControl>
-                                  <Button
-                                    variant={'outline'}
-                                    className={cn(
-                                      'w-full pl-3 text-left font-normal',
-                                      !field.value && 'text-muted-foreground'
-                                    )}
-                                  >
-                                    {field.value ? (
-                                      format(new Date(field.value), 'HH:mm')
-                                    ) : (
-                                      <span>
-                                        Chọn thời gian xuất bản sự kiện
-                                      </span>
-                                    )}
-                                    <LuClock className="ml-auto h-4 w-4 opacity-50" />
-                                  </Button>
-                                </FormControl>
-                              </PopoverTrigger>
-                              <PopoverContent
-                                className="w-auto p-4"
-                                align="start"
-                              >
-                                <TimePicker
-                                  date={field.value}
-                                  setDate={field.onChange}
-                                />
-                              </PopoverContent>
-                            </Popover>
-                            <FormMessage />
-                          </FormItem>
-                        )}
-                      />
-                    </div>
-                  )}
-                </div>
-              </form>
-            </Form>
           </CreateEventSection>
 
           <Separator className="mb-6 mt-8" />

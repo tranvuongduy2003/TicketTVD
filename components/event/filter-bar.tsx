@@ -119,17 +119,17 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
         case 'all':
           isTimeValid = true;
         case 'upcoming':
-          if (new Date(event.eventDate) > new Date()) isTimeValid = true;
+          if (new Date(event.startTime) > new Date()) isTimeValid = true;
           break;
         case 'opening':
           if (
-            new Date() > new Date(event.eventDate) &&
+            new Date() > new Date(event.startTime) &&
             new Date() < new Date(event.endTime)
           )
             isTimeValid = true;
           break;
         case 'closed':
-          if (new Date() > new Date(event.eventDate)) isTimeValid = true;
+          if (new Date() > new Date(event.startTime)) isTimeValid = true;
           break;
       }
     }

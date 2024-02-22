@@ -1,5 +1,5 @@
 import { paymentApi } from '@/apis';
-import { DetailItem, EventCard } from '@/components/event';
+import { DetailItem } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
 import { TicketForm } from '@/components/ticket';
 import {
@@ -13,11 +13,10 @@ import {
   Input,
   Loading,
   Separator,
-  Skeleton,
   toast
 } from '@/components/ui';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX } from '@/constants';
-import { useAuth, useEvent, useEvents } from '@/hooks';
+import { useAuth, useEvent } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { CheckoutPayload, CreateStripeSessionPayload } from '@/types';
 import { formatDateToLocaleDate, formatDateToTime } from '@/utils';
@@ -68,8 +67,7 @@ const EventDetailPage: NextPageWithLayout = () => {
   const router = useRouter();
   const { eventId } = router.query;
 
-  const { events, isLoading: eventLoading } = useEvents();
-  const { event, isLoading } = useEvent(Number.parseInt(eventId as string));
+  const { event, isLoading } = useEvent(eventId as string);
   const { profile } = useAuth();
 
   const [quantity, setQuantity] = useState<number>(0);
@@ -145,13 +143,13 @@ const EventDetailPage: NextPageWithLayout = () => {
             ownerName: item.fullname,
             ownerEmail: item.email,
             ownerPhone: item.phone,
-            eventId: Number.parseInt(eventId as string),
+            eventId: eventId as string,
             closeTime: event?.ticketCloseTime as Date,
             startTime: event?.ticketStartTime as Date,
             price: event?.ticketPrice as number
           })) || [],
         discount: event?.promotionPlan || 0,
-        eventId: Number.parseInt(eventId as string),
+        eventId: eventId as string,
         quantity: quantity,
         totalPrice:
           (event?.ticketPrice || 0) *
@@ -164,7 +162,7 @@ const EventDetailPage: NextPageWithLayout = () => {
         }
       };
 
-      const payment = await paymentApi.checkout(payload);
+      const { data: payment } = await paymentApi.checkout(payload);
 
       if (payment) {
         const route = window.location.href;
@@ -178,17 +176,17 @@ const EventDetailPage: NextPageWithLayout = () => {
               ownerName: item.fullname,
               ownerEmail: item.email,
               ownerPhone: item.phone,
-              eventId: Number.parseInt(eventId as string),
+              eventId: eventId as string,
               closeTime: event?.ticketCloseTime as Date,
               startTime: event?.ticketStartTime as Date,
               price: event?.ticketPrice as number
             })) || []
         };
 
-        const stripeResponse =
+        const { data: stripeData } =
           await paymentApi.createStripeSession(stripePayload);
-        if (stripeResponse.stripeSessionUrl) {
-          window.location.assign(stripeResponse.stripeSessionUrl);
+        if (stripeData && stripeData.stripeSessionUrl) {
+          window.location.assign(stripeData.stripeSessionUrl);
         }
       }
     } catch (error: any) {
@@ -238,12 +236,12 @@ const EventDetailPage: NextPageWithLayout = () => {
                 description={
                   <div className="flex flex-col">
                     <span>
-                      {event?.eventDate &&
-                        formatDateToLocaleDate(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToLocaleDate(new Date(event?.startTime))}
                     </span>
                     <span>
-                      {event?.eventDate &&
-                        formatDateToTime(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToTime(new Date(event?.startTime))}
                     </span>
                   </div>
                 }
@@ -482,7 +480,7 @@ const EventDetailPage: NextPageWithLayout = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -497,7 +495,7 @@ const EventDetailPage: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

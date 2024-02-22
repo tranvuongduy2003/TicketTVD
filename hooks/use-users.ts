@@ -1,19 +1,42 @@
 import { userApi } from '@/apis';
 import { QUERY_KEY } from '@/constants';
+import { FilteringOptions } from '@/models';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
 
-export function useUsers(options?: Partial<SWRConfiguration>) {
+export function useUsers(
+  filter?: Partial<FilteringOptions>,
+  options?: Partial<SWRConfiguration>
+) {
   const {
     data: users,
     error,
-    isLoading
-  } = useSWR(QUERY_KEY.users, () => userApi.getUsers(), {
-    revalidateOnMount: true,
-    revalidateOnFocus: true,
-    keepPreviousData: true,
-    ...options
-  });
+    mutate
+  } = useSWR(
+    QUERY_KEY.users,
+    async () => {
+      const { data } = await userApi.getUsers(filter);
+      return data;
+    },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
+      keepPreviousData: true,
+      ...options
+    }
+  );
 
-  return { users, error, isLoading };
+  useEffect(() => {
+    mutate();
+  }, [
+    filter?.order,
+    filter?.page,
+    filter?.size,
+    filter?.search,
+    filter?.takeAll,
+    mutate
+  ]);
+
+  return { users, mutate, error, isLoading: !error && !users };
 }

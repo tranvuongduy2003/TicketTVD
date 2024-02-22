@@ -2,7 +2,7 @@ import { eventApi, paymentApi } from '@/apis';
 import { DetailItem, EventCard } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
 import { Button, Loading, Separator, Skeleton } from '@/components/ui';
-import { useEvent, useEvents } from '@/hooks';
+import { useEvents } from '@/hooks';
 import { Event, NextPageWithLayout } from '@/models';
 import { PaymentTicket, ValidateStripeSessionResponse } from '@/types';
 import {
@@ -15,7 +15,6 @@ import { useEffect, useRef, useState } from 'react';
 import {
   LuArrowLeft,
   LuCalendar,
-  LuCheckCircle2,
   LuClock,
   LuMapPin,
   LuTicket
@@ -35,8 +34,6 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
   const [bill, setBill] = useState<ValidateStripeSessionResponse>();
   const [event, setEvent] = useState<Event>();
 
-  const { events, isLoading: eventLoading } = useEvents();
-
   const handleValidateStripeSession = useRef<any>(null);
 
   useEffect(() => {
@@ -44,12 +41,14 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
       setIsValidating(true);
       try {
         if (id) {
-          const response = await paymentApi.validateStripeSession(
-            Number.parseInt(id as string)
+          const { data: stripeData } = await paymentApi.validateStripeSession(
+            id as string
           );
-          const event = await eventApi.getEventById(response.eventId);
+          const { data: event } = await eventApi.getEventById(
+            stripeData!.eventId
+          );
           setEvent(event);
-          setBill(response);
+          setBill(stripeData);
         }
         setIsValidating(false);
       } catch (error) {
@@ -89,12 +88,12 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
                 description={
                   <div className="flex flex-col">
                     <span>
-                      {event?.eventDate &&
-                        formatDateToLocaleDate(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToLocaleDate(new Date(event?.startTime))}
                     </span>
                     <span>
-                      {event?.eventDate &&
-                        formatDateToTime(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToTime(new Date(event?.startTime))}
                     </span>
                   </div>
                 }
@@ -205,7 +204,7 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
           </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -220,7 +219,7 @@ const MyTicketDetailsPage: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

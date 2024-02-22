@@ -1,7 +1,7 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { Input } from '../../ui';
+import { Input } from '..';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;

@@ -1,7 +1,7 @@
 'use client';
 
 import { Event } from '@/models';
-import { convertToISODate, formatDate } from '@/utils';
+import { formatDate } from '@/utils';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { LuCalendar, LuMapPin } from 'react-icons/lu';
@@ -53,7 +53,7 @@ export function SearchEventCard({ event }: SearchEventCardProps) {
         <h3 className="font-bold my-3">{event.name}</h3>
         <p className="mb-2 flex items-center gap-2 text-primary-500 font-bold text-sm">
           <LuCalendar />{' '}
-          {event && event.eventDate && formatDate(event.eventDate)}
+          {/* {event && event.startTime && formatDate(event.startTime)} */}
         </p>
         <p className="flex items-center gap-2 text-neutral-500 text-sm">
           <LuMapPin /> {event.location}

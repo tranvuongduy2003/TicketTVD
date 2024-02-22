@@ -40,8 +40,8 @@ export default function initRequest() {
   );
 
   axiosInstance.interceptors.response.use(
-    (response: AxiosResponse<ApiResponse>) => {
-      return response.data.data;
+    (response: AxiosResponse) => {
+      return response.data;
     },
     async (error: any) => {
       const statusCode = error.response?.status;

@@ -1,6 +1,11 @@
 'use client';
 
+import { PHONE_REGEX } from '@/constants';
+import { zodResolver } from '@hookform/resolvers/zod';
 import React, { useEffect } from 'react';
+import { UseFormReturn, useForm } from 'react-hook-form';
+import { LuTicket } from 'react-icons/lu';
+import * as z from 'zod';
 import {
   Checkbox,
   Form,
@@ -11,11 +16,6 @@ import {
   FormMessage,
   Input
 } from '../ui';
-import * as z from 'zod';
-import { PHONE_REGEX } from '@/constants';
-import { UseFormReturn, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { LuTicket } from 'react-icons/lu';
 
 const ticketFormSchema = z.object({
   fullname: z.string({ required_error: 'Vui lòng nhập tên sự kiện' }),
@@ -40,14 +40,14 @@ interface TicketFormProps {
       phone: string;
     },
     any,
-    undefined
+    any
   >;
   ticketsForm: UseFormReturn<
     {
       tickets: z.infer<typeof ticketFormSchema>[];
     },
     any,
-    undefined
+    any
   >;
   index: number;
 }

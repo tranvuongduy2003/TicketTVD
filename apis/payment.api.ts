@@ -1,6 +1,6 @@
 import httpRequest from '@/api-client/httpRequest';
 import { API_ROUTE } from '@/constants';
-import { MyTicket, Payment } from '@/models';
+import { FilteringOptions, MyTicket, Payment } from '@/models';
 import {
   CheckoutPayload,
   CreateStripeSessionPayload,
@@ -9,14 +9,26 @@ import {
 } from '@/types';
 
 export const paymentApi = {
-  getAllPayments: () => {
-    return httpRequest.get<Payment[]>(API_ROUTE.payment);
+  getAllPayments: (options?: Partial<FilteringOptions>) => {
+    return httpRequest.get<Payment[]>(API_ROUTE.payment, {
+      params: options
+    });
   },
-  getPaymentsByEventId: (eventId: number) => {
-    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/event/${eventId}`);
+  getPaymentsByUserId: (
+    userId: string,
+    options?: Partial<FilteringOptions>
+  ) => {
+    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/${userId}`, {
+      params: options
+    });
   },
-  getPaymentsByUserId: (userId: string) => {
-    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/${userId}`);
+  getPaymentsByEventId: (
+    eventId: string,
+    options?: Partial<FilteringOptions>
+  ) => {
+    return httpRequest.get<Payment[]>(`${API_ROUTE.payment}/event/${eventId}`, {
+      params: options
+    });
   },
   checkout: (data: CheckoutPayload) => {
     return httpRequest.post<Payment, CheckoutPayload>(
@@ -33,9 +45,9 @@ export const paymentApi = {
       data
     );
   },
-  validateStripeSession: (paymentId: number) => {
+  validateStripeSession: (paymentId: string) => {
     return httpRequest.post<ValidateStripeSessionResponse>(
-      API_ROUTE.payment + `/validate-stripe-session/${paymentId}`,
+      API_ROUTE.payment + `/${paymentId}/validate-stripe-session`,
       {}
     );
   }

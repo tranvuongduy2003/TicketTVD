@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Status, User } from '@/models';
 import { Avatar, AvatarFallback, AvatarImage, Badge } from '../ui';
-import { DataTableRowActions } from './data-table';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
+import { DataTableRowActions } from './data-table-row-actions';
+import { DataTableColumnHeader } from '../ui/data-table/data-table-column-header';
 
 export const customerColumns: ColumnDef<User>[] = [
   {
@@ -60,7 +60,7 @@ export const customerColumns: ColumnDef<User>[] = [
       const createdDate = new Date(row.getValue('createdAt'));
       return <div>{createdDate.toLocaleDateString('vi-VN')}</div>;
     },
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -69,7 +69,7 @@ export const customerColumns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Tổng số vé đã mua" />
     ),
     cell: ({ row }) => <div>{row.getValue('totalBuyedTickets')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {

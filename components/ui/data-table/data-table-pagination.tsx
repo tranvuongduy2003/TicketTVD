@@ -6,7 +6,7 @@ import {
   LuChevronsRight
 } from 'react-icons/lu';
 
-import { Button } from '../../ui';
+import { Button } from '..';
 
 interface DataTablePaginationProps<TData> {
   table: Table<TData>;
@@ -18,7 +18,7 @@ export function DataTablePagination<TData>({
   return (
     <div className="flex items-center justify-end px-2">
       <div className="flex items-center space-x-6 lg:space-x-8">
-        <div className="flex w-[100px] items-center justify-center text-sm font-medium">
+        <div className="flex items-center justify-center text-sm font-medium">
           Trang{' '}
           {table.getPageCount() !== 0
             ? table.getState().pagination.pageIndex + 1

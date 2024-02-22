@@ -2,7 +2,7 @@
 
 import { fileApi, userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
-import { useEvents, usePayments, useUser } from '@/hooks';
+import { useUser } from '@/hooks';
 import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
 import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
@@ -81,8 +81,6 @@ export function EditUserDialog({
   const { toast } = useToast();
 
   const { user, isLoading, mutate: userMutate } = useUser(userId ?? '');
-  const { payments } = usePayments();
-  const { events } = useEvents();
 
   const [loading, setLoading] = useState<boolean>(false);
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
@@ -119,8 +117,8 @@ export function EditUserDialog({
       // Upload avatar
       if (avatar) {
         const compressedAvatar = await compressFile(avatar);
-        const avatarUrl = await fileApi.uploadFile(compressedAvatar);
-        payload.avatar = avatarUrl.blob.uri;
+        const { data: avatarUrl } = await fileApi.uploadFile(compressedAvatar);
+        payload.avatar = avatarUrl!.blob.uri;
       }
 
       await userApi.updateUser(user?.id ?? '', payload);
@@ -158,41 +156,9 @@ export function EditUserDialog({
           status: user.status
         });
 
-        if (user.role === Role.CUSTOMER) {
-          const totalTickets = payments
-            ?.filter(payment => payment.userId === user.id)
-            ?.reduce(
-              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
-              0
-            );
-          userMutate({ ...user, totalBuyedTickets: totalTickets as number });
-        }
-
-        if (user.role === Role.ORGANIZER) {
-          const totalEvents = events?.filter(
-            event => event.creatorId === user.id
-          );
-
-          const totalTickets = payments
-            ?.filter(
-              payment =>
-                totalEvents?.some(event => event.id === payment.eventId)
-            )
-            .reduce(
-              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
-              0
-            );
-
-          userMutate({
-            ...user,
-            totalEvents: totalEvents?.length as number,
-            totalSoldTickets: totalTickets as number
-          });
-        }
-
         if (user.avatar) {
           setAvatarPreview(user.avatar);
-          const avatarFile = await getFile(user.avatar);
+          const { data: avatarFile } = await getFile(user.avatar);
           setAvatar(avatarFile);
         }
       }
@@ -496,9 +462,9 @@ export function EditUserDialog({
               {isShowExtensiveInfo && (
                 <Card className="pt-6 transition-all">
                   <CardContent>
-                    {user.totalBuyedTickets !== null && (
+                    {user.totalBoughtTickets !== null && (
                       <div className="mb-2">
-                        Tổng số vé đã mua: {user.totalBuyedTickets}
+                        Tổng số vé đã mua: {user.totalBoughtTickets}
                       </div>
                     )}
                     {user.totalEvents !== null && (

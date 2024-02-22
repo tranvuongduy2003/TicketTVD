@@ -13,7 +13,7 @@ import {
 import { Event, Role } from '@/models';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
-import { RemoveEventConfirmDialog } from '..';
+import { RemoveEventConfirmDialog } from '.';
 import { useAuth } from '@/hooks';
 
 interface DataTableRowActionsProps<TData> {
