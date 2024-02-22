@@ -15,7 +15,8 @@ const nextConfig = {
     domains: [
       'dummyimage.com',
       'picsum.photos',
-      'tickettvdstorage.blob.core.windows.net'
+      'tickettvdstorage.blob.core.windows.net',
+      'tickettvdblobstorage.blob.core.windows.net'
     ]
   },
   compiler: {

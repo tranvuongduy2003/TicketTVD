@@ -20,7 +20,7 @@ export function getFile(uri: string) {
 export function getFileName(uri: string) {
   const decodedCoverImageUri = decodeURI(uri);
   const imageName = decodedCoverImageUri.split(
-    'https://tickettvdstorage.blob.core.windows.net/files/'
+    'https://tickettvdblobstorage.blob.core.windows.net/files/'
   )[1];
   return imageName;
 }

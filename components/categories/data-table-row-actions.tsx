@@ -10,8 +10,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { Payment } from '@/models';
-import { useRouter } from 'next/router';
+import { Category } from '@/models';
+import Link from 'next/link';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -20,9 +20,7 @@ interface DataTableRowActionsProps<TData> {
 export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
-  const router = useRouter();
-
-  const paymentId = (row.original as Payment).id;
+  const categoryId = (row.original as Category).id;
 
   return (
     <>
@@ -35,16 +33,11 @@ export function DataTableRowActions<TData>({
             <LuMoreHorizontal className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            onClick={() => router.push(`/management/payment/${paymentId}`)}
-          >
-            Chỉnh sửa
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <span className="text-danger-500">Hủy vé</span>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
+        <Link href={`/management/category/${categoryId}`}>
+          <DropdownMenuContent align="end" className="w-[160px]">
+            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+          </DropdownMenuContent>
+        </Link>
       </DropdownMenu>
     </>
   );

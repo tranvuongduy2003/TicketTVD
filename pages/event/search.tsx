@@ -128,12 +128,14 @@ const EventSearchPage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             <span className="text-primary-500">Gợi ý</span> cho bạn
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-6">

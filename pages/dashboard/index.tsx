@@ -1,3 +1,5 @@
+'use client';
+
 import {
   DashboardCard,
   EventsByCategoryChart,
@@ -168,9 +170,9 @@ const Dashboard: NextPageWithLayout = () => {
             {dayDiffFromNow(
               payments?.sort(
                 (a, b) =>
-                  new Date(b.createdAt).getTime() -
-                  new Date(a.createdAt).getTime()
-              )[0].createdAt ?? new Date()
+                  (b.createdAt ? new Date(b.createdAt) : new Date()).getTime() -
+                  (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
+              )[0]?.createdAt ?? new Date()
             )}
           </p> */}
         </div>

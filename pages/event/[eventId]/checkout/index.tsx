@@ -23,6 +23,7 @@ import { formatDateToLocaleDate, formatDateToTime } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { formatDistance } from 'date-fns';
 import { vi } from 'date-fns/locale';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -472,12 +473,14 @@ const EventDetailPage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">tương tự</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         {/* <div className="grid grid-cols-2 gap-6">

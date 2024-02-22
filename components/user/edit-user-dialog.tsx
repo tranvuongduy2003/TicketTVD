@@ -1,5 +1,3 @@
-'use client';
-
 import { fileApi, userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
 import { useUser } from '@/hooks';
@@ -14,7 +12,6 @@ import { useForm } from 'react-hook-form';
 import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
 import { mutate } from 'swr';
 import * as z from 'zod';
-import { ChangePasswordCard, DeactivateUserCard } from '../profile';
 import {
   Avatar,
   AvatarFallback,
@@ -22,8 +19,6 @@ import {
   Badge,
   Button,
   Calendar,
-  Card,
-  CardContent,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -86,8 +81,6 @@ export function EditUserDialog({
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
     useState<boolean>(false);
   const [isShowExtensiveChangePassword, setIsShowExtensiveChangePassword] =
-    useState<boolean>(false);
-  const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
     useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>();
@@ -166,19 +159,19 @@ export function EditUserDialog({
   }, [user]);
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        {...form}
-        className="max-w-screen-md overflow-y-scroll max-h-[80vh]"
-      >
-        <DialogHeader>
-          <DialogTitle>Thông tin người dùng</DialogTitle>
-        </DialogHeader>
-        {isLoading || !user ? (
-          <Loading />
-        ) : (
-          <>
-            <Form {...form}>
+    <Form {...form}>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent
+          // {...form}
+          className="max-w-screen-md overflow-y-scroll max-h-[80vh]"
+        >
+          <DialogHeader>
+            <DialogTitle>Thông tin người dùng</DialogTitle>
+          </DialogHeader>
+          {isLoading || !user ? (
+            <Loading />
+          ) : (
+            <>
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="grid grid-cols-2 gap-8"
@@ -450,85 +443,47 @@ export function EditUserDialog({
                   )}
                 />
               </form>
-            </Form>
-            <div className="mt-5">
-              <div
-                className="flex items-center gap-2 cursor-pointer"
-                onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
-              >
-                <h3 className="text-lg font-semibold mb-3">Thông tin thêm</h3>
-                <LuChevronDown />
+              <div className="mt-5">
+                <div
+                  className="flex items-center gap-2 cursor-pointer mb-3"
+                  onClick={() => setIsShowExtensiveInfo(!isShowExtensiveInfo)}
+                >
+                  <h3 className="text-lg font-semibold">Thông tin thêm</h3>
+                  <LuChevronDown />
+                </div>
               </div>
-              {isShowExtensiveInfo && (
-                <Card className="pt-6 transition-all">
-                  <CardContent>
-                    {user.totalBoughtTickets !== null && (
-                      <div className="mb-2">
-                        Tổng số vé đã mua: {user.totalBoughtTickets}
-                      </div>
-                    )}
-                    {user.totalEvents !== null && (
-                      <div className="mb-2">
-                        Tổng sự kiện: {user.totalEvents}
-                      </div>
-                    )}
-                    {user.totalSoldTickets !== null && (
-                      <div className="mb-2">
-                        Tổng số vé đã đã bán: {user.totalSoldTickets}
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              )}
-            </div>
-            <div className="mt-3">
-              <div
-                className="flex items-center gap-2 cursor-pointer"
-                onClick={() =>
-                  setIsShowExtensiveChangePassword(
-                    !isShowExtensiveChangePassword
-                  )
-                }
-              >
-                <h3 className="text-lg font-semibold mb-3">
-                  Thay đổi mật khẩu
-                </h3>
-                <LuChevronDown />
+              <div className="mt-3">
+                <div
+                  className="flex items-center gap-2 cursor-pointer"
+                  onClick={() =>
+                    setIsShowExtensiveChangePassword(
+                      !isShowExtensiveChangePassword
+                    )
+                  }
+                >
+                  <h3 className="text-lg font-semibold mb-3">
+                    Thay đổi mật khẩu
+                  </h3>
+                  <LuChevronDown />
+                </div>
               </div>
-              {isShowExtensiveChangePassword && (
-                <ChangePasswordCard userId={user.id} />
-              )}
-            </div>
-            <div className="mt-3">
-              <div
-                className="flex items-center gap-2 cursor-pointer"
-                onClick={() =>
-                  setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
-                }
-              >
-                <h3 className="text-lg font-semibold mb-3">Vô hiệu hóa</h3>
-                <LuChevronDown />
-              </div>
-              {isShowExtensiveDeactiveUser && (
-                <DeactivateUserCard userId={user.id} />
-              )}
-            </div>
-          </>
-        )}
-        <DialogFooter>
-          <Button
-            loading={loading}
-            type="submit"
-            className="text-white"
-            onClick={form.handleSubmit(onSubmit)}
-          >
-            Lưu
-          </Button>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
-            Đóng
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+            </>
+          )}
+          <DialogFooter>
+            <Button
+              loading={loading}
+              type="submit"
+              className="text-white"
+              onClick={form.handleSubmit(onSubmit)}
+            >
+              Lưu
+            </Button>
+            <Button variant="outline" onClick={() => onOpenChange(false)}>
+              Đóng
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </Form>
   );
 }

@@ -11,7 +11,7 @@ import {
   DropdownMenuTrigger
 } from '@/components/ui';
 import { Event, Role } from '@/models';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 import { useState } from 'react';
 import { RemoveEventConfirmDialog } from '.';
 import { useAuth } from '@/hooks';
@@ -24,7 +24,6 @@ export function DataTableRowActions<TData>({
   row
 }: DataTableRowActionsProps<TData>) {
   const { profile } = useAuth();
-  const router = useRouter();
 
   const [isConfirmationDialogOpen, setIsConfirmationDialogOpen] =
     useState<boolean>(false);
@@ -43,22 +42,21 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            onClick={() =>
+          <Link
+            href={
               profile?.role === Role.ADMIN
-                ? router.push(`/management/event/${eventId}`)
-                : profile?.role === Role.ORGANIZER &&
-                  router.push(`/event/${eventId}/edit`)
+                ? `/management/event/${eventId}`
+                : profile?.role === Role.ORGANIZER
+                  ? `/event/${eventId}/edit`
+                  : ''
             }
           >
-            Chỉnh sửa
-          </DropdownMenuItem>
+            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+          </Link>
           {profile?.role === Role.ORGANIZER && (
-            <DropdownMenuItem
-              onClick={() => router.push(`/my-events/${eventId}/payment`)}
-            >
-              Đơn mua
-            </DropdownMenuItem>
+            <Link href={`/my-events/${eventId}/payment`}>
+              <DropdownMenuItem>Đơn mua</DropdownMenuItem>
+            </Link>
           )}
           <DropdownMenuItem onClick={() => setIsConfirmationDialogOpen(true)}>
             <span className="text-danger-500">Xóa sự kiện</span>

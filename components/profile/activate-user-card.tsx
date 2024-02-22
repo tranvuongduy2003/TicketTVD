@@ -6,22 +6,22 @@ import { useState } from 'react';
 import { Button, Card, CardContent, toast } from '../ui';
 import { useRouter } from 'next/router';
 
-export interface DeactivateUserCardProps {
+export interface ActivateUserCardProps {
   userId: string;
 }
 
-export function DeactivateUserCard({ userId }: DeactivateUserCardProps) {
+export function ActivateUserCard({ userId }: ActivateUserCardProps) {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  async function onDeactivateUser() {
+  async function onActivateUser() {
     setIsLoading(true);
     try {
-      await userApi.deactivateUser(userId);
+      await userApi.activateUser(userId);
 
       setIsLoading(false);
       toast({
-        title: 'Vô hiệu hóa người dùng thành công',
+        title: 'Kích hoạt tài khoản thành công',
         description: '',
         duration: MILLISECOND_PER_SECOND * 0.5
       });
@@ -29,7 +29,7 @@ export function DeactivateUserCard({ userId }: DeactivateUserCardProps) {
     } catch (error: any) {
       setIsLoading(false);
       toast({
-        title: 'Vô hiệu hóa người dùng thất bại',
+        title: 'Kích hoạt tài khoản thất bại',
         description: error,
         variant: 'destructive',
         duration: MILLISECOND_PER_SECOND
@@ -45,10 +45,10 @@ export function DeactivateUserCard({ userId }: DeactivateUserCardProps) {
           <Button
             loading={isLoading}
             type="submit"
-            onClick={onDeactivateUser}
-            className="text-white text-base bg-red-500 hover:bg-red-400"
+            onClick={onActivateUser}
+            className="text-white text-base bg-green-500 hover:bg-green-400"
           >
-            Vô hiệu hóa tài khoản
+            Kích hoạt tài khoản
           </Button>
         </div>
       </CardContent>

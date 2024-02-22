@@ -12,6 +12,7 @@ import {
   formatDateToTime
 } from '@/utils';
 import Image from 'next/image';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import {
@@ -226,13 +227,11 @@ const EventDetailPage: NextPageWithLayout = () => {
               )}
             </div>
             {event.ticketSoldQuantity < event.ticketQuantity ? (
-              <Button
-                type="button"
-                className="text-white w-full mt-7"
-                onClick={() => router.push(`/event/${eventId}/checkout`)}
-              >
-                Mua vé
-              </Button>
+              <Link href={`/event/${eventId}/checkout`}>
+                <Button type="button" className="text-white w-full mt-7">
+                  Mua vé
+                </Button>
+              </Link>
             ) : (
               <div className="text-danger-500 font-bold w-full mt-7 border-2 rounded-md border-solid border-danger-500 text-center h-10 px-4 py-2">
                 Hết vé
@@ -247,12 +246,14 @@ const EventDetailPage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">tương tự</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         {/* <div className="grid grid-cols-2 gap-6">

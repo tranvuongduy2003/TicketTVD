@@ -1,5 +1,5 @@
 import { userApi } from '@/apis';
-import { QUERY_KEY } from '@/constants';
+import { MILLISECOND_PER_HOUR, QUERY_KEY } from '@/constants';
 import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
 

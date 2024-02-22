@@ -15,11 +15,9 @@ import {
 } from '@/hooks';
 import { HighlightType, NextPageWithLayout } from '@/models';
 import Image from 'next/image';
-import { useRouter } from 'next/router';
+import Link from 'next/link';
 
 const Home: NextPageWithLayout = () => {
-  const router = useRouter();
-
   const { events: newestEvents, isLoading: newestEventsLoading } =
     useNewestEvents();
   const { events: upcomingEvents, isLoading: upcomingEventsLoading } =
@@ -46,8 +44,10 @@ const Home: NextPageWithLayout = () => {
           nhất cho chính mình
         </h1>
         {/* SEARCH */}
-        <div className="absolute bottom-0 z-30 px-[293px] w-full translate-y-1/2">
-          <EventSearchBar onSearch={() => router.push('/event/search')} />
+        <div className="absolute bottom-0 z-30 px-[293px] w-full translate-y-1/2 cursor-pointer">
+          <Link href={'/event/search'}>
+            <EventSearchBar />
+          </Link>
         </div>
       </section>
 
@@ -57,13 +57,14 @@ const Home: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">mới nhất</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-8">
@@ -114,13 +115,14 @@ const Home: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sắp diễn ra <span className="text-primary-500">trong 24h</span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-2 gap-6">
@@ -155,13 +157,14 @@ const Home: NextPageWithLayout = () => {
                     : 'tuần'}
             </span>
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         {highlightEventLoading ? (
@@ -195,13 +198,14 @@ const Home: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Nhiều sự kiện hơn
           </h2>
-          <Button
-            type="button"
-            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            onClick={() => router.push('/event/search')}
-          >
-            Xem thêm
-          </Button>
+          <Link href={'/event/search'}>
+            <Button
+              type="button"
+              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+            >
+              Xem thêm
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-3 gap-8">

@@ -2,12 +2,9 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/router';
 import { Button } from '../../ui';
 
 export function MainHeader() {
-  const router = useRouter();
-
   return (
     <header className="px-8 h-14 flex items-center shadow-xs justify-between">
       {/* LEFT */}
@@ -30,20 +27,19 @@ export function MainHeader() {
       </Link>
 
       <div className="flex gap-3">
-        <Button
-          type="button"
-          className="bg-primary-100 hover:bg-primary-200 text-primary-500"
-          onClick={() => router.push('/auth/signup')}
-        >
-          Đăng ký
-        </Button>
-        <Button
-          type="button"
-          className="text-white"
-          onClick={() => router.push('/auth/login')}
-        >
-          Đăng nhập
-        </Button>
+        <Link href={'/auth/signup'}>
+          <Button
+            type="button"
+            className="bg-primary-100 hover:bg-primary-200 text-primary-500"
+          >
+            Đăng ký
+          </Button>
+        </Link>
+        <Link href={'/auth/login'}>
+          <Button type="button" className="text-white">
+            Đăng nhập
+          </Button>
+        </Link>
       </div>
     </header>
   );

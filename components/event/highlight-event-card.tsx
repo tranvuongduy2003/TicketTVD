@@ -1,10 +1,10 @@
 'use client';
 
-import * as React from 'react';
-import { LuCalendar, LuMapPin } from 'react-icons/lu';
-import { Button } from '../ui';
 import { Event } from '@/models';
 import { formatDate } from '@/utils';
+import Link from 'next/link';
+import { LuCalendar, LuMapPin } from 'react-icons/lu';
+import { Button } from '../ui';
 import { useRouter } from 'next/router';
 
 export interface HighlightEventCardProps {

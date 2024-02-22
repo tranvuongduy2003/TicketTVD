@@ -13,6 +13,7 @@ import {
 import { Payment, Role } from '@/models';
 import { useRouter } from 'next/router';
 import { useAuth } from '@/hooks';
+import Link from 'next/link';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -40,16 +41,17 @@ export function DataTableRowActions<TData>({
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="w-[160px]">
-          <DropdownMenuItem
-            onClick={() =>
+          <Link
+            href={
               profile?.role === Role.ADMIN
-                ? router.push(`/management/payment/${paymentId}`)
-                : profile?.role === Role.ORGANIZER &&
-                  router.push(`/my-events/${eventId}/payment/${paymentId}`)
+                ? `/management/payment/${paymentId}`
+                : profile?.role === Role.ORGANIZER
+                ? `/my-events/${eventId}/payment/${paymentId}`
+                : ''
             }
           >
-            Chỉnh sửa
-          </DropdownMenuItem>
+            <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>
+          </Link>
         </DropdownMenuContent>
       </DropdownMenu>
     </>

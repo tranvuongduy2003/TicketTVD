@@ -24,3 +24,4 @@ export * from './use-random-events';
 export * from './use-newest-events';
 export * from './use-upcoming-events';
 export * from './use-highlight-events';
+export * from './use-category';
