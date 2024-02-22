@@ -1,8 +1,7 @@
 import { eventApi, paymentApi } from '@/apis';
-import { DetailItem, EventCard } from '@/components/event';
+import { DetailItem } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
-import { Button, Loading, Separator, Skeleton } from '@/components/ui';
-import { useEvents } from '@/hooks';
+import { Button, Loading, Separator } from '@/components/ui';
 import { Event, NextPageWithLayout } from '@/models';
 import { PaymentTicket, ValidateStripeSessionResponse } from '@/types';
 import {
@@ -35,8 +34,6 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
   const [bill, setBill] = useState<ValidateStripeSessionResponse>();
   const [event, setEvent] = useState<Event>();
 
-  const { events, isLoading: eventLoading } = useEvents();
-
   const handleValidateStripeSession = useRef<any>(null);
 
   useEffect(() => {
@@ -44,12 +41,14 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
       setIsValidating(true);
       try {
         if (paymentId) {
-          const response = await paymentApi.validateStripeSession(
-            Number.parseInt(paymentId as string)
+          const { data: stripeData } = await paymentApi.validateStripeSession(
+            paymentId as string
           );
-          const event = await eventApi.getEventById(response.eventId);
+          const { data: event } = await eventApi.getEventById(
+            stripeData!.eventId
+          );
           setEvent(event);
-          setBill(response);
+          setBill(stripeData);
         }
         setIsValidating(false);
       } catch (error) {
@@ -89,12 +88,12 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
                 description={
                   <div className="flex flex-col">
                     <span>
-                      {event?.eventDate &&
-                        formatDateToLocaleDate(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToLocaleDate(new Date(event?.startTime))}
                     </span>
                     <span>
-                      {event?.eventDate &&
-                        formatDateToTime(new Date(event?.eventDate))}
+                      {event?.startTime &&
+                        formatDateToTime(new Date(event?.startTime))}
                     </span>
                   </div>
                 }
@@ -214,7 +213,7 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -229,7 +228,7 @@ const CheckoutConfirmation: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

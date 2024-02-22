@@ -3,23 +3,23 @@
 import {
   DashboardCard,
   EventsByCategoryChart,
-  RevenueChart,
-  eventColumns,
-  paymentColumns
+  RevenueChart
 } from '@/components/dashboard';
-import { DataTable } from '@/components/dashboard/data-table';
+import { columns as eventColumns } from '@/components/event';
 import { AdminLayout } from '@/components/layout';
+import { columns as paymentColumns } from '@/components/payment';
+import { Loading } from '@/components/ui';
+import { DataTable } from '@/components/ui/data-table';
 import {
-  useCategories,
   useEvents,
   useEventsByCategory,
   usePayments,
-  useRevuene,
-  useTickets,
-  useUsers
+  useRevuene
 } from '@/hooks';
+import { useGeneralStatistic } from '@/hooks/use-general-statistic';
 import { NextPageWithLayout } from '@/models';
-import { dayDiffFromNow } from '@/utils';
+import { PaginationState } from '@tanstack/react-table';
+import { useState } from 'react';
 import {
   LuAperture,
   LuBarChart3,
@@ -31,14 +31,41 @@ import {
 
 export interface DashboardProps {}
 
-const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
+const Dashboard: NextPageWithLayout = () => {
+  const [paymentsPagination, setPaymentsPagination] = useState<PaginationState>(
+    {
+      pageIndex: 0,
+      pageSize: 5
+    }
+  );
+  const [eventsPagination, setEventsPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  });
+
   const { revenue } = useRevuene();
-  const { events } = useEvents();
-  const { users } = useUsers();
-  const { categories } = useCategories();
-  const { tickets } = useTickets();
-  const { payments } = usePayments();
+  const { generalStatistic } = useGeneralStatistic();
   const { eventStatistic } = useEventsByCategory();
+
+  const {
+    events,
+    meta: eventsMeta,
+    isLoading: eventsLoading
+  } = useEvents({
+    page: eventsPagination.pageIndex + 1,
+    size: eventsPagination.pageSize,
+    takeAll: false
+  });
+
+  const {
+    payments,
+    meta: paymentsMeta,
+    isLoading: paymentsLoading
+  } = usePayments({
+    page: paymentsPagination.pageIndex + 1,
+    size: paymentsPagination.pageSize,
+    takeAll: false
+  });
 
   return (
     <div className="px-8 py-20">
@@ -52,7 +79,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
           borderColor="#FBCDDEFF"
           bgColor="#FEF1F6FF"
           icon={<LuCalendar />}
-          content={events?.length}
+          content={generalStatistic?.totalEvents || 0}
           title="Sự kiện"
         />
         <DashboardCard
@@ -60,7 +87,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
           borderColor="#D7E5D5FF"
           bgColor="#F6F9F6FF"
           icon={<LuTicket />}
-          content={tickets?.length}
+          content={generalStatistic?.totalBoughtTickets || 0}
           title="Vé đã bán"
         />
         <DashboardCard
@@ -68,7 +95,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
           borderColor="#CDD5FBFF"
           bgColor="#F1F3FEFF"
           icon={<LuAperture />}
-          content={categories?.length}
+          content={generalStatistic?.totalCategories || 0}
           title="Thể loại"
         />
         <DashboardCard
@@ -76,7 +103,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
           borderColor="#FEF9EEFF"
           bgColor="#FAE7B6FF"
           icon={<LuUser />}
-          content={users?.length}
+          content={generalStatistic?.totalUsers || 0}
           title="Người dùng"
         />
       </div>
@@ -94,10 +121,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
             </h5>
           </div>
           <div className="rounded-lg bg-neutral-150 flex items-center justify-center flex-col pb-4">
-            <EventsByCategoryChart
-              categories={categories || []}
-              eventsByCategory={eventStatistic || []}
-            />
+            <EventsByCategoryChart eventsByCategory={eventStatistic || []} />
             <h5 className="font-semibold text-neutral-700">
               Thống kê sự kiện theo thể loại
             </h5>
@@ -111,27 +135,28 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
             <LuSlack className="text-primary-500" />
             <span>Thống kê theo sự kiện</span>
           </h2>
-          <p className="text-sm text-neutral-550">
+          {/* <p className="text-sm text-neutral-550">
             Sự kiện gần đây nhất:{' '}
             {dayDiffFromNow(
               events?.sort(
                 (a, b) =>
-                  (b.eventDate ? new Date(b.eventDate) : new Date()).getTime() -
-                  (a.eventDate ? new Date(a.eventDate) : new Date()).getTime()
-              )[0].eventDate ?? new Date()
+                  new Date(b.startTime).getTime() -
+                  new Date(a.startTime).getTime()
+              )[0].startTime ?? new Date()
             )}
-          </p>
+          </p> */}
         </div>
-        <DataTable
-          data={
-            events?.sort(
-              (a, b) =>
-                (b.eventDate ? new Date(b.eventDate) : new Date()).getTime() -
-                (a.eventDate ? new Date(a.eventDate) : new Date()).getTime()
-            ) || []
-          }
-          columns={eventColumns}
-        />
+        {eventsLoading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            data={events || []}
+            columns={eventColumns}
+            pagination={eventsPagination}
+            setPagination={setEventsPagination}
+            meta={eventsMeta}
+          />
+        )}
       </div>
 
       <div className="mt-14">
@@ -140,7 +165,7 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
             <LuTicket className="text-primary-500" />
             <span>Đơn mua gần đây</span>
           </h2>
-          <p className="text-sm text-neutral-550">
+          {/* <p className="text-sm text-neutral-550">
             Cập nhật mới nhất:{' '}
             {dayDiffFromNow(
               payments?.sort(
@@ -149,24 +174,19 @@ const Dashboard: NextPageWithLayout = (props: DashboardProps) => {
                   (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
               )[0]?.createdAt ?? new Date()
             )}
-          </p>
+          </p> */}
         </div>
-        <DataTable
-          data={
-            payments
-              ?.map(item => {
-                const user = users?.find(u => u.id == item.userId);
-
-                return { ...item, user: user };
-              })
-              .sort(
-                (a, b) =>
-                  (b.createdAt ? new Date(b.createdAt) : new Date()).getTime() -
-                  (a.createdAt ? new Date(a.createdAt) : new Date()).getTime()
-              ) || []
-          }
-          columns={paymentColumns}
-        />
+        {paymentsLoading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            data={payments || []}
+            columns={paymentColumns}
+            pagination={paymentsPagination}
+            setPagination={setPaymentsPagination}
+            meta={paymentsMeta}
+          />
+        )}
       </div>
     </div>
   );

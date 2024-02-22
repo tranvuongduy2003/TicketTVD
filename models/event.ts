@@ -1,4 +1,4 @@
-import { Category } from '.';
+import { Category, User } from '.';
 
 export enum UserStatus {
   UPCOMING = 'UPCOMING',
@@ -6,19 +6,16 @@ export enum UserStatus {
   CLOSED = 'CLOSED'
 }
 
-export type Event = {
-  id: number;
+export interface Event {
+  id: string;
   coverImage: string;
   name: string;
   description: string;
-  categoryId: number;
+  categoryId: string;
   album: string[];
   location: string;
-  eventDate: Date;
   startTime: Date;
   endTime: Date;
-  ticketTypeId: number;
-  ticketIsPaid: boolean;
   ticketSoldQuantity: number;
   ticketQuantity: number;
   ticketPrice: number;
@@ -26,7 +23,6 @@ export type Event = {
   ticketCloseTime: Date;
   isPromotion: boolean;
   promotionPlan: number;
-  publishTime: Date;
   creatorId: string;
   favourite: number;
   share: number;
@@ -34,4 +30,41 @@ export type Event = {
   createdAt: Date;
   updatedAt: Date;
   category?: Category;
-};
+  creator?: User;
+}
+
+export interface CreateEventPayload {
+  coverImage: string;
+  name: string;
+  description: string;
+  categoryId: string;
+  album: string[];
+  location: string;
+  startTime: Date;
+  endTime: Date;
+  ticketQuantity: number;
+  ticketPrice: number;
+  ticketStartTime: Date;
+  ticketCloseTime: Date;
+  isPromotion: boolean;
+  promotionPlan: number;
+  creatorId: string;
+}
+
+export interface EventsStatistic {
+  totalEvents: number;
+  totalBoughtTickets: number;
+  revenue: number;
+}
+
+export enum HighlightType {
+  WEEK = 'WEEK',
+  MONTH = 'MONTH',
+  YEAR = 'YEAR',
+  NONE = 'NONE'
+}
+
+export interface HighlightEvent {
+  event: Event;
+  highlightType: HighlightType;
+}

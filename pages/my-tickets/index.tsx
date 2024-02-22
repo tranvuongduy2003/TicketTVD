@@ -1,4 +1,3 @@
-import { EventCard } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
 import { MyTicketCard } from '@/components/my-tickets';
 import {
@@ -10,40 +9,24 @@ import {
   Input,
   Skeleton
 } from '@/components/ui';
-import { useEvents, useMyTickets } from '@/hooks';
-import { MyTicket, NextPageWithLayout } from '@/models';
+import { useMyTickets } from '@/hooks';
+import { NextPageWithLayout } from '@/models';
 import { useProfileStore } from '@/stores';
-import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { useState } from 'react';
 import { LuPen } from 'react-icons/lu';
 
 const PER_PAGE = 3;
 
 const MyTicketsPage: NextPageWithLayout = () => {
+  const router = useRouter();
+
   const [page, setPage] = useState<number>(1);
-  const [searchedMyTickets, setSearchedMyTickets] = useState<MyTicket[]>([]);
 
   const { profile } = useProfileStore();
-  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(profile?.id);
-  const { events, isLoading: eventLoading } = useEvents();
-
-  useEffect(() => {
-    if (myTickets) {
-      setSearchedMyTickets(myTickets);
-    }
-  }, [myTickets]);
-
-  function handleSearchMyTicket(value: string) {
-    if (value && value !== '') {
-      const searchedValue =
-        myTickets?.filter(ticket =>
-          ticket.name.toLowerCase().includes(value.toLowerCase())
-        ) || [];
-      setSearchedMyTickets(searchedValue);
-    } else {
-      setSearchedMyTickets(myTickets || []);
-    }
-  }
+  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(
+    profile?.id || ''
+  );
 
   return (
     <div>
@@ -75,29 +58,31 @@ const MyTicketsPage: NextPageWithLayout = () => {
               </p>
               <div className="flex justify-center mt-6 mb-[30px] w-full gap-2">
                 <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
-                  {myTickets?.length} đơn mua
+                  24 đơn mua
+                </Badge>
+                <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
+                  4 đang theo dõi
+                </Badge>
+                <Badge className="text-primary-500 font-normal bg-primary-100 px-2 rounded-m h-7 hover:bg-primary-150">
+                  24 yêu thích
                 </Badge>
               </div>
-              <Link href={'/profile'}>
-                <Button
-                  type="button"
-                  className="flex items-center gap-[6px] text-white w-full"
-                >
-                  <LuPen /> <span>Chỉnh sửa thông tin</span>
-                </Button>
-              </Link>
+              <Button
+                type="button"
+                className="flex items-center gap-[6px] text-white w-full"
+                onClick={() => router.push('/profile')}
+              >
+                <LuPen /> <span>Chỉnh sửa thông tin</span>
+              </Button>
             </div>
           </div>
           <div className="w-2/3">
             <div className="flex items-center justify-between">
               <span className="text-sm">
-                <b>{myTickets?.length}</b> đơn mua
+                <b>{myTickets?.length}</b> sự kiện
               </span>
               <div className="w-1/2">
-                <Input
-                  placeholder="Tìm kiếm"
-                  onChange={e => handleSearchMyTicket(e.target.value)}
-                />
+                <Input placeholder="Tìm kiếm" />
               </div>
             </div>
 
@@ -109,9 +94,9 @@ const MyTicketsPage: NextPageWithLayout = () => {
                   <Skeleton className="h-[221px]" />
                 </>
               ) : (
-                searchedMyTickets &&
-                searchedMyTickets.length > 0 &&
-                searchedMyTickets
+                myTickets &&
+                myTickets.length > 0 &&
+                myTickets
                   .slice(0, page * PER_PAGE)
                   .map(myTicket => (
                     <MyTicketCard key={myTicket.id} myTicket={myTicket} />
@@ -148,17 +133,15 @@ const MyTicketsPage: NextPageWithLayout = () => {
           <h2 className="text-[32px] font-bold leading-[48px]">
             Sự kiện <span className="text-primary-500">tương tự</span>
           </h2>
-          <Link href={'/event/search'}>
-            <Button
-              type="button"
-              className="bg-primary-100 text-primary-500 hover:bg-primary-200"
-            >
-              Xem thêm
-            </Button>
-          </Link>
+          <Button
+            type="button"
+            className="bg-primary-100 text-primary-500 hover:bg-primary-200"
+          >
+            Xem thêm
+          </Button>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -173,7 +156,7 @@ const MyTicketsPage: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

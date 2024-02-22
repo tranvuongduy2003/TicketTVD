@@ -5,6 +5,7 @@ import { cn } from '@/types';
 import { convertToISODate, formatDate } from '@/utils';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { LuCalendar, LuMapPin } from 'react-icons/lu';
 
 export interface EventCardProps {
@@ -18,16 +19,28 @@ export function EventCard({
   mode = 'light',
   event
 }: EventCardProps) {
+  const router = useRouter();
+
   return (
-    <Link href={`/event/${event.id}`}>
+    <div
+      className={cn(
+        'cursor-pointer rounded-m overflow-hidden hover:scale-105 transition-all',
+        mode === 'light'
+          ? 'bg-white border-solid border border-neutral-300'
+          : mode === 'dark'
+            ? 'bg-neutral-700'
+            : ''
+      )}
+      onClick={() => router.push(`/event/${event.id}`)}
+    >
       <div
         className={cn(
           'cursor-pointer rounded-m overflow-hidden hover:scale-105 transition-all',
           mode === 'light'
             ? 'bg-white border-solid border border-neutral-300'
             : mode === 'dark'
-            ? 'bg-neutral-700'
-            : ''
+              ? 'bg-neutral-700'
+              : ''
         )}
       >
         <div
@@ -61,14 +74,14 @@ export function EventCard({
           <p className="mb-2 flex items-center gap-2 text-primary-500 font-bold text-sm">
             <LuCalendar />{' '}
             {event &&
-              event.eventDate &&
-              formatDate(convertToISODate(new Date(event.eventDate + '.000Z')))}
+              event.startTime &&
+              formatDate(convertToISODate(new Date(event.startTime + '.000Z')))}
           </p>
           <p className="flex items-center gap-2 text-neutral-500 text-sm">
             <LuMapPin /> {event?.location}
           </p>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }

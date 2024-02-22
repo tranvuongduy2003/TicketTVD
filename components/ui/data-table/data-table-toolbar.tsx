@@ -1,9 +1,10 @@
 'use client';
 
 import { Table } from '@tanstack/react-table';
-import { Button, Input } from '../../ui';
-import { LuPlus } from 'react-icons/lu';
 import Link from 'next/link';
+import { LuPlus } from 'react-icons/lu';
+import { Input } from '..';
+import { Button } from '../../ui';
 
 interface DataTableToolbarProps<TData> {
   table: Table<TData>;
@@ -17,9 +18,11 @@ export function DataTableToolbar<TData>({
       <div className="flex flex-1 items-center space-x-2">
         <Input
           placeholder="Tìm kiếm"
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
+          value={
+            (table.getColumn('customerName')?.getFilterValue() as string) ?? ''
+          }
           onChange={event =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
+            table.getColumn('customerName')?.setFilterValue(event.target.value)
           }
           className="h-10 w-[150px] lg:w-[300px]"
         />

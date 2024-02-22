@@ -12,7 +12,7 @@ import {
 } from '@/components/ui';
 import { Status, User } from '@/models';
 import { useState } from 'react';
-import { ConfirmationDialog, EditUserDialog } from '..';
+import { ConfirmationDialog, EditUserDialog } from '.';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;

@@ -31,3 +31,4 @@ export * from './switch';
 export * from './skeleton';
 export * from './tooltip';
 export * from './gradient-picker';
+export * from './pagination';

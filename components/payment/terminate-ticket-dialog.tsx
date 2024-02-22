@@ -15,7 +15,7 @@ import { ticketApi } from '@/apis';
 export interface ITerminateTicketDialogProps {
   open: boolean;
   onOpenChange(open: boolean): void;
-  ticketId: number;
+  ticketId: string;
 }
 
 export function TerminateTicketDialog({

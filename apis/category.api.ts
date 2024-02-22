@@ -1,27 +1,39 @@
 import httpRequest from '@/api-client/httpRequest';
 import { API_ROUTE } from '@/constants';
-import { Category } from '@/models';
+import {
+  Category,
+  CreateCategoryPayload,
+  FilteringOptions,
+  PageOrder
+} from '@/models';
 
 export const categoryApi = {
-  getCategories: () => {
-    return httpRequest.get<Category[]>(API_ROUTE.category);
+  getCategories: (options?: Partial<FilteringOptions>) => {
+    return httpRequest.get<Category[]>(API_ROUTE.category, {
+      params: options
+    });
   },
-  getCategoryById: (id: number) => {
+  getStatisticCategories: (options?: Partial<FilteringOptions>) => {
+    return httpRequest.get<Category[]>(API_ROUTE.category + '/statistic', {
+      params: options
+    });
+  },
+  getCategoryById: (id: string) => {
     return httpRequest.get<Category>(`${API_ROUTE.category}/${id}`);
   },
-  createCategory: (data: Partial<Category>) => {
-    return httpRequest.post<any, Partial<Category>>(
-      `${API_ROUTE.category}`,
+  createCategory: (data: CreateCategoryPayload) => {
+    return httpRequest.post<any, CreateCategoryPayload>(
+      API_ROUTE.category,
       data
     );
   },
-  updateCategory: (id: number, data: Partial<Category>) => {
-    return httpRequest.put<any, Partial<Category>>(
+  updateCategory: (id: string, data: CreateCategoryPayload) => {
+    return httpRequest.put<any, CreateCategoryPayload>(
       `${API_ROUTE.category}/${id}`,
       data
     );
   },
-  deleteCategory: (id: number) => {
+  deleteCategory: (id: string) => {
     return httpRequest.delete(`${API_ROUTE.category}/${id}`);
   }
 };

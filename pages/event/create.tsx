@@ -30,7 +30,12 @@ import {
 } from '@/components/ui';
 import { MILLISECOND_PER_SECOND } from '@/constants';
 import { useAuth, useCategories } from '@/hooks';
-import { District, Event, NextPageWithLayout, Province } from '@/models';
+import {
+  CreateEventPayload,
+  District,
+  NextPageWithLayout,
+  Province
+} from '@/models';
 import { cn } from '@/types';
 import {
   compressFile,
@@ -121,12 +126,6 @@ const ticketInfoFormSchema = z.object({
     .optional()
 });
 
-const publishFormSchema = z.object({
-  isPublish: z.boolean().default(false),
-  publishTime: z.date().optional(),
-  publishDate: z.date().optional()
-});
-
 const CreateEventPage: NextPageWithLayout = () => {
   const { categories } = useCategories();
   const { profile } = useAuth();
@@ -156,10 +155,6 @@ const CreateEventPage: NextPageWithLayout = () => {
 
   const ticketInfoForm = useForm<z.infer<typeof ticketInfoFormSchema>>({
     resolver: zodResolver(ticketInfoFormSchema)
-  });
-
-  const publishForm = useForm<z.infer<typeof publishFormSchema>>({
-    resolver: zodResolver(publishFormSchema)
   });
 
   const handleFetchProvinces = useRef<any>(null);
@@ -219,7 +214,6 @@ const CreateEventPage: NextPageWithLayout = () => {
         addressForm.getValues();
 
       const {
-        isPaid,
         price,
         quantity,
         isPromotion,
@@ -230,18 +224,16 @@ const CreateEventPage: NextPageWithLayout = () => {
         ticketStartTime
       } = ticketInfoForm.getValues();
 
-      const { isPublish, publishDate, publishTime } = publishForm.getValues();
-
-      const data: Partial<Event> = {
+      const data: CreateEventPayload = {
         name: name,
+        coverImage: coverImagePreview!,
         description: description,
-        categoryId: Number.parseInt(categoryId),
-        location: `${address}, ${districts?.find(item => item.code === district)
-          ?.path_with_type}`,
-        eventDate: concatDateWithTime(eventDate, startTime),
+        categoryId: categoryId,
+        location: `${address}, ${
+          districts?.find(item => item.code === district)?.path_with_type
+        }`,
         startTime: concatDateWithTime(eventDate, startTime),
         endTime: concatDateWithTime(eventDate, endTime),
-        ticketIsPaid: isPaid === 'paid' ? true : false,
         ticketQuantity: Number.parseInt(quantity),
         ticketPrice: Number.parseInt(price),
         ticketStartTime: concatDateWithTime(ticketStartDate, ticketStartTime),
@@ -249,18 +241,15 @@ const CreateEventPage: NextPageWithLayout = () => {
         isPromotion: isPromotion,
         promotionPlan: isPromotion ? Number.parseInt(promotionPlan) : 0,
         album: [],
-        creatorId: profile?.id
+        creatorId: profile!.id
       };
-
-      if (isPublish && publishDate && publishTime) {
-        data.publishTime = concatDateWithTime(publishDate, publishTime);
-      }
 
       // Upload cover image
       if (coverImage) {
         const compressedCoverImage = await compressFile(coverImage!);
-        const coverImageUrl = await fileApi.uploadFile(compressedCoverImage);
-        data.coverImage = coverImageUrl.blob.uri;
+        const { data: coverImageUrl } =
+          await fileApi.uploadFile(compressedCoverImage);
+        data.coverImage = coverImageUrl!.blob.uri;
       }
       // Upload albums
       if (album && album.length > 0) {
@@ -270,9 +259,9 @@ const CreateEventPage: NextPageWithLayout = () => {
               new Promise<string>(async (resolve, reject) => {
                 try {
                   const compressedCoverImage = await compressFile(item);
-                  const coverImageUrl =
+                  const { data: coverImageUrl } =
                     await fileApi.uploadFile(compressedCoverImage);
-                  resolve(coverImageUrl.blob.uri);
+                  resolve(coverImageUrl!.blob.uri);
                 } catch (error) {
                   reject(error);
                 }
@@ -1258,155 +1247,14 @@ const CreateEventPage: NextPageWithLayout = () => {
                       promotionPlan: ticketInfoForm.watch().promotionPlan || 0,
                       coverImage: coverImagePreview || '',
                       name: generalInfoForm.watch().name,
-                      eventDate: concatDateWithTime(
-                        addressForm.watch().eventDate,
-                        addressForm.watch().startTime
-                      ),
-                      location: `${
-                        addressForm.watch().address
-                      }, ${districts?.find(
-                        item => item.code === addressForm.watch().district
-                      )?.path_with_type}`
+                      location: `${addressForm.watch().address}, ${
+                        districts?.find(
+                          item => item.code === addressForm.watch().district
+                        )?.path_with_type
+                      }`
                     }}
                   />
                 </div>
-                <Form {...publishForm}>
-                  <form
-                    onSubmit={publishForm.handleSubmit(() => {})}
-                    className="mt-8"
-                  >
-                    <div>
-                      <FormField
-                        control={publishForm.control}
-                        name="isPublish"
-                        render={({ field: { onChange, value, ...rest } }) => (
-                          <FormItem className="flex items-center gap-4">
-                            <FormLabel>
-                              <h6 className="text-xl font-bold">
-                                Lịch xuất bản
-                              </h6>
-                            </FormLabel>
-                            <FormControl>
-                              <Switch
-                                checked={value}
-                                onCheckedChange={onChange}
-                              />
-                            </FormControl>
-                          </FormItem>
-                        )}
-                      />
-                      <p className="text-sm text-neutral-550 my-2">
-                        Đặt thời gian xuất bản để đảm bảo sự kiện của bạn xuất
-                        hiện trên trang web vào thời gian được chỉ định
-                      </p>
-                      {publishForm.watch().isPublish && (
-                        <div className="grid grid-cols-2 grid-rows-2 gap-x-8 gap-y-2">
-                          <FormField
-                            control={publishForm.control}
-                            name="publishDate"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm font-bold">
-                                  Ngày xuất bản
-                                </FormLabel>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <FormControl>
-                                      <Button
-                                        variant={'outline'}
-                                        className={cn(
-                                          'w-full pl-3 text-left font-normal',
-                                          !field.value &&
-                                            'text-muted-foreground'
-                                        )}
-                                      >
-                                        {field.value ? (
-                                          format(field.value, 'dd/MM/yyyy', {
-                                            locale: vi
-                                          })
-                                        ) : (
-                                          <span>
-                                            Chọn ngày xuất bản sự kiện
-                                          </span>
-                                        )}
-                                        <LuCalendar className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
-                                    </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent
-                                    className="w-auto p-0"
-                                    align="start"
-                                  >
-                                    <Calendar
-                                      locale={vi}
-                                      lang="vi"
-                                      mode="single"
-                                      captionLayout="dropdown-buttons"
-                                      selected={field.value}
-                                      onSelect={field.onChange}
-                                      disabled={date =>
-                                        date < new Date('1900-01-01')
-                                      }
-                                      fromYear={1900}
-                                      toYear={new Date().getFullYear() + 2}
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                          <FormField
-                            control={publishForm.control}
-                            name="publishTime"
-                            render={({ field }) => (
-                              <FormItem>
-                                <FormLabel className="text-sm font-bold">
-                                  Thời gian xuất bản
-                                </FormLabel>
-                                <Popover>
-                                  <PopoverTrigger asChild>
-                                    <FormControl>
-                                      <Button
-                                        variant={'outline'}
-                                        className={cn(
-                                          'w-full pl-3 text-left font-normal',
-                                          !field.value &&
-                                            'text-muted-foreground'
-                                        )}
-                                      >
-                                        {field.value ? (
-                                          format(field.value, 'HH:mm', {
-                                            locale: vi
-                                          })
-                                        ) : (
-                                          <span>
-                                            Chọn thời gian xuất bản sự kiện
-                                          </span>
-                                        )}
-                                        <LuClock className="ml-auto h-4 w-4 opacity-50" />
-                                      </Button>
-                                    </FormControl>
-                                  </PopoverTrigger>
-                                  <PopoverContent
-                                    className="w-auto p-4"
-                                    align="start"
-                                  >
-                                    <TimePicker
-                                      date={field.value}
-                                      setDate={field.onChange}
-                                    />
-                                  </PopoverContent>
-                                </Popover>
-                                <FormMessage />
-                              </FormItem>
-                            )}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </form>
-                </Form>
               </CreateEventSection>
             </>
           )}

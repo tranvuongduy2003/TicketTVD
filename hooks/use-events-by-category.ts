@@ -7,10 +7,13 @@ export function useEventsByCategory(options?: Partial<SWRConfiguration>) {
   const {
     data: eventStatistic,
     error,
-    isLoading
+    mutate
   } = useSWR(
-    QUERY_KEY.eventStatistic,
-    () => statisticApi.getEventsByCategory(),
+    QUERY_KEY.eventStatisticByCategory,
+    async () => {
+      const { data } = await statisticApi.getEventsByCategory();
+      return data;
+    },
     {
       revalidateOnMount: true,
       revalidateOnFocus: true,
@@ -19,5 +22,10 @@ export function useEventsByCategory(options?: Partial<SWRConfiguration>) {
     }
   );
 
-  return { eventStatistic, error, isLoading };
+  return {
+    eventStatistic,
+    mutate,
+    error,
+    isLoading: !error && !eventStatistic
+  };
 }

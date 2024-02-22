@@ -1,9 +1,9 @@
 import { eventApi } from '@/apis';
-import { DetailItem, EventCard } from '@/components/event';
+import { DetailItem } from '@/components/event';
 import { MainLayout } from '@/components/layout';
-import { Button, Loading, Skeleton, useToast } from '@/components/ui';
+import { Button, Loading, useToast } from '@/components/ui';
 import { MILLISECOND_PER_SECOND } from '@/constants';
-import { useAuth, useEvent, useEvents } from '@/hooks';
+import { useEvent } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { cn } from '@/types';
 import {
@@ -25,20 +25,18 @@ import {
 import { MdOutlineDiscount } from 'react-icons/md';
 
 const EventDetailPage: NextPageWithLayout = () => {
-  const { profile } = useAuth();
   const { toast } = useToast();
   const router = useRouter();
   const { eventId } = router.query;
 
-  const { events, isLoading: eventLoading } = useEvents();
-  const { event, isLoading } = useEvent(Number.parseInt(eventId as string));
+  const { event, isLoading } = useEvent(eventId as string);
 
   const [isShowMoreDesc, setIsShowMoreDesc] = useState<boolean>(false);
   // const [isFavourite, setIsFavourite] = useState<boolean>(false);
 
   async function handleIncreaseFavourire() {
     try {
-      await eventApi.increaseFavourite(Number.parseInt(eventId as string));
+      await eventApi.increaseFavourite(eventId as string);
     } catch (error) {
       console.log(error);
       toast({
@@ -51,7 +49,7 @@ const EventDetailPage: NextPageWithLayout = () => {
 
   async function handleDecreaseFavourire() {
     try {
-      await eventApi.decreaseFavourite(Number.parseInt(eventId as string));
+      await eventApi.decreaseFavourite(eventId as string);
     } catch (error) {
       console.log(error);
       toast({
@@ -82,8 +80,8 @@ const EventDetailPage: NextPageWithLayout = () => {
         />
         <div className="bg-white opacity-95 rounded-m px-28 py-9 flex flex-col items-center">
           <span className="text-center mb-4 text-sm font-bold">
-            {event?.eventDate && new Date(event?.eventDate).getDate()} tháng{' '}
-            {event?.eventDate && new Date(event?.eventDate).getMonth()}
+            {event?.startTime && new Date(event?.startTime).getDate()} tháng{' '}
+            {event?.startTime && new Date(event?.startTime).getMonth()}
           </span>
           <h2 className="text-center text-[40px] font-bold leading-[56px] text-primary-500 mb-4">
             {event?.name}
@@ -117,12 +115,12 @@ const EventDetailPage: NextPageWithLayout = () => {
                   description={
                     <div className="flex flex-col">
                       <span>
-                        {event?.eventDate &&
-                          formatDateToLocaleDate(new Date(event?.eventDate))}
+                        {event?.startTime &&
+                          formatDateToLocaleDate(new Date(event?.startTime))}
                       </span>
                       <span>
-                        {event?.eventDate &&
-                          formatDateToTime(new Date(event?.eventDate))}
+                        {event?.startTime &&
+                          formatDateToTime(new Date(event?.startTime))}
                       </span>
                     </div>
                   }
@@ -258,7 +256,7 @@ const EventDetailPage: NextPageWithLayout = () => {
           </Link>
         </div>
 
-        <div className="grid grid-cols-2 gap-6">
+        {/* <div className="grid grid-cols-2 gap-6">
           {eventLoading ? (
             <>
               <Skeleton className="h-[349px]" />
@@ -273,7 +271,7 @@ const EventDetailPage: NextPageWithLayout = () => {
                 <EventCard key={event.id} event={event} size="large" />
               ))
           )}
-        </div>
+        </div> */}
       </div>
     </div>
   );

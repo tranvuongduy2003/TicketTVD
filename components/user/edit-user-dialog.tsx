@@ -1,18 +1,17 @@
 import { fileApi, userApi } from '@/apis';
 import { MILLISECOND_PER_SECOND, PHONE_REGEX, QUERY_KEY } from '@/constants';
-import { useEvents, usePayments, useUser } from '@/hooks';
+import { useUser } from '@/hooks';
 import { Gender, Role, Status, User } from '@/models';
 import { cn } from '@/types';
 import { compressFile, convertToISODate, getFile, getImageData } from '@/utils';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { vi } from 'date-fns/locale';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { LuCalendar, LuChevronDown, LuUpload } from 'react-icons/lu';
 import { mutate } from 'swr';
 import * as z from 'zod';
-import { ActivateUserCard, DeactivateUserCard } from '../profile';
 import {
   Avatar,
   AvatarFallback,
@@ -20,8 +19,6 @@ import {
   Badge,
   Button,
   Calendar,
-  Card,
-  CardContent,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -78,46 +75,15 @@ export function EditUserDialog({
 }: EditUserDialogProps) {
   const { toast } = useToast();
 
-  const { mutate: userMutate } = useUser(userId ?? '', {
-    revalidateOnFocus: false,
-    revalidateOnMount: false,
-    revalidateOnReconnect: false,
-    refreshWhenOffline: false,
-    refreshWhenHidden: false,
-    refreshInterval: 0
-  });
-  const { payments } = usePayments();
-  const { events } = useEvents();
+  const { user, isLoading, mutate: userMutate } = useUser(userId ?? '');
 
   const [loading, setLoading] = useState<boolean>(false);
-  const [user, setUser] = useState<User>();
-  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isShowExtensiveInfo, setIsShowExtensiveInfo] =
     useState<boolean>(false);
-  const [isShowExtensiveDeactiveUser, setIsShowExtensiveDeactiveUser] =
+  const [isShowExtensiveChangePassword, setIsShowExtensiveChangePassword] =
     useState<boolean>(false);
   const [avatarPreview, setAvatarPreview] = useState<string>('');
   const [avatar, setAvatar] = useState<File | null>();
-
-  const handleFetchUser = useRef<any>(null);
-
-  useEffect(() => {
-    handleFetchUser.current = async () => {
-      setIsLoading(true);
-      try {
-        if (userId) {
-          const user = await userApi.getUserById(userId);
-          setUser(user);
-          setIsLoading(false);
-        }
-      } catch (error) {
-        setIsLoading(false);
-        console.log(error);
-      }
-    };
-    handleFetchUser.current();
-    () => handleFetchUser.current;
-  }, []);
 
   // 1. Define your form.
   const form = useForm<z.infer<typeof formSchema>>({
@@ -144,8 +110,8 @@ export function EditUserDialog({
       // Upload avatar
       if (avatar) {
         const compressedAvatar = await compressFile(avatar);
-        const avatarUrl = await fileApi.uploadFile(compressedAvatar);
-        payload.avatar = avatarUrl.blob.uri;
+        const { data: avatarUrl } = await fileApi.uploadFile(compressedAvatar);
+        payload.avatar = avatarUrl!.blob.uri;
       }
 
       await userApi.updateUser(user?.id ?? '', payload);
@@ -183,41 +149,9 @@ export function EditUserDialog({
           status: user.status
         });
 
-        if (user.role === Role.CUSTOMER) {
-          const totalTickets = payments
-            ?.filter(payment => payment.userId === user.id)
-            ?.reduce(
-              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
-              0
-            );
-          userMutate({ ...user, totalBuyedTickets: totalTickets as number });
-        }
-
-        if (user.role === Role.ORGANIZER) {
-          const totalEvents = events?.filter(
-            event => event.creatorId === user.id
-          );
-
-          const totalTickets = payments
-            ?.filter(
-              payment =>
-                totalEvents?.some(event => event.id === payment.eventId)
-            )
-            .reduce(
-              (curQuantity, curPayment) => curQuantity + curPayment.quantity,
-              0
-            );
-
-          userMutate({
-            ...user,
-            totalEvents: totalEvents?.length as number,
-            totalSoldTickets: totalTickets as number
-          });
-        }
-
         if (user.avatar) {
           setAvatarPreview(user.avatar);
-          const avatarFile = await getFile(user.avatar);
+          const { data: avatarFile } = await getFile(user.avatar);
           setAvatar(avatarFile);
         }
       }
@@ -517,52 +451,21 @@ export function EditUserDialog({
                   <h3 className="text-lg font-semibold">Thông tin thêm</h3>
                   <LuChevronDown />
                 </div>
-                {isShowExtensiveInfo && (
-                  <Card className="pt-6 transition-all">
-                    <CardContent>
-                      {user.totalBuyedTickets !== null && (
-                        <div className="mb-2">
-                          Tổng số vé đã mua: {user.totalBuyedTickets}
-                        </div>
-                      )}
-                      {user.totalEvents !== null && (
-                        <div className="mb-2">
-                          Tổng sự kiện: {user.totalEvents}
-                        </div>
-                      )}
-                      {user.totalSoldTickets !== null && (
-                        <div className="mb-2">
-                          Tổng số vé đã đã bán: {user.totalSoldTickets}
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                )}
               </div>
               <div className="mt-3">
                 <div
-                  className="flex items-center gap-2 cursor-pointer mb-3"
+                  className="flex items-center gap-2 cursor-pointer"
                   onClick={() =>
-                    setIsShowExtensiveDeactiveUser(!isShowExtensiveDeactiveUser)
+                    setIsShowExtensiveChangePassword(
+                      !isShowExtensiveChangePassword
+                    )
                   }
                 >
-                  <h3 className="text-lg font-semibold">
-                    {user.status === Status.DEACTIVE
-                      ? 'Kích hoạt'
-                      : user.status === Status.ACTIVE
-                      ? 'Vô hiệu hóa'
-                      : ''}
+                  <h3 className="text-lg font-semibold mb-3">
+                    Thay đổi mật khẩu
                   </h3>
                   <LuChevronDown />
                 </div>
-                {isShowExtensiveDeactiveUser &&
-                  (user.status === Status.ACTIVE ? (
-                    <DeactivateUserCard userId={user.id} />
-                  ) : user.status === Status.DEACTIVE ? (
-                    <ActivateUserCard userId={user.id} />
-                  ) : (
-                    <></>
-                  ))}
               </div>
             </>
           )}

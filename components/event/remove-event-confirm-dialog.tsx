@@ -18,7 +18,7 @@ import {
 export interface RemoveEventConfirmDialogProps {
   open: boolean;
   onOpenChange(open: boolean): void;
-  eventId: number;
+  eventId: string;
 }
 
 export function RemoveEventConfirmDialog({

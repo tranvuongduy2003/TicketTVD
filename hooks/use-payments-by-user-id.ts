@@ -1,19 +1,25 @@
 import { paymentApi } from '@/apis';
 import { QUERY_KEY } from '@/constants';
+import { useEffect } from 'react';
 import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
+import { FilteringOptions } from './../models/common';
 
 export function usePaymentsByUserId(
-  userId?: string,
+  userId: string,
+  filter?: Partial<FilteringOptions>,
   options?: Partial<SWRConfiguration>
 ) {
   const {
     data: payments,
     error,
-    isLoading
+    mutate
   } = useSWR(
     [QUERY_KEY.payments, 'user', userId],
-    () => paymentApi.getPaymentsByUserId(userId!),
+    async () => {
+      const { data } = await paymentApi.getPaymentsByUserId(userId, filter);
+      return data;
+    },
     {
       revalidateOnMount: true,
       revalidateOnFocus: true,
@@ -22,5 +28,16 @@ export function usePaymentsByUserId(
     }
   );
 
-  return { payments, error, isLoading };
+  useEffect(() => {
+    mutate();
+  }, [
+    filter?.order,
+    filter?.page,
+    filter?.size,
+    filter?.search,
+    filter?.takeAll,
+    mutate
+  ]);
+
+  return { payments, error, isLoading: !error && !payments };
 }

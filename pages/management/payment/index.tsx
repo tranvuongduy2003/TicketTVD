@@ -1,12 +1,23 @@
 import { AdminLayout } from '@/components/layout';
 import { columns } from '@/components/payment';
-import { DataTable } from '@/components/payment/data-table';
-import { usePayments, useUsers } from '@/hooks';
+import { DataTable } from '@/components/ui/data-table';
+import { Loading } from '@/components/ui';
+import { usePayments } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
+import { PaginationState } from '@tanstack/react-table';
+import { useState } from 'react';
 
 const Payment: NextPageWithLayout = () => {
-  const { payments } = usePayments();
-  const { users } = useUsers();
+  const [pagination, setPagination] = useState<PaginationState>({
+    pageIndex: 0,
+    pageSize: 5
+  });
+
+  const { payments, meta, isLoading } = usePayments({
+    page: pagination.pageIndex + 1,
+    size: pagination.pageSize,
+    takeAll: false
+  });
 
   return (
     <div className="w-full px-8 py-20">
@@ -15,16 +26,17 @@ const Payment: NextPageWithLayout = () => {
       </h1>
 
       <div>
-        <DataTable
-          data={
-            payments?.map(item => {
-              const user = users?.find(u => u.id == item.userId);
-
-              return { ...item, user: user };
-            }) || []
-          }
-          columns={columns}
-        />
+        {isLoading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            data={payments || []}
+            columns={columns}
+            pagination={pagination}
+            setPagination={setPagination}
+            meta={meta}
+          />
+        )}
       </div>
     </div>
   );

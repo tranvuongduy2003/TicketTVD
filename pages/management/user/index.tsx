@@ -1,14 +1,49 @@
 import { AdminLayout } from '@/components/layout';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui';
+import {
+  Loading,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger
+} from '@/components/ui';
+import { DataTable } from '@/components/ui/data-table';
 import { customerColumns, organizerColumns } from '@/components/user';
-import { DataTable } from '@/components/user/data-table';
-import { useEvents, usePayments, useUsers } from '@/hooks';
-import { NextPageWithLayout, Role, User } from '@/models';
+import { useCustomers, useOrganizers } from '@/hooks';
+import { NextPageWithLayout } from '@/models';
+import { PaginationState } from '@tanstack/react-table';
+import { useState } from 'react';
 
 const UserPage: NextPageWithLayout = () => {
-  const { users } = useUsers();
-  const { payments } = usePayments();
-  const { events } = useEvents();
+  const [customerPagination, setCustomerPagination] = useState<PaginationState>(
+    {
+      pageIndex: 0,
+      pageSize: 5
+    }
+  );
+  const [organizerPagination, setOrganizerPagination] =
+    useState<PaginationState>({
+      pageIndex: 0,
+      pageSize: 5
+    });
+
+  const {
+    users: customers,
+    meta: customersMeta,
+    isLoading: customersLoading
+  } = useCustomers({
+    page: customerPagination.pageIndex + 1,
+    size: customerPagination.pageSize,
+    takeAll: false
+  });
+  const {
+    users: organizers,
+    meta: organizersMeta,
+    isLoading: organizersLoading
+  } = useOrganizers({
+    page: organizerPagination.pageIndex + 1,
+    size: organizerPagination.pageSize,
+    takeAll: false
+  });
 
   return (
     <div className="w-full px-8 py-20">
@@ -33,57 +68,30 @@ const UserPage: NextPageWithLayout = () => {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="customer">
-            <DataTable
-              data={
-                users
-                  ?.filter((user: User) => user.role === Role.CUSTOMER)
-                  .map(user => {
-                    const totalTickets = payments
-                      ?.filter(payment => payment.userId === user.id)
-                      ?.reduce(
-                        (curQuantity, curPayment) =>
-                          curQuantity + curPayment.quantity,
-                        0
-                      );
-
-                    return { ...user, totalBuyedTickets: totalTickets } as User;
-                  }) ?? []
-              }
-              columns={customerColumns}
-            />
+            {customersLoading ? (
+              <Loading />
+            ) : (
+              <DataTable
+                data={customers ?? []}
+                columns={customerColumns}
+                pagination={customerPagination}
+                setPagination={setCustomerPagination}
+                meta={customersMeta}
+              />
+            )}
           </TabsContent>
           <TabsContent value="organizer">
-            <DataTable
-              data={
-                users
-                  ?.filter((user: User) => user.role === Role.ORGANIZER)
-                  .map(user => {
-                    const totalEvents = events?.filter(
-                      event => event.creatorId === user.id
-                    );
-
-                    const totalTickets = payments
-                      ?.filter(
-                        payment =>
-                          totalEvents?.some(
-                            event => event.id === payment.eventId
-                          )
-                      )
-                      .reduce(
-                        (curQuantity, curPayment) =>
-                          curQuantity + curPayment.quantity,
-                        0
-                      );
-
-                    return {
-                      ...user,
-                      totalEvents: totalEvents?.length,
-                      totalSoldTickets: totalTickets
-                    } as User;
-                  }) ?? []
-              }
-              columns={organizerColumns}
-            />
+            {organizersLoading ? (
+              <Loading />
+            ) : (
+              <DataTable
+                data={organizers ?? []}
+                columns={organizerColumns}
+                pagination={organizerPagination}
+                setPagination={setOrganizerPagination}
+                meta={organizersMeta}
+              />
+            )}
           </TabsContent>
         </Tabs>
       </div>

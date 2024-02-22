@@ -4,9 +4,9 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Event } from '@/models';
 import Image from 'next/image';
-import { DataTableRowActions } from './data-table';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
+import { DataTableColumnHeader } from '../ui/data-table/data-table-column-header';
 import { EventDateTag } from './event-date-tag';
+import { DataTableRowActions } from './data-table-row-actions';
 
 export const columns: ColumnDef<Event>[] = [
   {
@@ -37,12 +37,12 @@ export const columns: ColumnDef<Event>[] = [
     enableHiding: false
   },
   {
-    accessorKey: 'eventDate',
+    accessorKey: 'startTime',
     header: ({ column }) => (
       <DataTableColumnHeader column={column} title="Ngày diễn ra" />
     ),
     cell: ({ row }) => {
-      const createdDate = new Date(row.getValue('eventDate'));
+      const createdDate = new Date(row.getValue('startTime'));
       return (
         <div className="flex items-center justify-between">
           <span>{createdDate.toLocaleDateString('vi-VN')}</span>
@@ -50,7 +50,7 @@ export const columns: ColumnDef<Event>[] = [
         </div>
       );
     },
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -63,7 +63,7 @@ export const columns: ColumnDef<Event>[] = [
         {row.original.ticketSoldQuantity} / {row.getValue('ticketQuantity')}
       </div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -79,7 +79,7 @@ export const columns: ColumnDef<Event>[] = [
         }).format(row.getValue('ticketPrice'))}
       </div>
     ),
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {

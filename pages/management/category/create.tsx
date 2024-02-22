@@ -12,7 +12,7 @@ import {
   Input,
   useToast
 } from '@/components/ui';
-import { Category, NextPageWithLayout } from '@/models';
+import { Category, CreateCategoryPayload, NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
@@ -47,7 +47,7 @@ const CreateCategoryPage: NextPageWithLayout = () => {
     try {
       const { name, color } = values;
 
-      const payload: Partial<Category> = {
+      const payload: CreateCategoryPayload = {
         name: name,
         color: color
       };

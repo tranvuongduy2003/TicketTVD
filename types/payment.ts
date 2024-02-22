@@ -1,7 +1,7 @@
-import { PaymentStatus, Status, TicketStatus } from '@/models';
+import { PaymentStatus, TicketStatus } from '@/models';
 
 export type CheckoutPayload = {
-  eventId: number;
+  eventId: string;
   userId: string;
   tickets: PaymentTicket[];
   totalPrice: number;
@@ -11,12 +11,12 @@ export type CheckoutPayload = {
 };
 
 export type PaymentTicket = {
-  id?: number;
+  id?: string;
   ticketCode?: string;
   ownerName: string;
   ownerEmail: string;
   ownerPhone: string;
-  eventId: number;
+  eventId: string;
   price: number;
   status?: TicketStatus;
   startTime: Date;
@@ -34,7 +34,7 @@ type ContactInfo = {
 export type CreateStripeSessionPayload = {
   approvedUrl: string;
   cancelUrl: string;
-  paymentId: number;
+  paymentId: string;
   tickets: PaymentTicket[];
 };
 
@@ -43,14 +43,14 @@ export type StripeSession = {
   stripeSessionId: string;
   approvedUrl: string;
   cancelUrl: string;
-  paymentId: number;
+  paymentId: string;
   tickets: PaymentTicket[];
 };
 
 export type ValidateStripeSessionResponse = {
-  id: number;
+  id: string;
   quantity: number;
-  eventId: number;
+  eventId: string;
   status: PaymentStatus;
   tickets: PaymentTicket[];
   discount: number;

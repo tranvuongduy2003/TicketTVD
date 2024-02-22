@@ -1,4 +1,4 @@
-export type User = {
+export interface User {
   id: string;
   name: string;
   email: string;
@@ -6,14 +6,23 @@ export type User = {
   dob: Date;
   gender: Gender | string;
   avatar: string;
-  totalBuyedTickets: number;
-  totalEvents: number;
-  totalSoldTickets: number;
   status: Status | string;
   role: Role;
   createdAt: Date;
   updatedAt: Date;
-};
+  totalBoughtTickets?: number;
+  totalEvents?: number;
+  totalSoldTickets?: number;
+}
+
+export interface Customer extends User {
+  totalBoughtTickets: number;
+}
+
+export interface Organizer extends User {
+  totalEvents: number;
+  totalSoldTickets: number;
+}
 
 export enum Gender {
   MALE = 'MALE',
@@ -34,4 +43,12 @@ export enum Status {
 export interface ChangePasswordPayload {
   oldPassword: string;
   newPassword: string;
+}
+
+export interface RegisterPayload {
+  email: string;
+  name: string;
+  phoneNumber: string;
+  password: string;
+  role: Role;
 }

@@ -10,11 +10,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui';
-import { useAuth } from '@/hooks';
 import { Event, Role } from '@/models';
 import Link from 'next/link';
 import { useState } from 'react';
-import { RemoveEventConfirmDialog } from '..';
+import { RemoveEventConfirmDialog } from '.';
+import { useAuth } from '@/hooks';
 
 interface DataTableRowActionsProps<TData> {
   row: Row<TData>;
@@ -47,8 +47,8 @@ export function DataTableRowActions<TData>({
               profile?.role === Role.ADMIN
                 ? `/management/event/${eventId}`
                 : profile?.role === Role.ORGANIZER
-                ? `/event/${eventId}/edit`
-                : ''
+                  ? `/event/${eventId}/edit`
+                  : ''
             }
           >
             <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>

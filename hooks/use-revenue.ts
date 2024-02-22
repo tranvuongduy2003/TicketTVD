@@ -7,13 +7,20 @@ export function useRevuene(options?: Partial<SWRConfiguration>) {
   const {
     data: revenue,
     error,
-    isLoading
-  } = useSWR(QUERY_KEY.revenue, () => statisticApi.getRevenueInYear(), {
-    revalidateOnMount: true,
-    revalidateOnFocus: true,
-    keepPreviousData: true,
-    ...options
-  });
+    mutate
+  } = useSWR(
+    QUERY_KEY.revenue,
+    async () => {
+      const { data } = await statisticApi.getRevenueInYear();
+      return data;
+    },
+    {
+      revalidateOnMount: true,
+      revalidateOnFocus: true,
+      keepPreviousData: true,
+      ...options
+    }
+  );
 
-  return { revenue, error, isLoading };
+  return { revenue, mutate, error, isLoading: !error && !revenue };
 }

@@ -14,7 +14,7 @@ import {
   useToast
 } from '@/components/ui';
 import { useCategory } from '@/hooks';
-import { Category, NextPageWithLayout } from '@/models';
+import { CreateCategoryPayload, NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
@@ -36,7 +36,7 @@ const EditCategoryPage: NextPageWithLayout = () => {
   const { categoryId } = router.query;
 
   const { category, isLoading: categoryLoading } = useCategory(
-    Number.parseInt(categoryId as string)
+    categoryId as string
   );
 
   const [loading, setLoading] = useState<boolean>(false);
@@ -71,15 +71,12 @@ const EditCategoryPage: NextPageWithLayout = () => {
     try {
       const { name, color } = values;
 
-      const payload: Partial<Category> = {
+      const payload: CreateCategoryPayload = {
         name: name,
         color: color
       };
 
-      await categoryApi.updateCategory(
-        Number.parseInt(categoryId as string),
-        payload
-      );
+      await categoryApi.updateCategory(categoryId as string, payload);
 
       setLoading(false);
       toast({

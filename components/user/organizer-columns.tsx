@@ -4,8 +4,8 @@ import { ColumnDef } from '@tanstack/react-table';
 
 import { Status, User } from '@/models';
 import { Avatar, AvatarFallback, AvatarImage, Badge } from '../ui';
-import { DataTableRowActions } from './data-table';
-import { DataTableColumnHeader } from './data-table/data-table-column-header';
+import { DataTableRowActions } from './data-table-row-actions';
+import { DataTableColumnHeader } from '../ui/data-table/data-table-column-header';
 
 export const organizerColumns: ColumnDef<User>[] = [
   {
@@ -60,7 +60,7 @@ export const organizerColumns: ColumnDef<User>[] = [
       const createdDate = new Date(row.getValue('createdAt'));
       return <div>{createdDate.toLocaleDateString('vi-VN')}</div>;
     },
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -69,7 +69,7 @@ export const organizerColumns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Tổng sự kiện" />
     ),
     cell: ({ row }) => <div>{row.getValue('totalEvents')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -78,7 +78,7 @@ export const organizerColumns: ColumnDef<User>[] = [
       <DataTableColumnHeader column={column} title="Tổng vé đã bán" />
     ),
     cell: ({ row }) => <div>{row.getValue('totalSoldTickets')}</div>,
-    enableSorting: true,
+    enableSorting: false,
     enableHiding: false
   },
   {
@@ -138,7 +138,6 @@ export const organizerColumns: ColumnDef<User>[] = [
   //       </div>
   //     );
   //   },
-  //   enableSorting: false,
   //   enableHiding: false
   // }
 ];
