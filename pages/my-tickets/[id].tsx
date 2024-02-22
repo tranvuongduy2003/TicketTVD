@@ -1,8 +1,7 @@
 import { eventApi, paymentApi } from '@/apis';
-import { DetailItem, EventCard } from '@/components/event';
+import { DetailItem } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
-import { Button, Loading, Separator, Skeleton } from '@/components/ui';
-import { useEvents } from '@/hooks';
+import { Button, Loading, Separator } from '@/components/ui';
 import { Event, NextPageWithLayout } from '@/models';
 import { PaymentTicket, ValidateStripeSessionResponse } from '@/types';
 import {

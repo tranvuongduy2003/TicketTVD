@@ -18,13 +18,13 @@ const MyEventsPage: NextPageWithLayout = () => {
     pageSize: 5
   });
 
-  const { events, meta, isLoading } = useEventsByOrganizer(profile!.id, {
+  const { events, meta, isLoading } = useEventsByOrganizer(profile?.id || '', {
     page: pagination.pageIndex + 1,
     size: pagination.pageSize,
     takeAll: false
   });
 
-  const { eventsStatistic } = useEventsStatisticByOrganizer(profile!.id);
+  const { eventsStatistic } = useEventsStatisticByOrganizer(profile?.id || '');
 
   return (
     profile?.id && (

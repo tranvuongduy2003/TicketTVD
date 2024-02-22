@@ -1,15 +1,6 @@
 import { EventSearchBar, FilterBar, SearchEventCard } from '@/components/event';
 import { MainLayout } from '@/components/layout';
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-  Skeleton
-} from '@/components/ui';
+import { Skeleton } from '@/components/ui';
 import { DataTablePagination } from '@/components/ui/data-table';
 import { useCategories, useEvents } from '@/hooks';
 import { Event, NextPageWithLayout } from '@/models';

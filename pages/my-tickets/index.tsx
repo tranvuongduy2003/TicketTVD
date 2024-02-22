@@ -1,4 +1,3 @@
-import { EventCard } from '@/components/event';
 import { CustomerLayout } from '@/components/layout';
 import { MyTicketCard } from '@/components/my-tickets';
 import {
@@ -10,7 +9,7 @@ import {
   Input,
   Skeleton
 } from '@/components/ui';
-import { useEvents, useMyTickets } from '@/hooks';
+import { useMyTickets } from '@/hooks';
 import { NextPageWithLayout } from '@/models';
 import { useProfileStore } from '@/stores';
 import { useRouter } from 'next/router';
@@ -25,7 +24,9 @@ const MyTicketsPage: NextPageWithLayout = () => {
   const [page, setPage] = useState<number>(1);
 
   const { profile } = useProfileStore();
-  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(profile!.id);
+  const { myTickets, isLoading: myTicketsLoading } = useMyTickets(
+    profile?.id || ''
+  );
 
   return (
     <div>
