@@ -3,14 +3,19 @@ import { API_ROUTE } from '@/constants';
 import {
   CreateEventPayload,
   Event,
+  EventFilter,
   FilteringOptions,
   HighlightEvent
 } from '@/models';
+import QueryString from 'qs';
 
 export const eventApi = {
-  getEvents: (options?: Partial<FilteringOptions>) => {
+  getEvents: (options?: Partial<EventFilter>) => {
     return httpRequest.get<Event[]>(API_ROUTE.event, {
-      params: options
+      params: options,
+      paramsSerializer: params => {
+        return QueryString.stringify(params);
+      }
     });
   },
   getNewestEvents: () => {

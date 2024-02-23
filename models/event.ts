@@ -1,6 +1,6 @@
-import { Category, User } from '.';
+import { Category, FilteringOptions, User } from '.';
 
-export enum UserStatus {
+export enum EventStatus {
   UPCOMING = 'UPCOMING',
   OPENING = 'OPENING',
   CLOSED = 'CLOSED'
@@ -26,7 +26,7 @@ export interface Event {
   creatorId: string;
   favourite: number;
   share: number;
-  status: UserStatus;
+  status: EventStatus;
   createdAt: Date;
   updatedAt: Date;
   category?: Category;
@@ -67,4 +67,15 @@ export enum HighlightType {
 export interface HighlightEvent {
   event: Event;
   highlightType: HighlightType;
+}
+
+export enum PriceType {
+  FREE = 'FREE',
+  PAID = 'PAID'
+}
+
+export interface EventFilter extends FilteringOptions {
+  categoryKeys: string[];
+  price: PriceType[];
+  time: EventStatus[];
 }

@@ -46,8 +46,8 @@ export function DataTableRowActions<TData>({
               profile?.role === Role.ADMIN
                 ? `/management/payment/${paymentId}`
                 : profile?.role === Role.ORGANIZER
-                ? `/my-events/${eventId}/payment/${paymentId}`
-                : ''
+                  ? `/my-events/${eventId}/payment/${paymentId}`
+                  : ''
             }
           >
             <DropdownMenuItem>Chỉnh sửa</DropdownMenuItem>

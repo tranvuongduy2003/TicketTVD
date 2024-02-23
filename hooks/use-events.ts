@@ -1,12 +1,12 @@
 import { eventApi } from '@/apis';
 import { QUERY_KEY } from '@/constants';
-import { FilteringOptions } from '@/models';
+import { EventFilter, FilteringOptions } from '@/models';
 import { useEffect } from 'react';
 import useSWR from 'swr';
 import { SWRConfiguration } from 'swr/_internal';
 
 export function useEvents(
-  filter?: Partial<FilteringOptions>,
+  filter?: Partial<EventFilter>,
   options?: Partial<SWRConfiguration>
 ) {
   const { data, mutate, error } = useSWR(
@@ -31,6 +31,9 @@ export function useEvents(
     filter?.size,
     filter?.search,
     filter?.takeAll,
+    filter?.categoryKeys,
+    filter?.price,
+    filter?.time,
     mutate
   ]);
 

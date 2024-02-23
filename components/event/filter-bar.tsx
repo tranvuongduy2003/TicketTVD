@@ -1,7 +1,15 @@
 'use client';
 
+import { Category, Event, EventStatus, PriceType } from '@/models';
 import { cn } from '@/types';
-import { ReactNode, useEffect, useState } from 'react';
+import {
+  Dispatch,
+  ReactNode,
+  SetStateAction,
+  useEffect,
+  useState
+} from 'react';
+import { useForm } from 'react-hook-form';
 import { LuChevronDown } from 'react-icons/lu';
 import {
   Button,
@@ -13,16 +21,19 @@ import {
   FormLabel,
   Separator
 } from '../ui';
-import { Category, Event } from '@/models';
-import { useForm } from 'react-hook-form';
-import clsx from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import css from 'styled-jsx/css';
 
 export interface FilterBarProps {
-  events: Event[];
   categories: Category[];
-  setFilter: Function;
+  setFilter: Dispatch<
+    SetStateAction<
+      | {
+          categoryKeys: string[];
+          priceKeys: PriceType[];
+          timeKeys: EventStatus[];
+        }
+      | undefined
+    >
+  >;
 }
 
 export interface FilterSectionProps {
@@ -32,110 +43,48 @@ export interface FilterSectionProps {
 
 const paidItems = [
   {
-    id: 'free',
+    id: PriceType.FREE,
     label: 'Miễn phí'
   },
   {
-    id: 'paid',
+    id: PriceType.PAID,
     label: 'Trả phí'
   }
 ];
 
 const timeItems = [
   {
-    id: 'upcoming',
+    id: EventStatus.UPCOMING,
     label: 'Sắp diễn ra'
   },
   {
-    id: 'opening',
+    id: EventStatus.OPENING,
     label: 'Đang điễn ra'
   },
   {
-    id: 'closed',
+    id: EventStatus.CLOSED,
     label: 'Đã kết thúc'
   }
 ];
 
-export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
+export function FilterBar({ categories, setFilter }: FilterBarProps) {
   const form = useForm<{ items: string[] }>({
     defaultValues: {
       items: ['all']
     }
   });
 
-  const priceForm = useForm<{ items: string[] }>({
+  const priceForm = useForm<{ items: (PriceType | 'all')[] }>({
     defaultValues: {
       items: ['all']
     }
   });
 
-  const timeForm = useForm<{ items: string[] }>({
+  const timeForm = useForm<{ items: (EventStatus | 'all')[] }>({
     defaultValues: {
       items: ['all']
     }
   });
-
-  const selectEvent = (event: Event) => {
-    if (form.watch().items.length <= 0) {
-      return true;
-    }
-
-    let isCategoryValid = false;
-    let isPriceValid = false;
-    let isTimeValid = false;
-
-    for (let index = 0; index < form.watch().items.length; index++) {
-      const key = form.watch().items[index];
-
-      switch (key) {
-        case 'all':
-          isCategoryValid = true;
-
-        default:
-          if (key === event.categoryId?.toString()) isCategoryValid = true;
-          break;
-      }
-    }
-
-    for (let index = 0; index < priceForm.watch().items.length; index++) {
-      const key = priceForm.watch().items[index];
-
-      switch (key) {
-        case 'all':
-          isPriceValid = true;
-        case 'free':
-          if (event.ticketPrice === 0) isPriceValid = true;
-          break;
-        case 'paid':
-          if (event.ticketPrice > 0) isPriceValid = true;
-          break;
-      }
-    }
-
-    for (let index = 0; index < timeForm.watch().items.length; index++) {
-      const key = timeForm.watch().items[index];
-
-      switch (key) {
-        case 'all':
-          isTimeValid = true;
-        case 'upcoming':
-          if (new Date(event.startTime) > new Date()) isTimeValid = true;
-          break;
-        case 'opening':
-          if (
-            new Date() > new Date(event.startTime) &&
-            new Date() < new Date(event.endTime)
-          )
-            isTimeValid = true;
-          break;
-        case 'closed':
-          if (new Date() > new Date(event.startTime)) isTimeValid = true;
-          break;
-      }
-    }
-
-    return isCategoryValid && isPriceValid && isTimeValid;
-  };
 
   useEffect(() => {
     (() => {
@@ -408,7 +357,7 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
             className="text-primary-500 w-full"
             onClick={() => {
               form.reset();
-              setFilter(events);
+              setFilter(undefined);
             }}
           >
             Xóa tất cả
@@ -416,7 +365,17 @@ export function FilterBar({ categories, setFilter, events }: FilterBarProps) {
           <Button
             type="button"
             className="text-white w-full"
-            onClick={() => setFilter(events.filter(item => selectEvent(item)))}
+            onClick={() => {
+              setFilter({
+                categoryKeys: form.watch().items.filter(item => item !== 'all'),
+                priceKeys: priceForm
+                  .watch()
+                  .items.filter(item => item !== 'all') as PriceType[],
+                timeKeys: timeForm
+                  .watch()
+                  .items.filter(item => item !== 'all') as EventStatus[]
+              });
+            }}
           >
             Áp dụng
           </Button>

@@ -15,7 +15,7 @@ import {
 import { MILLISECOND_PER_SECOND } from '@/constants';
 import { PASSWORD_REGEX, PHONE_REGEX } from '@/constants/regex';
 import { useAuth } from '@/hooks';
-import { NextPageWithLayout, Role, UserStatus } from '@/models';
+import { NextPageWithLayout, Role, EventStatus } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import Image from 'next/image';
 import Link from 'next/link';

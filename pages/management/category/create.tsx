@@ -12,7 +12,7 @@ import {
   Input,
   useToast
 } from '@/components/ui';
-import { Category, CreateCategoryPayload, NextPageWithLayout } from '@/models';
+import { CreateCategoryPayload, NextPageWithLayout } from '@/models';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useRouter } from 'next/router';
 import { useState } from 'react';

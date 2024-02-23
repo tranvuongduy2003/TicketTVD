@@ -16,6 +16,11 @@ export function EventSearchBar({ onSearch }: EventSearchBarProps) {
       <LuSearch className="text-primary text-2xl mx-[15px]" />
       <Input
         ref={inputRef}
+        onChange={e => {
+          if ((!e.target.value || e.target.value === '') && onSearch) {
+            onSearch();
+          }
+        }}
         type="text"
         placeholder="TÌm những sự kiện mà bạn hứng thú"
         className="border-none rounded-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"

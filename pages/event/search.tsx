@@ -3,7 +3,7 @@ import { MainLayout } from '@/components/layout';
 import { Skeleton } from '@/components/ui';
 import { DataTablePagination } from '@/components/ui/data-table';
 import { useCategories, useEvents } from '@/hooks';
-import { Event, NextPageWithLayout } from '@/models';
+import { Event, EventStatus, NextPageWithLayout, PriceType } from '@/models';
 import {
   PaginationState,
   getCoreRowModel,
@@ -18,7 +18,11 @@ const EventSearchPage: NextPageWithLayout = () => {
     pageIndex: 0,
     pageSize: PER_PAGE
   });
-  const [filteredEvents, setFilteredEvents] = useState<Event[]>();
+  const [filterKeys, setFilterKeys] = useState<{
+    categoryKeys: string[];
+    priceKeys: PriceType[];
+    timeKeys: EventStatus[];
+  }>();
   const [searchEventValue, setSearchEventValue] = useState<string>();
 
   const {
@@ -29,6 +33,9 @@ const EventSearchPage: NextPageWithLayout = () => {
     search: searchEventValue,
     takeAll: false,
     page: pagination.pageIndex + 1,
+    categoryKeys: filterKeys?.categoryKeys,
+    price: filterKeys?.priceKeys,
+    time: filterKeys?.timeKeys,
     size: PER_PAGE
   });
   const { categories, isLoading: categoryLoading } = useCategories();
@@ -44,10 +51,6 @@ const EventSearchPage: NextPageWithLayout = () => {
     onPaginationChange: setPagination,
     getCoreRowModel: getCoreRowModel()
   });
-
-  useEffect(() => {
-    setFilteredEvents(events);
-  }, [events]);
 
   return (
     <div className="py-14 px-32">
@@ -68,11 +71,7 @@ const EventSearchPage: NextPageWithLayout = () => {
           ) : (
             categories &&
             categories.length > 0 && (
-              <FilterBar
-                events={events || []}
-                setFilter={setFilteredEvents}
-                categories={categories}
-              />
+              <FilterBar setFilter={setFilterKeys} categories={categories} />
             )
           )}
         </div>
